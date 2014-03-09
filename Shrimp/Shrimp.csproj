@@ -1,0 +1,752 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B8C86773-5EE6-4994-AD7C-6A19DABBAD90}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Shrimp</RootNamespace>
+    <AssemblyName>Shrimp</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Shrimp.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>346F6962C41838828CD0ED2C17265EA6D318E597</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>Shrimp_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>shrimp.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="KeraLua, Version=1.3.0.0, Culture=neutral, PublicKeyToken=04d04586786c6f34, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\KeraLua.dll</HintPath>
+    </Reference>
+    <Reference Include="NLua, Version=1.3.0.0, Culture=neutral, PublicKeyToken=8df2ab518030ea95, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\NLua.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.90.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Account\AccountManager.cs" />
+    <Compile Include="ControlParts\ActionControl.cs" />
+    <Compile Include="ControlParts\AuthPanel\AccountRegister.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ControlParts\AuthPanel\AccountRegister.Designer.cs">
+      <DependentUpon>AccountRegister.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\ContextMenus\Tabs\TabControlContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ControlParts\ContextMenus\Tabs\TabControlContextMenu.Designer.cs">
+      <DependentUpon>TabControlContextMenu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\ContextMenus\TextMenu\SelUserContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ControlParts\ContextMenus\TextMenu\SelUserContextMenu.Designer.cs">
+      <DependentUpon>SelUserContextMenu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\ContextMenus\TweetBox\TweetBoxContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ControlParts\ContextMenus\TweetBox\TweetBoxContextMenu.Designer.cs">
+      <DependentUpon>TweetBoxContextMenu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\IControl.cs" />
+    <Compile Include="ControlParts\Popup\SearchForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ControlParts\Popup\SearchForm.Designer.cs">
+      <DependentUpon>SearchForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\Popup\StatusPopup.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ControlParts\Popup\StatusPopup.Designer.cs">
+      <DependentUpon>StatusPopup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\Popup\TabNameChange.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ControlParts\Popup\TabNameChange.Designer.cs">
+      <DependentUpon>TabNameChange.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\Popup\ToolStripButtonPopup.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ControlParts\TabSetting\DeliverFromUser.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlParts\TabSetting\DeliverFromUser.Designer.cs">
+      <DependentUpon>DeliverFromUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\TabSetting\MuteTweet.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlParts\TabSetting\MuteTweet.Designer.cs">
+      <DependentUpon>MuteTweet.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\TabSetting\ListSelectView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlParts\TabSetting\ListSelectView.Designer.cs">
+      <DependentUpon>ListSelectView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\TabSetting\NotifySelectView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlParts\TabSetting\NotifySelectView.Designer.cs">
+      <DependentUpon>NotifySelectView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\TabSetting\TabCategory.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlParts\TabSetting\TabCategory.Designer.cs">
+      <DependentUpon>TabCategory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\TabSetting\TabSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ControlParts\TabSetting\TabSettings.Designer.cs">
+      <DependentUpon>TabSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\Tabs\ShrimpTabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ControlParts\Tabs\ShrimpTabs.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ControlParts\Tabs\TabControls.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ControlParts\Tabs\TabControlsCollection.cs" />
+    <Compile Include="ControlParts\Tabs\TabDelivery.cs" />
+    <Compile Include="ControlParts\Tabs\TabDeliveryCollection.cs" />
+    <Compile Include="ControlParts\Tabs\TabManager.cs" />
+    <Compile Include="ControlParts\Tabs\TimelineCategory.cs" />
+    <Compile Include="ControlParts\Timeline\Animation\AnimationControl.cs" />
+    <Compile Include="ControlParts\Timeline\Animation\AnimationDelegate.cs" />
+    <Compile Include="ControlParts\Timeline\Animation\IAnimation.cs" />
+    <Compile Include="ControlParts\Timeline\Animation\ImageViewAnimation.cs" />
+    <Compile Include="ControlParts\Timeline\Animation\TabChangeAnimation.cs" />
+    <Compile Include="ControlParts\Timeline\Animation\TweetInsertAnimation.cs" />
+    <Compile Include="ControlParts\Timeline\Animation\TweetNotifyAnimation.cs" />
+    <Compile Include="ControlParts\Timeline\Click\ClickCells.cs" />
+    <Compile Include="ControlParts\Timeline\Click\ClickCellsData.cs" />
+    <Compile Include="ControlParts\Timeline\Click\ShortcutAction.cs" />
+    <Compile Include="ControlParts\Timeline\Click\ShortcutActionCollection.cs" />
+    <Compile Include="ControlParts\Timeline\Click\ShortcutKey.cs" />
+    <Compile Include="ControlParts\Timeline\Draw\Cells\DrawTweetCell.cs" />
+    <Compile Include="ControlParts\Timeline\Draw\Cells\IDrawCell.cs" />
+    <Compile Include="ControlParts\Timeline\ITimeline.cs" />
+    <Compile Include="ControlParts\Timeline\Select\SelectControl.cs" />
+    <Compile Include="ControlParts\ContextMenus\TextMenu\SelTextContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ControlParts\ContextMenus\TextMenu\SelTextContextMenu.Designer.cs">
+      <DependentUpon>SelTextContextMenu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\ContextMenus\TextMenu\SelTweetContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ControlParts\ContextMenus\TextMenu\SelTweetContextMenu.Designer.cs">
+      <DependentUpon>SelTweetContextMenu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\Timeline\TimelineCells.cs" />
+    <Compile Include="ControlParts\Timeline\TimelineCellsTweetID.cs" />
+    <Compile Include="ControlParts\Timeline\TimelineControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlParts\Timeline\TimelineControl.Designer.cs">
+      <DependentUpon>TimelineControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\Timeline\Timeline.cs" />
+    <Compile Include="ControlParts\Timeline\Draw\TweetDraw.cs" />
+    <Compile Include="ControlParts\TweetBox\AutoCompleteForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ControlParts\TweetBox\AutoCompleteForm.Designer.cs">
+      <DependentUpon>AutoCompleteForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\TweetBox\TextBoxAC.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ControlParts\TweetBox\TweetBoxControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlParts\TweetBox\TweetBoxControl.Designer.cs">
+      <DependentUpon>TweetBoxControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\User\Users.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlParts\User\Users.Designer.cs">
+      <DependentUpon>Users.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\User\UserStatusCells.cs" />
+    <Compile Include="ControlParts\User\UserStatusCellSize.cs" />
+    <Compile Include="ControlParts\User\UserStatusControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlParts\User\UserStatusControl.Designer.cs">
+      <DependentUpon>UserStatusControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\User\UserStatusControlBase.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlParts\User\UserStatusControlBase.Designer.cs">
+      <DependentUpon>UserStatusControlBase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ControlParts\User\UserInformation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ControlParts\User\UserInformation.Designer.cs">
+      <DependentUpon>UserInformation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DynamicJson.cs" />
+    <Compile Include="Log\LogControl.cs" />
+    <Compile Include="Log\LogViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Log\LogViewer.Designer.cs">
+      <DependentUpon>LogViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Module\APIIntroduction.cs" />
+    <Compile Include="Module\Base64Util.cs" />
+    <Compile Include="Module\ButtonImage.cs" />
+    <Compile Include="Module\EncryptSerializer.cs" />
+    <Compile Include="Module\Forms\ShrimpSpeed.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Module\FormUtil\MessageBoxEX.cs" />
+    <Compile Include="Module\Parts\Cell.cs" />
+    <Compile Include="Module\Parts\MathUtil.cs" />
+    <Compile Include="Module\Parts\ShrimpStatusBar\StreamState.cs" />
+    <Compile Include="Module\Queue\IQueue.cs" />
+    <Compile Include="Module\Queue\TabQueue.cs" />
+    <Compile Include="Module\Queue\TabQueueData.cs" />
+    <Compile Include="Module\Queue\UserStreamQueue.cs" />
+    <Compile Include="Module\Queue\UserStreamQueueData.cs" />
+    <Compile Include="Module\SendingTweet.cs" />
+    <Compile Include="Module\SettingSerializer.cs" />
+    <Compile Include="Module\StringUtil\kanaxs.cs" />
+    <Compile Include="Module\ThumURLUtil.cs" />
+    <Compile Include="Module\TimeUtil\TimeSpanUtil.cs" />
+    <Compile Include="Module\ImageUtil\ImageCache.cs" />
+    <Compile Include="Module\ImageUtil\ImageCacheData.cs" />
+    <Compile Include="Module\ImageUtil\ImageGenerateUtil.cs" />
+    <Compile Include="Module\Parts\ButtonSize.cs" />
+    <Compile Include="Module\Parts\DrawCellSize.cs" />
+    <Compile Include="Module\Parts\DrawTextUtil.cs" />
+    <Compile Include="Module\RegexUtil.cs" />
+    <Compile Include="Module\TimelineUtil.cs" />
+    <Compile Include="Plugin\Ref\OnCreatedTweetHook.cs" />
+    <Compile Include="Plugin\Ref\OnRegistTweetBoxMenuHook.cs" />
+    <Compile Include="Plugin\Ref\OnTweetSendingHook.cs" />
+    <Compile Include="Plugin\Ref\ShrimpVersion.cs" />
+    <Compile Include="Plugin\Ref\TweetBoxValue.cs" />
+    <Compile Include="Query\QueryParser.cs" />
+    <Compile Include="Setting\BackgroundImage.cs" />
+    <Compile Include="Setting\CrollingTimeline.cs" />
+    <Compile Include="Setting\Database.cs" />
+    <Compile Include="Setting\FormSetting.cs" />
+    <Compile Include="Setting\Forms\AccountManagement.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\AccountManagement.designer.cs">
+      <DependentUpon>AccountManagement.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Forms\ISettingForm.cs" />
+    <Compile Include="Setting\Forms\NewColor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\NewColor.Designer.cs">
+      <DependentUpon>NewColor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Forms\SettingUtils.cs" />
+    <Compile Include="Setting\Forms\ShortcutKey.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\ShortcutKey.Designer.cs">
+      <DependentUpon>ShortcutKey.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Forms\ShortcutKeyEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\ShortcutKeyEdit.Designer.cs">
+      <DependentUpon>ShortcutKeyEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Forms\ShrimpInfo.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\ShrimpInfo.Designer.cs">
+      <DependentUpon>ShrimpInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Forms\TimelineColor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\TimelineColor.Designer.cs">
+      <DependentUpon>TimelineColor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Forms\TabColor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\TabColor.Designer.cs">
+      <DependentUpon>TabColor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Forms\TabSetting.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\TabSetting.Designer.cs">
+      <DependentUpon>TabSetting.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Forms\UserStreamSetting.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\UserStreamSetting.Designer.cs">
+      <DependentUpon>UserStreamSetting.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Forms\GlobalMute.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\GlobalMute.Designer.cs">
+      <DependentUpon>GlobalMute.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\ObjectXML\BrushEX.cs" />
+    <Compile Include="Setting\ObjectXML\IEx.cs" />
+    <Compile Include="Setting\ShortcutKeys.cs" />
+    <Compile Include="Setting\ObjectXML\TabColorManager.cs" />
+    <Compile Include="Setting\ResourceImages.cs" />
+    <Compile Include="Setting\Forms\SettingForms.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\SettingForms.designer.cs">
+      <DependentUpon>SettingForms.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Forms\TimelineManagement.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\TimelineManagement.designer.cs">
+      <DependentUpon>TimelineManagement.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Setting\Search.cs" />
+    <Compile Include="Setting\ShrimpSettings.cs" />
+    <Compile Include="Setting\TabColors.cs" />
+    <Compile Include="Setting\Update.cs" />
+    <Compile Include="Setting\UserStream.cs" />
+    <Compile Include="Setting\ColorOwner.cs" />
+    <Compile Include="SQL\DBControl.cs" />
+    <Compile Include="Twitter\Entities\TwitterEntities.cs" />
+    <Compile Include="Twitter\Entities\TwitterEntitiesHashTags.cs" />
+    <Compile Include="Twitter\Entities\TwitterEntitiesMedia.cs" />
+    <Compile Include="Twitter\Entities\TwitterEntitiesPosition.cs" />
+    <Compile Include="Twitter\Entities\TwitterEntitiesURLs.cs" />
+    <Compile Include="Twitter\Entities\TwitterEntitiesUserMentions.cs" />
+    <Compile Include="Twitter\Entities\TwitterEntitiesUtil.cs" />
+    <Compile Include="Twitter\REST\DirectMessage\DirectMessages.cs" />
+    <Compile Include="Twitter\REST\Authorize\OAuthorize.cs" />
+    <Compile Include="Twitter\REST\Help\ConfigStatus.cs" />
+    <Compile Include="Twitter\REST\Help\help.cs" />
+    <Compile Include="Twitter\REST\ITwitterWorker.cs" />
+    <Compile Include="Twitter\REST\List\listData.cs" />
+    <Compile Include="Twitter\REST\List\listDataCollection.cs" />
+    <Compile Include="Twitter\REST\List\lists.cs" />
+    <Compile Include="Twitter\REST\Search\search.cs" />
+    <Compile Include="Twitter\REST\Tweets\Statuses.cs" />
+    <Compile Include="Twitter\REST\TwitterWorker.cs" />
+    <Compile Include="Twitter\REST\Users\AboutUsers.cs" />
+    <Compile Include="Twitter\Status\NotifyFilter.cs" />
+    <Compile Include="Twitter\Status\StatusChecker\TwitterStatusChecker.cs" />
+    <Compile Include="Twitter\Status\TwitterDirectMessageStatus.cs" />
+    <Compile Include="Twitter\Status\TwitterNotifyStatus.cs" />
+    <Compile Include="Twitter\Streaming\UserStreamThreadData.cs" />
+    <Compile Include="Twitter\TwitterConnect.cs" />
+    <Compile Include="Twitter\TwitterInfo.cs" />
+    <Compile Include="Twitter\Status\TwitterStatus.cs" />
+    <Compile Include="Twitter\Status\TwitterUserStatus.cs" />
+    <Compile Include="Plugin\Plugins.cs" />
+    <Compile Include="Plugin\Plugin.cs" />
+    <Compile Include="Setting\BombDetect.cs" />
+    <Compile Include="Setting\Colors.cs" />
+    <Compile Include="Setting\Fonts.cs" />
+    <Compile Include="Setting\ISetting.cs" />
+    <Compile Include="Setting\SettingOwner.cs" />
+    <Compile Include="Setting\Timeline.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shrimp.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Shrimp.Designer.cs">
+      <DependentUpon>Shrimp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Twitter\OAuthBase.cs" />
+    <Compile Include="Twitter\REST\Timelines\Timelines.cs" />
+    <Compile Include="Twitter\REST\TwitterCompletedEventArgs.cs" />
+    <Compile Include="Twitter\Streaming\UserStreaming.cs" />
+    <Compile Include="Twitter\Streaming\UserStreamingEventArgs.cs" />
+    <Compile Include="Twitter\TwitterSocket.cs" />
+    <Compile Include="Twitter\TwitterUpdateImage.cs" />
+    <Compile Include="Update\CheckUpdate.cs" />
+    <Compile Include="Update\PatchInfo.cs" />
+    <Compile Include="Update\UpdateForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Update\UpdateForm.Designer.cs">
+      <DependentUpon>UpdateForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Win32API\user32.cs" />
+    <EmbeddedResource Include="ControlParts\AuthPanel\AccountRegister.resx">
+      <DependentUpon>AccountRegister.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\ContextMenus\Tabs\TabControlContextMenu.resx">
+      <DependentUpon>TabControlContextMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\ContextMenus\TextMenu\SelTextContextMenu.resx">
+      <DependentUpon>SelTextContextMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\ContextMenus\TextMenu\SelTweetContextMenu.resx">
+      <DependentUpon>SelTweetContextMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\ContextMenus\TextMenu\SelUserContextMenu.resx">
+      <DependentUpon>SelUserContextMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\ContextMenus\TweetBox\TweetBoxContextMenu.resx">
+      <DependentUpon>TweetBoxContextMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\Popup\SearchForm.resx">
+      <DependentUpon>SearchForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\Popup\StatusPopup.resx">
+      <DependentUpon>StatusPopup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\Popup\TabNameChange.resx">
+      <DependentUpon>TabNameChange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\TabSetting\DeliverFromUser.resx">
+      <DependentUpon>DeliverFromUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\TabSetting\MuteTweet.resx">
+      <DependentUpon>MuteTweet.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\TabSetting\ListSelectView.resx">
+      <DependentUpon>ListSelectView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\TabSetting\NotifySelectView.resx">
+      <DependentUpon>NotifySelectView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\TabSetting\TabCategory.resx">
+      <DependentUpon>TabCategory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\TabSetting\TabSettings.resx">
+      <DependentUpon>TabSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\Timeline\TimelineControl.resx">
+      <DependentUpon>TimelineControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\TweetBox\AutoCompleteForm.resx">
+      <DependentUpon>AutoCompleteForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\TweetBox\TweetBoxControl.resx">
+      <DependentUpon>TweetBoxControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\User\Users.resx">
+      <DependentUpon>Users.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\User\UserStatusControl.resx">
+      <DependentUpon>UserStatusControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\User\UserStatusControlBase.resx">
+      <DependentUpon>UserStatusControlBase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ControlParts\User\UserInformation.resx">
+      <DependentUpon>UserInformation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Log\LogViewer.resx">
+      <DependentUpon>LogViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="Setting\Forms\AccountManagement.resx">
+      <DependentUpon>AccountManagement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setting\Forms\NewColor.resx">
+      <DependentUpon>NewColor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setting\Forms\SettingForms.resx">
+      <DependentUpon>SettingForms.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setting\Forms\ShortcutKey.resx">
+      <DependentUpon>ShortcutKey.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setting\Forms\ShortcutKeyEdit.resx">
+      <DependentUpon>ShortcutKeyEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setting\Forms\ShrimpInfo.resx">
+      <DependentUpon>ShrimpInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setting\Forms\TimelineColor.resx">
+      <DependentUpon>TimelineColor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setting\Forms\TimelineManagement.resx">
+      <DependentUpon>TimelineManagement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setting\Forms\TabColor.resx">
+      <DependentUpon>TabColor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setting\Forms\TabSetting.resx">
+      <DependentUpon>TabSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setting\Forms\UserStreamSetting.resx">
+      <DependentUpon>UserStreamSetting.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setting\Forms\GlobalMute.resx">
+      <DependentUpon>GlobalMute.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Shrimp.resx">
+      <DependentUpon>Shrimp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Update\UpdateForm.resx">
+      <DependentUpon>UpdateForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config" />
+    <Compile Include="Plugin\IPlugin.cs" />
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
+    <None Include="packages.config" />
+    <None Include="Properties\app.manifest" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\protected.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 および x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows インストーラー 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\c_fav.png" />
+    <EmbeddedResource Include="Images\c_reply.png" />
+    <EmbeddedResource Include="Images\c_retweet.png" />
+    <EmbeddedResource Include="Images\c_unfav.png" />
+    <EmbeddedResource Include="Images\fav.png" />
+    <EmbeddedResource Include="Images\reply.png" />
+    <EmbeddedResource Include="Images\retweet.png" />
+    <EmbeddedResource Include="Images\unfav.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\hash.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\atmark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\hash_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\atmark_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\image_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\hash_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\atmark_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\image_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\in_reply_status_id_arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\settings.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\draft_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\loading.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\loading.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\loadingAnime.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ebi.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\image_16_w.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\image_16_c.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\user.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\search.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\favs.png" />
+    <EmbeddedResource Include="Images\replies.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\block.png" />
+    <EmbeddedResource Include="Images\bookmark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\remove.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\conversation.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Images\text.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\shrimp.png" />
+    <Content Include="shrimp.ico" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,58 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using Shrimp.Setting.ObjectXML;
+
+namespace Shrimp.Setting.Forms
+{
+    public partial class TabSetting : UserControl, ISettingForm, IDisposable
+    {
+		private Dictionary<string, object> settings;
+        private Shrimp.OnChangedTabControlAlignment OnTabAlignChanged;
+        private bool RefWait = true;
+        public TabSetting ( Shrimp.OnChangedTabControlAlignment OnTabAlignChanged )
+        {
+            InitializeComponent ();
+            this.OnTabAlignChanged = OnTabAlignChanged;
+			settings = Setting.Timeline.save();
+            SettingReflection ();
+            RefWait = false;
+        }
+
+        public void SettingReflection ()
+        {
+            this.TabAlignmentSelect.SelectedIndex = (int)this.settings["ShrimpTabAlignment"];
+			this.TabAnimationSelect.SelectedIndex = (int)this.settings["TabChangeAnimation"];
+			this.TabSettingCheckedListBox.SetItemChecked ( 0, (bool)this.settings["SelectTabWhenCreatedTab"] );
+
+        }
+
+        public void SaveReflection ()
+        {
+			Setting.Timeline.load(this.settings);
+        }
+
+		private void TabAnimationSelect_SelectedIndexChanged(object sender, EventArgs e)
+		{
+            if ( RefWait )
+                return;
+			this.settings["TabChangeAnimation"] = this.TabAnimationSelect.SelectedIndex;
+            this.settings["ShrimpTabAlignment"] = this.TabAlignmentSelect.SelectedIndex;
+
+            OnTabAlignChanged.Invoke ( (TabAlignment)this.TabAlignmentSelect.SelectedIndex );
+			this.SaveReflection();
+		}
+
+		private void TabSettingCheckedListBox_ItemCheck(object sender, ItemCheckEventArgs e)
+		{
+			if ( e.Index == 0 )
+				this.settings["SelectTabWhenCreatedTab"] = ( e.NewValue == CheckState.Checked ? true : false );
+			this.SaveReflection();
+		}
+	}
+}
