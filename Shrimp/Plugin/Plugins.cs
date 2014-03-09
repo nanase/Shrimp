@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using Shrimp.Log;
-using System.Reflection;
-using Shrimp.Plugin.Ref;
 using NLua;
+using Shrimp.Log;
+using Shrimp.Plugin.Ref;
 using Shrimp.Setting;
 
 namespace Shrimp.Plugin
@@ -23,7 +20,7 @@ namespace Shrimp.Plugin
 
         #endregion
 
-        
+
         #region 静的メソッドの最適化リスト
         private Dictionary<Plugin, LuaFunction> OnTweetSendingList,
             OnRegistTweetboxMenuList, OnCreatedTweetList;
@@ -31,11 +28,11 @@ namespace Shrimp.Plugin
 
         #region コンストラクタ
 
-        public Plugins ()
+        public Plugins()
         {
-            this.OnTweetSendingList = new Dictionary<Plugin, LuaFunction> ();
-            this.OnRegistTweetboxMenuList = new Dictionary<Plugin, LuaFunction> ();
-            this.OnCreatedTweetList = new Dictionary<Plugin, LuaFunction> ();
+            this.OnTweetSendingList = new Dictionary<Plugin, LuaFunction>();
+            this.OnRegistTweetboxMenuList = new Dictionary<Plugin, LuaFunction>();
+            this.OnCreatedTweetList = new Dictionary<Plugin, LuaFunction>();
         }
 
         /// <summary>
@@ -46,71 +43,71 @@ namespace Shrimp.Plugin
             foreach (Plugin p in plugins)
             {
                 p.unloadPlugin();
-                p.Dispose ();
+                p.Dispose();
             }
         }
 
         #endregion
 
-        public void LoadPlugins ()
+        public void LoadPlugins()
         {
-            plugins = new List<Plugin> ();
-            LogControl.AddLogs ( "プラグインの読み込みが開始されました\nDir: " + ShrimpSettings.PluginDirectory + "" );
+            plugins = new List<Plugin>();
+            LogControl.AddLogs("プラグインの読み込みが開始されました\nDir: " + ShrimpSettings.PluginDirectory + "");
 
-            if ( !Directory.Exists ( ShrimpSettings.PluginDirectory ) )
+            if (!Directory.Exists(ShrimpSettings.PluginDirectory))
             {
                 //  ディレクトリないんですが・・・
-                Directory.CreateDirectory ( ShrimpSettings.PluginDirectory );
+                Directory.CreateDirectory(ShrimpSettings.PluginDirectory);
             }
             //  読み込み
-            string[] pluginPath = Directory.GetFiles ( ShrimpSettings.PluginDirectory, "*.lua" );
-            foreach ( string plugin in pluginPath )
+            string[] pluginPath = Directory.GetFiles(ShrimpSettings.PluginDirectory, "*.lua");
+            foreach (string plugin in pluginPath)
             {
-                string fileName = Path.GetFileName ( plugin );
-                LogControl.AddLogs ( ""+ plugin +"を読み込みます。" );
-                var newPlugin = new Plugin ();
+                string fileName = Path.GetFileName(plugin);
+                LogControl.AddLogs("" + plugin + "を読み込みます。");
+                var newPlugin = new Plugin();
                 string err = null;
-                if ( ( err = newPlugin.loadPlugin ( plugin ) ) != null )
+                if ((err = newPlugin.loadPlugin(plugin)) != null)
                 {
-                    LogControl.AddLogs ( "プラグインを読み込み中に、エラーが発生しました\n" + err + "" );
+                    LogControl.AddLogs("プラグインを読み込み中に、エラーが発生しました\n" + err + "");
                     continue;
                 }
-                if ( !newPlugin.initializePlugin () )
+                if (!newPlugin.initializePlugin())
                 {
-                    LogControl.AddLogs ( "プラグインを初期化中に、エラーが発生しました\n" + fileName + "" );
+                    LogControl.AddLogs("プラグインを初期化中に、エラーが発生しました\n" + fileName + "");
                     continue;
                 }
-                plugins.Add ( newPlugin );
+                plugins.Add(newPlugin);
             }
-            LogControl.AddLogs ( "プラグインの関数をチェック中です・・・" );
-            CheckPlugin ();
-            LogControl.AddLogs ( "プラグインの関数をチェックしました。" );
-            LogControl.AddLogs ( "プラグインの読み込み完了" );
+            LogControl.AddLogs("プラグインの関数をチェック中です・・・");
+            CheckPlugin();
+            LogControl.AddLogs("プラグインの関数をチェックしました。");
+            LogControl.AddLogs("プラグインの読み込み完了");
         }
 
         /// <summary>
         /// プラグインの登録されている関数をチェックする
         /// </summary>
-        private void CheckPlugin ()
+        private void CheckPlugin()
         {
             try
             {
-                foreach ( Plugin p in plugins )
+                foreach (Plugin p in plugins)
                 {
-                    LuaFunction l = p.OnTweetSendingReady ();
-                    if ( l != null )
-                        this.OnTweetSendingList.Add ( p, l );
-                    l = p.OnRegistTweetBoxMenuReady ();
-                    if ( l != null )
-                        this.OnRegistTweetboxMenuList.Add ( p, l );
-                    l = p.OnCreatedTweetReady ();
-                    if ( l != null )
-                        this.OnCreatedTweetList.Add ( p, l );
+                    LuaFunction l = p.OnTweetSendingReady();
+                    if (l != null)
+                        this.OnTweetSendingList.Add(p, l);
+                    l = p.OnRegistTweetBoxMenuReady();
+                    if (l != null)
+                        this.OnRegistTweetboxMenuList.Add(p, l);
+                    l = p.OnCreatedTweetReady();
+                    if (l != null)
+                        this.OnCreatedTweetList.Add(p, l);
                 }
             }
-            catch ( Exception e )
+            catch (Exception e)
             {
-                LogControl.AddLogs ( "プラグインの関数をチェック中に、エラーが発生しました\n" + e.Message + "" );
+                LogControl.AddLogs("プラグインの関数をチェック中に、エラーが発生しました\n" + e.Message + "");
                 return;
             }
         }
@@ -118,20 +115,20 @@ namespace Shrimp.Plugin
         /// <summary>
         /// ツイートが送信される直前に呼び出して
         /// </summary>
-        public void OnTweetSendingHook ( OnTweetSendingHook hook )
+        public void OnTweetSendingHook(OnTweetSendingHook hook)
         {
-            if ( this.OnTweetSendingList.Count == 0 )
+            if (this.OnTweetSendingList.Count == 0)
                 return;
             try
             {
-                foreach ( KeyValuePair<Plugin, LuaFunction> p in this.OnTweetSendingList )
+                foreach (KeyValuePair<Plugin, LuaFunction> p in this.OnTweetSendingList)
                 {
-                    p.Key.OnTweetSending ( p.Value, hook );
+                    p.Key.OnTweetSending(p.Value, hook);
                 }
             }
-            catch ( Exception e )
+            catch (Exception e)
             {
-                LogControl.AddLogs ( "プラグインを実行中に、エラーが発生しました\n" + e.Message + "" );
+                LogControl.AddLogs("プラグインを実行中に、エラーが発生しました\n" + e.Message + "");
                 return;
             }
         }
@@ -139,23 +136,23 @@ namespace Shrimp.Plugin
         /// <summary>
         /// ツイートが送信される直前に呼び出して
         /// </summary>
-        public List<OnRegistTweetBoxMenuHook> OnRegistTweetBoxMenuHook ()
+        public List<OnRegistTweetBoxMenuHook> OnRegistTweetBoxMenuHook()
         {
-            List<OnRegistTweetBoxMenuHook> result = new List<OnRegistTweetBoxMenuHook> ();
-            if ( this.OnRegistTweetboxMenuList.Count == 0 )
+            List<OnRegistTweetBoxMenuHook> result = new List<OnRegistTweetBoxMenuHook>();
+            if (this.OnRegistTweetboxMenuList.Count == 0)
                 return result;
             try
             {
-                foreach ( KeyValuePair<Plugin, LuaFunction> p in this.OnRegistTweetboxMenuList )
+                foreach (KeyValuePair<Plugin, LuaFunction> p in this.OnRegistTweetboxMenuList)
                 {
-                    OnRegistTweetBoxMenuHook hook = new OnRegistTweetBoxMenuHook ( p.Key );
-                    p.Key.OnRegistTweetBoxMenu ( p.Value, hook );
-                    result.Add ( hook );
+                    OnRegistTweetBoxMenuHook hook = new OnRegistTweetBoxMenuHook(p.Key);
+                    p.Key.OnRegistTweetBoxMenu(p.Value, hook);
+                    result.Add(hook);
                 }
             }
-            catch ( Exception e )
+            catch (Exception e)
             {
-                LogControl.AddLogs ( "プラグインを実行中に、エラーが発生しました\n" + e.Message + "" );
+                LogControl.AddLogs("プラグインを実行中に、エラーが発生しました\n" + e.Message + "");
                 return null;
             }
             return result;
@@ -164,32 +161,32 @@ namespace Shrimp.Plugin
         /// <summary>
         /// ツイートが生成された直前に呼び出します
         /// </summary>
-        public void OnCreatedTweet ( OnCreatedTweetHook hook )
+        public void OnCreatedTweet(OnCreatedTweetHook hook)
         {
-            List<OnRegistTweetBoxMenuHook> result = new List<OnRegistTweetBoxMenuHook> ();
-            if ( this.OnCreatedTweetList.Count == 0 )
+            List<OnRegistTweetBoxMenuHook> result = new List<OnRegistTweetBoxMenuHook>();
+            if (this.OnCreatedTweetList.Count == 0)
                 return;
             try
             {
-                foreach ( KeyValuePair<Plugin, LuaFunction> p in this.OnCreatedTweetList )
+                foreach (KeyValuePair<Plugin, LuaFunction> p in this.OnCreatedTweetList)
                 {
-                    p.Key.OnCreatedTweet ( p.Value, hook );
+                    p.Key.OnCreatedTweet(p.Value, hook);
                 }
             }
-            catch ( Exception e )
+            catch (Exception e)
             {
-                LogControl.AddLogs ( "プラグインを実行中に、エラーが発生しました\n" + e.Message + "" );
+                LogControl.AddLogs("プラグインを実行中に、エラーが発生しました\n" + e.Message + "");
             }
         }
 
         /// <summary>
         /// プラグインが初期化されるときに呼び出して
         /// </summary>
-        public void InitializePlugin ()
+        public void InitializePlugin()
         {
-            foreach ( Plugin p in plugins )
+            foreach (Plugin p in plugins)
             {
-                p.initializePlugin ();
+                p.initializePlugin();
             }
         }
     }

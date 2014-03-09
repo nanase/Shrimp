@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Shrimp.Setting
 {
@@ -16,22 +13,22 @@ namespace Shrimp.Setting
         /// <summary>
         /// 静的コンストラクタ
         /// </summary>
-        public static void initialize ()
+        public static void initialize()
         {
             BackgroundImagePath = null;
         }
 
-        public static void load ( Dictionary<string, string> obj )
+        public static void load(Dictionary<string, string> obj)
         {
-            if ( obj == null )
+            if (obj == null)
                 return;
-            if ( obj.ContainsKey ( "BackgroundImagePath" ) )
-                BackgroundImagePath = (string)( (string)obj["BackgroundImagePath"] ).Clone ();
+            if (obj.ContainsKey("BackgroundImagePath"))
+                BackgroundImagePath = (string)((string)obj["BackgroundImagePath"]).Clone();
         }
 
-        public static Dictionary<string, string> save ()
+        public static Dictionary<string, string> save()
         {
-            var dest = new Dictionary<string, string> ();
+            var dest = new Dictionary<string, string>();
             dest["BackgroundImagePath"] = BackgroundImagePath;
             return dest;
         }

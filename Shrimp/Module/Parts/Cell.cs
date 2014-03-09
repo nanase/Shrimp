@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
 
 namespace Shrimp.Module.Parts
@@ -11,21 +8,21 @@ namespace Shrimp.Module.Parts
     /// </summary>
     public class Cell
     {
-        public Cell ()
+        public Cell()
         {
         }
 
-		/// <summary>
-		/// セルを初期化します
-		/// </summary>
-		public void initialize()
-		{
-			this.Position = Point.Empty;
-			this.Size = Size.Empty;
-			this.Detail = String.Empty;
-		}
+        /// <summary>
+        /// セルを初期化します
+        /// </summary>
+        public void initialize()
+        {
+            this.Position = Point.Empty;
+            this.Size = Size.Empty;
+            this.Detail = String.Empty;
+        }
 
-        public Cell ( Point point, Size size, string detail )
+        public Cell(Point point, Size size, string detail)
         {
             this.Position = point;
             this.Size = size;
@@ -57,7 +54,7 @@ namespace Shrimp.Module.Parts
         {
             get
             {
-                return new Rectangle ( Position, Size );
+                return new Rectangle(Position, Size);
             }
         }
 
@@ -69,5 +66,5 @@ namespace Shrimp.Module.Parts
             get;
             set;
         }
-	}
+    }
 }

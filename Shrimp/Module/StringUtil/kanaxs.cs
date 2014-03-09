@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Shrimp.Module.StringUtil
 {
     class kanaxs
@@ -12,7 +8,7 @@ namespace Shrimp.Module.StringUtil
         /// </summary>
         public sealed class Kana
         {
-            private Kana ()
+            private Kana()
             {
             }
 
@@ -21,27 +17,27 @@ namespace Shrimp.Module.StringUtil
             /// </summary>
             /// <param name="str">変換する String。</param>
             /// <returns>変換された String。</returns>
-            public static string ToHiragana ( string str )
+            public static string ToHiragana(string str)
             {
-                if ( str == null || str.Length == 0 )
+                if (str == null || str.Length == 0)
                 {
                     return str;
                 }
 
-                char[] cs = str.ToCharArray ();
+                char[] cs = str.ToCharArray();
                 int f = cs.Length;
 
-                for ( int i = 0; i < f; i++ )
+                for (int i = 0; i < f; i++)
                 {
                     char c = cs[i];
                     // ァ(0x30A1) ～ ヶ(0x30F6)
-                    if ( 'ァ' <= c && c <= 'ヶ' )
+                    if ('ァ' <= c && c <= 'ヶ')
                     {
-                        cs[i] = (char)( c - 0x0060 );
+                        cs[i] = (char)(c - 0x0060);
                     }
                 }
 
-                return new string ( cs );
+                return new string(cs);
             }
 
             /// <summary>
@@ -49,27 +45,27 @@ namespace Shrimp.Module.StringUtil
             /// </summary>
             /// <param name="str">変換する String。</param>
             /// <returns>変換された String。</returns>
-            public static string ToKatakana ( string str )
+            public static string ToKatakana(string str)
             {
-                if ( str == null || str.Length == 0 )
+                if (str == null || str.Length == 0)
                 {
                     return str;
                 }
 
-                char[] cs = str.ToCharArray ();
+                char[] cs = str.ToCharArray();
                 int f = cs.Length;
 
-                for ( int i = 0; i < f; i++ )
+                for (int i = 0; i < f; i++)
                 {
                     char c = cs[i];
                     // ぁ(0x3041) ～ ゖ(0x3096)
-                    if ( 'ぁ' <= c && c <= 'ゖ' )
+                    if ('ぁ' <= c && c <= 'ゖ')
                     {
-                        cs[i] = (char)( c + 0x0060 );
+                        cs[i] = (char)(c + 0x0060);
                     }
                 }
 
-                return new string ( cs );
+                return new string(cs);
             }
 
             /// <summary>
@@ -77,32 +73,32 @@ namespace Shrimp.Module.StringUtil
             /// </summary>
             /// <param name="str">変換する String。</param>
             /// <returns>変換された String。</returns>
-            public static string ToHankaku ( string str )
+            public static string ToHankaku(string str)
             {
-                if ( str == null || str.Length == 0 )
+                if (str == null || str.Length == 0)
                 {
                     return str;
                 }
 
-                char[] cs = str.ToCharArray ();
+                char[] cs = str.ToCharArray();
                 int f = cs.Length;
 
-                for ( int i = 0; i < f; i++ )
+                for (int i = 0; i < f; i++)
                 {
                     char c = cs[i];
                     // ！(0xFF01) ～ ～(0xFF5E)
-                    if ( '！' <= c && c <= '～' )
+                    if ('！' <= c && c <= '～')
                     {
-                        cs[i] = (char)( c - 0xFEE0 );
+                        cs[i] = (char)(c - 0xFEE0);
                     }
                     // 全角スペース(0x3000) -> 半角スペース(0x0020)
-                    else if ( c == '　' )
+                    else if (c == '　')
                     {
                         cs[i] = ' ';
                     }
                 }
 
-                return new string ( cs );
+                return new string(cs);
             }
 
             /// <summary>
@@ -110,32 +106,32 @@ namespace Shrimp.Module.StringUtil
             /// </summary>
             /// <param name="str">変換する String。</param>
             /// <returns>変換された String。</returns>
-            public static string ToZenkaku ( string str )
+            public static string ToZenkaku(string str)
             {
-                if ( str == null || str.Length == 0 )
+                if (str == null || str.Length == 0)
                 {
                     return str;
                 }
 
-                char[] cs = str.ToCharArray ();
+                char[] cs = str.ToCharArray();
                 int f = cs.Length;
 
-                for ( int i = 0; i < f; i++ )
+                for (int i = 0; i < f; i++)
                 {
                     char c = cs[i];
                     // !(0x0021) ～ ~(0x007E)
-                    if ( '!' <= c && c <= '~' )
+                    if ('!' <= c && c <= '~')
                     {
-                        cs[i] = (char)( c + 0xFEE0 );
+                        cs[i] = (char)(c + 0xFEE0);
                     }
                     // 半角スペース(0x0020) -> 全角スペース(0x3000)
-                    else if ( c == ' ' )
+                    else if (c == ' ')
                     {
                         cs[i] = '　';
                     }
                 }
 
-                return new string ( cs );
+                return new string(cs);
             }
 
             /// <summary>
@@ -143,9 +139,9 @@ namespace Shrimp.Module.StringUtil
             /// </summary>
             /// <param name="str">変換する String。</param>
             /// <returns>変換された String。</returns>
-            public static string ToHankakuKana ( string str )
+            public static string ToHankakuKana(string str)
             {
-                if ( str == null || str.Length == 0 )
+                if (str == null || str.Length == 0)
                 {
                     return str;
                 }
@@ -155,29 +151,29 @@ namespace Shrimp.Module.StringUtil
 
                 int f = str.Length;
 
-                for ( int i = 0; i < f; i++ )
+                for (int i = 0; i < f; i++)
                 {
                     char c = str[i];
                     // ァ(0x30A1) ～ ー(0x30FC)
-                    if ( 'ァ' <= c && c <= 'ー' )
+                    if ('ァ' <= c && c <= 'ー')
                     {
-                        char m = ConvertToHankakuKanaChar ( c );
-                        if ( m != '\0' )
+                        char m = ConvertToHankakuKanaChar(c);
+                        if (m != '\0')
                         {
                             cs[len++] = m;
                         }
                         // カ(0x30AB) ～ ド(0x30C9)
-                        else if ( 'カ' <= c && c <= 'ド' )
+                        else if ('カ' <= c && c <= 'ド')
                         {
-                            cs[len++] = ConvertToHankakuKanaChar ( (char)( c - 1 ) );
+                            cs[len++] = ConvertToHankakuKanaChar((char)(c - 1));
                             cs[len++] = 'ﾞ';
                         }
                         // ハ(0x30CF) ～ ポ(0x30DD)
-                        else if ( 'ハ' <= c && c <= 'ポ' )
+                        else if ('ハ' <= c && c <= 'ポ')
                         {
                             int mod3 = c % 3;
-                            cs[len++] = ConvertToHankakuKanaChar ( (char)( c - mod3 ) );
-                            cs[len++] = ( mod3 == 1 ? 'ﾞ' : 'ﾟ' );
+                            cs[len++] = ConvertToHankakuKanaChar((char)(c - mod3));
+                            cs[len++] = (mod3 == 1 ? 'ﾞ' : 'ﾟ');
                         }
                         else
                         {
@@ -190,7 +186,7 @@ namespace Shrimp.Module.StringUtil
                     }
                 }
 
-                return new string ( cs, 0, len );
+                return new string(cs, 0, len);
             }
 
             /// <summary>
@@ -198,31 +194,31 @@ namespace Shrimp.Module.StringUtil
             /// </summary>
             /// <param name="str">変換する String。</param>
             /// <returns>変換された String。</returns>
-            public static string ToZenkakuKana ( string str )
+            public static string ToZenkakuKana(string str)
             {
-                if ( str == null || str.Length == 0 )
+                if (str == null || str.Length == 0)
                 {
                     return str;
                 }
 
-                char[] cs = str.ToCharArray ();
+                char[] cs = str.ToCharArray();
                 int f = str.Length;
 
-                for ( int i = 0; i < f; i++ )
+                for (int i = 0; i < f; i++)
                 {
                     char c = cs[i];
                     // ｦ(0xFF66) ～ ﾟ(0xFF9F)
-                    if ( 'ｦ' <= c && c <= 'ﾟ' )
+                    if ('ｦ' <= c && c <= 'ﾟ')
                     {
-                        char m = ConvertToZenkakuKanaChar ( c );
-                        if ( m != '\0' )
+                        char m = ConvertToZenkakuKanaChar(c);
+                        if (m != '\0')
                         {
                             cs[i] = m;
                         }
                     }
                 }
 
-                return new string ( cs );
+                return new string(cs);
             }
 
             /// <summary>
@@ -230,9 +226,9 @@ namespace Shrimp.Module.StringUtil
             /// </summary>
             /// <param name="str">変換する String。</param>
             /// <returns>変換された String。</returns>
-            public static string ToPadding ( string str )
+            public static string ToPadding(string str)
             {
-                if ( str == null || str.Length == 0 )
+                if (str == null || str.Length == 0)
                 {
                     return str;
                 }
@@ -242,12 +238,12 @@ namespace Shrimp.Module.StringUtil
 
                 int f = str.Length - 1;
 
-                for ( int i = f; 0 <= i; i-- )
+                for (int i = f; 0 <= i; i--)
                 {
                     char c = str[i];
 
                     // ゛(0x309B) 濁点
-                    if ( c == '゛' && 0 < i )
+                    if (c == '゛' && 0 < i)
                     {
                         char c2 = str[i - 1];
                         int mod2 = c2 % 2;
@@ -259,14 +255,14 @@ namespace Shrimp.Module.StringUtil
                         // ツ(0x30C4) ～ ド(0x30C9)
                         // は(0x306F) ～ ぽ(0x307D)
                         // ハ(0x30CF) ～ ポ(0x30DD)
-                        if ( ( 'か' <= c2 && c2 <= 'ぢ' && mod2 == 1 ) ||
-                            ( 'カ' <= c2 && c2 <= 'ヂ' && mod2 == 1 ) ||
-                            ( 'つ' <= c2 && c2 <= 'ど' && mod2 == 0 ) ||
-                            ( 'ツ' <= c2 && c2 <= 'ド' && mod2 == 0 ) ||
-                            ( 'は' <= c2 && c2 <= 'ぽ' && mod3 == 0 ) ||
-                            ( 'ハ' <= c2 && c2 <= 'ポ' && mod3 == 0 ) )
+                        if (('か' <= c2 && c2 <= 'ぢ' && mod2 == 1) ||
+                            ('カ' <= c2 && c2 <= 'ヂ' && mod2 == 1) ||
+                            ('つ' <= c2 && c2 <= 'ど' && mod2 == 0) ||
+                            ('ツ' <= c2 && c2 <= 'ド' && mod2 == 0) ||
+                            ('は' <= c2 && c2 <= 'ぽ' && mod3 == 0) ||
+                            ('ハ' <= c2 && c2 <= 'ポ' && mod3 == 0))
                         {
-                            cs[pos--] = (char)( c2 + 1 );
+                            cs[pos--] = (char)(c2 + 1);
                             i--;
                         }
                         else
@@ -275,17 +271,17 @@ namespace Shrimp.Module.StringUtil
                         }
                     }
                     // ゜(0x309C) 半濁点
-                    else if ( c == '゜' && 0 < i )
+                    else if (c == '゜' && 0 < i)
                     {
                         char c2 = str[i - 1];
                         int mod3 = c2 % 3;
 
                         // は(0x306F) ～ ぽ(0x307D)
                         // ハ(0x30CF) ～ ポ(0x30DD)
-                        if ( ( 'は' <= c2 && c2 <= 'ぽ' && mod3 == 0 ) ||
-                            ( 'ハ' <= c2 && c2 <= 'ポ' && mod3 == 0 ) )
+                        if (('は' <= c2 && c2 <= 'ぽ' && mod3 == 0) ||
+                            ('ハ' <= c2 && c2 <= 'ポ' && mod3 == 0))
                         {
-                            cs[pos--] = (char)( c2 + 2 );
+                            cs[pos--] = (char)(c2 + 2);
                             i--;
                         }
                         else
@@ -299,12 +295,12 @@ namespace Shrimp.Module.StringUtil
                     }
                 }
 
-                return new string ( cs, pos + 1, cs.Length - pos - 1 );
+                return new string(cs, pos + 1, cs.Length - pos - 1);
             }
 
-            private static char ConvertToHankakuKanaChar ( char zenkakuChar )
+            private static char ConvertToHankakuKanaChar(char zenkakuChar)
             {
-                switch ( zenkakuChar )
+                switch (zenkakuChar)
                 {
                     case 'ァ':
                         return 'ｧ';
@@ -426,9 +422,9 @@ namespace Shrimp.Module.StringUtil
                 }
             }
 
-            private static char ConvertToZenkakuKanaChar ( char hankakuChar )
+            private static char ConvertToZenkakuKanaChar(char hankakuChar)
             {
-                switch ( hankakuChar )
+                switch (hankakuChar)
                 {
                     case 'ｦ':
                         return 'ヲ';

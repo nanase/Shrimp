@@ -1,60 +1,56 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Net;
 using Shrimp.Twitter.Entities;
-using System.Globalization;
 
 namespace Shrimp.Twitter.Status
 {
     public class TwitterUserStatus : ICloneable
     {
-        public TwitterUserStatus ()
+        public TwitterUserStatus()
         {
         }
 
-        public TwitterUserStatus ( string[] sqlData, int offset )
+        public TwitterUserStatus(string[] sqlData, int offset)
         {
             //  offset = 19
-            this.created_at = DateTime.ParseExact (
+            this.created_at = DateTime.ParseExact(
                 sqlData[offset],
                 "ddd MMM dd HH:mm:ss K yyyy",
-                System.Globalization.DateTimeFormatInfo.InvariantInfo );
-            this.id = Decimal.Parse ( sqlData[offset+1] );
-            this.name = (string)sqlData[offset+2].Clone ();
-            this.screen_name = (string)sqlData[offset+3].Clone ();
-            this.location = (string)sqlData[offset+4].Clone ();
-            this.url = (string)sqlData[offset+5].Clone ();
-            this.description = (string)sqlData[offset+6].Clone ();
-            this.entities = new TwitterEntities ( this.description );
-            this.profile_image_url = (string)sqlData[offset+7].Clone ();
-            this.favourites_count = Decimal.Parse ( sqlData[offset+8] );
-            this.followers_count = Decimal.Parse ( sqlData[offset+9] );
-            this.friends_count = Decimal.Parse ( sqlData[offset+10] );
-            this.listed_count = Decimal.Parse ( sqlData[offset+11] );
-            this.protected_account = ( int.Parse ( sqlData[offset+12] ) == 0 ? false : true );
-            this.statuses_count = Decimal.Parse ( sqlData[offset+13] );
+                System.Globalization.DateTimeFormatInfo.InvariantInfo);
+            this.id = Decimal.Parse(sqlData[offset + 1]);
+            this.name = (string)sqlData[offset + 2].Clone();
+            this.screen_name = (string)sqlData[offset + 3].Clone();
+            this.location = (string)sqlData[offset + 4].Clone();
+            this.url = (string)sqlData[offset + 5].Clone();
+            this.description = (string)sqlData[offset + 6].Clone();
+            this.entities = new TwitterEntities(this.description);
+            this.profile_image_url = (string)sqlData[offset + 7].Clone();
+            this.favourites_count = Decimal.Parse(sqlData[offset + 8]);
+            this.followers_count = Decimal.Parse(sqlData[offset + 9]);
+            this.friends_count = Decimal.Parse(sqlData[offset + 10]);
+            this.listed_count = Decimal.Parse(sqlData[offset + 11]);
+            this.protected_account = (int.Parse(sqlData[offset + 12]) == 0 ? false : true);
+            this.statuses_count = Decimal.Parse(sqlData[offset + 13]);
         }
 
-        public TwitterUserStatus ( dynamic raw_data )
+        public TwitterUserStatus(dynamic raw_data)
         {
-            this.created_at = DateTime.ParseExact (
+            this.created_at = DateTime.ParseExact(
                                         raw_data.created_at,
                                         "ddd MMM dd HH:mm:ss K yyyy",
-                                        System.Globalization.DateTimeFormatInfo.InvariantInfo );
-            this.id = Decimal.Parse ( raw_data.id_str );
+                                        System.Globalization.DateTimeFormatInfo.InvariantInfo);
+            this.id = Decimal.Parse(raw_data.id_str);
             this.name = raw_data.name;
             this.screen_name = raw_data.screen_name;
             this.location = raw_data.location;
             this.url = raw_data.url;
-            this.description = WebUtility.HtmlDecode ( ( raw_data.description == null ? "" : raw_data.description ) );
-            this.entities = new TwitterEntities ( this.description );
+            this.description = WebUtility.HtmlDecode((raw_data.description == null ? "" : raw_data.description));
+            this.entities = new TwitterEntities(this.description);
             this.profile_image_url = raw_data.profile_image_url;
             this.favourites_count = (decimal)raw_data.favourites_count;
             this.followers_count = (decimal)raw_data.followers_count;
             this.friends_count = (decimal)raw_data.friends_count;
-            this.listed_count = (decimal)( raw_data.listed_count == null ? 0 : raw_data.listed_count );
+            this.listed_count = (decimal)(raw_data.listed_count == null ? 0 : raw_data.listed_count);
             this.protected_account = (bool)raw_data["protected"];
             this.statuses_count = (decimal)raw_data.statuses_count;
         }
@@ -238,24 +234,24 @@ namespace Shrimp.Twitter.Status
             set;
         }
 
-        public object Clone ()
+        public object Clone()
         {
-            var dest = new TwitterUserStatus ();
+            var dest = new TwitterUserStatus();
             dest.created_at = this.created_at;
-            dest.description = (string)this.description.Clone ();
+            dest.description = (string)this.description.Clone();
             dest.favourites_count = this.favourites_count;
             dest.followers_count = this.followers_count;
             dest.friends_count = this.friends_count;
             dest.id = this.id;
             dest.listed_count = this.listed_count;
-            dest.location = ( this.location != null ? (string)this.location.Clone () : "" );
-            dest.name = (string)this.name.Clone ();
-            dest.profile_image_url = (string)this.profile_image_url.Clone ();
+            dest.location = (this.location != null ? (string)this.location.Clone() : "");
+            dest.name = (string)this.name.Clone();
+            dest.profile_image_url = (string)this.profile_image_url.Clone();
             dest.protected_account = this.protected_account;
-            dest.screen_name = (string)this.screen_name.Clone ();
+            dest.screen_name = (string)this.screen_name.Clone();
             dest.statuses_count = this.statuses_count;
-            dest.url = ( this.url != null ? (string)this.url.Clone () : "" );
-            dest.entities = new TwitterEntities ( dest.description );
+            dest.url = (this.url != null ? (string)this.url.Clone() : "");
+            dest.entities = new TwitterEntities(dest.description);
             return dest;
         }
     }

@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Shrimp.ControlParts.Tabs;
-using OAuth;
-using Codeplex.Data;
-using Shrimp.Twitter.Status;
 using System.Net;
 using System.Threading;
+using Codeplex.Data;
+using OAuth;
 using Shrimp.Log;
 
 namespace Shrimp.Twitter.REST
@@ -16,22 +12,22 @@ namespace Shrimp.Twitter.REST
     {
         #region 定義
         // 　ロード処理の跡の個別処理をこのデリゲートで管理します
-        public delegate void TwitterCompletedProcessDelegate ( object data );
+        public delegate void TwitterCompletedProcessDelegate(object data);
         /// <summary>
         /// エラーのとき、渡されるデリゲートです
         /// </summary>
         /// <param name="e"></param>
-        public delegate void TwitterErrorProcessDelegate ( TwitterCompletedEventArgs e );
+        public delegate void TwitterErrorProcessDelegate(TwitterCompletedEventArgs e);
         //  ロード完了時のイベントハンドラ
-        public delegate void loadCompletedEventHandler ( object sender, TwitterCompletedEventArgs e );
+        public delegate void loadCompletedEventHandler(object sender, TwitterCompletedEventArgs e);
         public event loadCompletedEventHandler loadCompletedEvent;
 
-        private delegate void loadWorkerDelegate ( TwitterInfo srv, string Method, workerResultDelegate workerResult,
-            TwitterCompletedProcessDelegate completedProcess, string url, List<OAuthBase.QueryParameter> q );
-        public delegate object workerResultDelegate ( dynamic obj );
+        private delegate void loadWorkerDelegate(TwitterInfo srv, string Method, workerResultDelegate workerResult,
+            TwitterCompletedProcessDelegate completedProcess, string url, List<OAuthBase.QueryParameter> q);
+        public delegate object workerResultDelegate(dynamic obj);
         //private Thread thread;
-        private List<object[]> objs = new List<object[]> ();
-        private object lockObjects = new object ();
+        private List<object[]> objs = new List<object[]>();
+        private object lockObjects = new object();
         #endregion
         /*
         public TwitterWorker ()
@@ -65,13 +61,13 @@ namespace Shrimp.Twitter.REST
         /// <summary>
         /// ロードシンク
         /// </summary>
-        protected Thread loadAsync ( TwitterInfo srv, string Method, workerResultDelegate workerResult,
-            TwitterCompletedProcessDelegate completedProcess, TwitterErrorProcessDelegate errorProcess, 
-            string url, List<OAuthBase.QueryParameter> q, TwitterUpdateImage image = null )
+        protected Thread loadAsync(TwitterInfo srv, string Method, workerResultDelegate workerResult,
+            TwitterCompletedProcessDelegate completedProcess, TwitterErrorProcessDelegate errorProcess,
+            string url, List<OAuthBase.QueryParameter> q, TwitterUpdateImage image = null)
         {
-            if ( srv == null || Method == null || workerResult == null )
+            if (srv == null || Method == null || workerResult == null)
                 return null;
-            var thread = new Thread ( new ParameterizedThreadStart ( loadWorker ) );
+            var thread = new Thread(new ParameterizedThreadStart(loadWorker));
             //loadWorkerDelegate l = new loadWorkerDelegate (loadWorker);
             //IAsyncResult res = l.BeginInvoke ( srv, Method, workerResult, completedProcess, url, q, null, null );
             /*
@@ -81,7 +77,7 @@ namespace Shrimp.Twitter.REST
             }
              */
             //return res;
-            thread.Start ( new object[] { srv, Method, workerResult, completedProcess, errorProcess, url, q, image } );
+            thread.Start(new object[] { srv, Method, workerResult, completedProcess, errorProcess, url, q, image });
             return thread;
         }
 
@@ -89,7 +85,7 @@ namespace Shrimp.Twitter.REST
         /// 非同期で行われる処理の内容
         /// </summary>
         /// <param name="srv"></param>
-        private void loadWorker ( object obj )
+        private void loadWorker(object obj)
         {
             object[] obs = obj as object[];
             TwitterInfo srv = obs[0] as TwitterInfo;
@@ -100,59 +96,59 @@ namespace Shrimp.Twitter.REST
             string url = obs[5] as string;
             List<OAuthBase.QueryParameter> q = obs[6] as List<OAuthBase.QueryParameter>;
             TwitterUpdateImage objects = obs[7] as TwitterUpdateImage;
-        /*
-        private void loadWorker ( TwitterInfo srv, string Method, workerResultDelegate workerResult,
-            TwitterCompletedProcessDelegate completedProcess, string url, List<OAuthBase.QueryParameter> q )
-        {
-        */
+            /*
+            private void loadWorker ( TwitterInfo srv, string Method, workerResultDelegate workerResult,
+                TwitterCompletedProcessDelegate completedProcess, string url, List<OAuthBase.QueryParameter> q )
+            {
+            */
             TwitterSocket res;
-            if ( Method == "GET" )
-                res = srv.get ( url, q );
+            if (Method == "GET")
+                res = srv.get(url, q);
             else
-                res = srv.post ( url, q, objects );
+                res = srv.post(url, q, objects);
 
             dynamic data = null;
-            if ( res.rawdata != null && url != "oauth/request_token" && url != "oauth/access_token" )
+            if (res.rawdata != null && url != "oauth/request_token" && url != "oauth/access_token")
             {
                 try
                 {
-                    data = DynamicJson.Parse ( res.rawdata );
+                    data = DynamicJson.Parse(res.rawdata);
                 }
-                catch ( Exception e )
+                catch (Exception e)
                 {
-                    LogControl.AddLogs ( "DynamicJSONをパース中にエラーが発生しました\n" + e.StackTrace );
+                    LogControl.AddLogs("DynamicJSONをパース中にエラーが発生しました\n" + e.StackTrace);
                     res.status_code = HttpStatusCode.BadGateway;
                 }
             }
-            else if ( url == "oauth/request_token" || url == "oauth/access_token" )
+            else if (url == "oauth/request_token" || url == "oauth/access_token")
             {
                 //  ああ・・・
                 data = res;
             }
-            OnLoadCompleted ( completedProcess, errorProcess, new TwitterCompletedEventArgs ( srv, res.status_code, workerResult.Invoke ( data ), res ) );
+            OnLoadCompleted(completedProcess, errorProcess, new TwitterCompletedEventArgs(srv, res.status_code, workerResult.Invoke(data), res));
         }
 
 
-        protected virtual void OnLoadCompleted ( TwitterCompletedProcessDelegate completedProcess,
-               TwitterErrorProcessDelegate errorProcess, TwitterCompletedEventArgs e )
+        protected virtual void OnLoadCompleted(TwitterCompletedProcessDelegate completedProcess,
+               TwitterErrorProcessDelegate errorProcess, TwitterCompletedEventArgs e)
         {
-            if ( loadCompletedEvent != null )
-                loadCompletedEvent.BeginInvoke ( completedProcess, e, null, null );
-            if ( e.error_code == HttpStatusCode.OK && e.data != null && completedProcess != null )
-                completedProcess.BeginInvoke ( e.data, null, null );
-            if ( e.error_code != HttpStatusCode.OK && errorProcess != null )
-                errorProcess.BeginInvoke ( e, null, null );
+            if (loadCompletedEvent != null)
+                loadCompletedEvent.BeginInvoke(completedProcess, e, null, null);
+            if (e.error_code == HttpStatusCode.OK && e.data != null && completedProcess != null)
+                completedProcess.BeginInvoke(e.data, null, null);
+            if (e.error_code != HttpStatusCode.OK && errorProcess != null)
+                errorProcess.BeginInvoke(e, null, null);
         }
 
         /// <summary>
         /// ハンドルを待機する
         /// </summary>
         /// <param name="res"></param>
-        protected void WaitResult ( Thread res )
+        protected void WaitResult(Thread res)
         {
-            if ( res != null && res.IsAlive )
+            if (res != null && res.IsAlive)
             {
-                res.Abort ();
+                res.Abort();
             }
         }
     }

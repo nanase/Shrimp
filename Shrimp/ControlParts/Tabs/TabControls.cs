@@ -1,20 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using Shrimp.ControlParts.ContextMenus.Tabs;
-using Shrimp.ControlParts.Timeline;
-using Shrimp.Twitter.Status;
-using Shrimp.ControlParts.User;
-using System.Xml.Serialization;
-using Shrimp.SQL;
-using Shrimp.Twitter;
-using Shrimp.Query;
 using System.Drawing;
-using Shrimp.Win32API;
-using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Xml.Serialization;
+using Shrimp.ControlParts.Timeline;
+using Shrimp.ControlParts.User;
+using Shrimp.Query;
+using Shrimp.SQL;
+using Shrimp.Twitter.Status;
 
 namespace Shrimp.ControlParts.Tabs
 {
@@ -38,27 +32,27 @@ namespace Shrimp.ControlParts.Tabs
         private int unreadNum = 0;
 
         private DBControl db;
-        private QueryParser shrimpQueryParser = new QueryParser ();
+        private QueryParser shrimpQueryParser = new QueryParser();
         /// <summary>
         /// 読み込む際のデリゲート
         /// </summary>
-        public delegate void OnReloadDelegate ( TabControls tab );
+        public delegate void OnReloadDelegate(TabControls tab);
         public OnReloadDelegate OnReload;
         /// <summary>
         /// タブを最初に開いたときにtrueになる
         /// </summary>
         public bool isFirstView = false;
-		private bool isDisposeTabControls = false;
+        private bool isDisposeTabControls = false;
 
         /// <summary>
         /// FlashWindowを動かすためのデリゲート
         /// </summary>
-        public delegate void FlashWindowDelegate ();
+        public delegate void FlashWindowDelegate();
         public FlashWindowDelegate FlashWindowHandler;
         #endregion
 
         #region コンストラクタ
-        public TabControls ()
+        public TabControls()
         {
         }
 
@@ -67,7 +61,7 @@ namespace Shrimp.ControlParts.Tabs
         /// </summary>
         public bool isContainUnRead
         {
-            get { return ( unreadNum != 0 ); }
+            get { return (unreadNum != 0); }
         }
 
         /// <summary>
@@ -75,28 +69,28 @@ namespace Shrimp.ControlParts.Tabs
         /// </summary>
         /// <param name="tweet"></param>
         /// <returns></returns>
-        public bool isMatchQuery ( TwitterStatus tweet )
+        public bool isMatchQuery(TwitterStatus tweet)
         {
             //
-            if ( this.ignoreTweet == null || String.IsNullOrEmpty ( this.ignoreTweet ) || tweet == null )
+            if (this.ignoreTweet == null || String.IsNullOrEmpty(this.ignoreTweet) || tweet == null)
                 return false;
-            return shrimpQueryParser.isMatch ( this.ignoreTweet, tweet );
+            return shrimpQueryParser.isMatch(this.ignoreTweet, tweet);
         }
 
         /// <summary>
         /// 一番上にスクロールします
         /// </summary>
-        public void SetFirstView ( bool isSQL )
+        public void SetFirstView(bool isSQL)
         {
             //  一番最初のところを表示する
-            if ( this.tabDelivery != null )
+            if (this.tabDelivery != null)
             {
-                if ( this.timeline is TimelineControl )
+                if (this.timeline is TimelineControl)
                 {
                     var tl = this.timeline as TimelineControl;
-                    tl.SetFirstView ();
-                    if ( isSQL )
-                        tl.SetSQL ();
+                    tl.SetFirstView();
+                    if (isSQL)
+                        tl.SetSQL();
                 }
             }
         }
@@ -105,19 +99,19 @@ namespace Shrimp.ControlParts.Tabs
         /// コントロールを撮影します
         /// </summary>
         /// <returns></returns>
-        public Bitmap CaptureControl ()
+        public Bitmap CaptureControl()
         {
-            if ( this.tabDelivery != null )
+            if (this.tabDelivery != null)
             {
-                if ( this.timeline is TimelineControl )
+                if (this.timeline is TimelineControl)
                 {
                     var tl = this.timeline as TimelineControl;
-                    return tl.CaptureControl ();
+                    return tl.CaptureControl();
                 }
                 else
                 {
                     var tl = this.timeline as UserStatusControl;
-                    return tl.CaptureControl ();
+                    return tl.CaptureControl();
                 }
             }
             return null;
@@ -126,14 +120,14 @@ namespace Shrimp.ControlParts.Tabs
         /// <summary>
         /// コントロールをスクロール
         /// </summary>
-        public void ScrollUp ()
+        public void ScrollUp()
         {
-            if ( this.tabDelivery != null )
+            if (this.tabDelivery != null)
             {
-                if ( this.timeline is TimelineControl )
+                if (this.timeline is TimelineControl)
                 {
                     var tl = this.timeline as TimelineControl;
-                    tl.ScrollUp ();
+                    tl.ScrollUp();
                 }
             }
         }
@@ -141,14 +135,14 @@ namespace Shrimp.ControlParts.Tabs
         /// <summary>
         /// スクロール
         /// </summary>
-        public void ScrollDown ()
+        public void ScrollDown()
         {
-            if ( this.tabDelivery != null )
+            if (this.tabDelivery != null)
             {
-                if ( this.timeline is TimelineControl )
+                if (this.timeline is TimelineControl)
                 {
                     var tl = this.timeline as TimelineControl;
-                    tl.ScrollDown ();
+                    tl.ScrollDown();
                 }
             }
         }
@@ -157,37 +151,37 @@ namespace Shrimp.ControlParts.Tabs
         /// タブコントロールで得たキーを、タイムライン下にも配る
         /// </summary>
         /// <param name="ke"></param>
-        public void OnKeyDownFromParent ( KeyEventArgs ke )
+        public void OnKeyDownFromParent(KeyEventArgs ke)
         {
-            if ( this.tabDelivery != null )
+            if (this.tabDelivery != null)
             {
-                if ( this.timeline is TimelineControl )
+                if (this.timeline is TimelineControl)
                 {
                     var tl = this.timeline as TimelineControl;
-                    tl.TimelineControl_KeyDown ( this, ke );
+                    tl.TimelineControl_KeyDown(this, ke);
                 }
             }
         }
 
-        public TabControls ( DBControl db, bool isDefaultTab, bool isLock, TimelineCategory category, OnReloadDelegate onReload, TimelineControl.TabControlOperationgDelegate TabControlOperation,
+        public TabControls(DBControl db, bool isDefaultTab, bool isLock, TimelineCategory category, OnReloadDelegate onReload, TimelineControl.TabControlOperationgDelegate TabControlOperation,
                              TimelineControl.OnUseTwitterAPIDelegate OnUseTwitterAPIHandler,
-                             FlashWindowDelegate FlashWindowEventHandler, Shrimp.OnUserStatusControlAPIDelegate OnUserStatusControlAPI )
+                             FlashWindowDelegate FlashWindowEventHandler, Shrimp.OnUserStatusControlAPIDelegate OnUserStatusControlAPI)
         {
             this.db = db;
 
             this.isDefaultTab = isDefaultTab;
-            if ( category.category == TimelineCategories.UserInformation )
+            if (category.category == TimelineCategories.UserInformation)
             {
-                timeline = (UserStatusControl)new UserStatusControl ( null, TabControlOperation, OnUseTwitterAPIHandler, OnUserStatusControlAPI ) { Dock = DockStyle.Fill };
+                timeline = (UserStatusControl)new UserStatusControl(null, TabControlOperation, OnUseTwitterAPIHandler, OnUserStatusControlAPI) { Dock = DockStyle.Fill };
             }
             else
             {
-                timeline = (TimelineControl)new TimelineControl () { Dock = DockStyle.Fill };
+                timeline = (TimelineControl)new TimelineControl() { Dock = DockStyle.Fill };
             }
             this.tabParent = (Control)timeline;
             this.isLock = isLock;
-            this.tabDelivery = new TabDeliveryCollection ();
-            this.tabDelivery.AddDelivery ( new TabDelivery ( category, null ) );
+            this.tabDelivery = new TabDeliveryCollection();
+            this.tabDelivery.AddDelivery(new TabDelivery(category, null));
             this.OnReload = onReload;
             this.FlashWindowHandler = FlashWindowEventHandler;
         }
@@ -227,22 +221,22 @@ namespace Shrimp.ControlParts.Tabs
         /// </summary>
         /// <param name="num"></param>
         /// <returns></returns>
-        public string insertTimelineSQLRange ( int num )
+        public string insertTimelineSQLRange(int num)
         {
-            if ( num == 0 )
+            if (num == 0)
                 return null;
             string f = "INSERT INTO " + TabID + " (id) ";
             //bool isFirst = false;
-            for ( int i = 0; i < num; i ++ )
+            for (int i = 0; i < num; i++)
             {
-                if ( i % 2 == 0 )
+                if (i % 2 == 0)
                 {
                     f += " select ?";
                 }
                 else
                 {
-					if ( i < num -1 )
-						f += " UNION";
+                    if (i < num - 1)
+                        f += " UNION";
                 }
             }
             return f;
@@ -253,29 +247,29 @@ namespace Shrimp.ControlParts.Tabs
         /// 保存するときに、データベースにタイムラインのツイートID一式をすべて保存します
         /// </summary>
         /// <param name="db"></param>
-        public void SetTimelineToDatabase ( DBControl db )
+        public void SetTimelineToDatabase(DBControl db)
         {
-            if ( db == null )
+            if (db == null)
                 return;
-            if ( this.timeline is TimelineControl )
+            if (this.timeline is TimelineControl)
             {
                 //  TimelineControlならば、直接データひろってきていいかなぁ。
                 var tl = this.timeline as TimelineControl;
-                tl.Invoke ( (MethodInvoker)delegate ()
+                tl.Invoke((MethodInvoker)delegate()
                 {
                     var gen = tl.GenerateStatusIDs;
-                    if ( gen.Count != 0 )
+                    if (gen.Count != 0)
                     {
                         int count = gen.Count;
                         int MaxInsert = 499;
-                        for ( int i = 0; i < ( gen.Count / MaxInsert ) + 1; i++ )
+                        for (int i = 0; i < (gen.Count / MaxInsert) + 1; i++)
                         {
-                            var range = gen.GetRange ( ( i * MaxInsert ), count > MaxInsert ? MaxInsert : count );
-                            db.InsertTimeline ( insertTimelineSQLRange ( range.Count ), range );
+                            var range = gen.GetRange((i * MaxInsert), count > MaxInsert ? MaxInsert : count);
+                            db.InsertTimeline(insertTimelineSQLRange(range.Count), range);
                             count -= MaxInsert;
                         }
                     }
-                } );
+                });
             }
         }
 
@@ -308,19 +302,19 @@ namespace Shrimp.ControlParts.Tabs
         /// </summary>
         /// <param name="db"></param>
         /// <returns></returns>
-        public TabManager save ( DBControl db )
+        public TabManager save(DBControl db)
         {
-            TabManager dest = new TabManager ();
+            TabManager dest = new TabManager();
 
             dest.isDefaultTab = this.isDefaultTab;
             dest.isLock = this.isLock;
-            dest.sourceTabName = (string)this.sourceTabName.Clone ();
-            dest.ignoreTweet = (string)this.ignoreTweet.Clone ();
-            dest.tabID = (string)this.TabID.Clone ();
+            dest.sourceTabName = (string)this.sourceTabName.Clone();
+            dest.ignoreTweet = (string)this.ignoreTweet.Clone();
+            dest.tabID = (string)this.TabID.Clone();
             dest.isFlash = this.isFlash;
-            dest.TabDelivery = (TabDeliveryCollection)this.tabDelivery.Clone ();
-            if ( db != null )
-                this.SetTimelineToDatabase ( db );
+            dest.TabDelivery = (TabDeliveryCollection)this.tabDelivery.Clone();
+            if (db != null)
+                this.SetTimelineToDatabase(db);
 
             return dest;
         }
@@ -331,31 +325,31 @@ namespace Shrimp.ControlParts.Tabs
         /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
-			if (!this.isDisposeTabControls)
-			{
-				if (!this.tabDelivery.isTimeline)
-				{
-					var tl = this.timeline as UserStatusControl;
-					if (tl != null)
-					{
-						tl.Dispose();
-						tl = null;
-					}
-				}
-				else
-				{
-					var tl = this.timeline as TimelineControl;
-					if (tl != null)
-					{
-						tl.Dispose();
-						tl = null;
-					}
-				}
-				this.timeline = null;
-				this.tabDelivery = null;
-				base.Dispose(disposing);
-				this.isDisposeTabControls = true;
-			}
+            if (!this.isDisposeTabControls)
+            {
+                if (!this.tabDelivery.isTimeline)
+                {
+                    var tl = this.timeline as UserStatusControl;
+                    if (tl != null)
+                    {
+                        tl.Dispose();
+                        tl = null;
+                    }
+                }
+                else
+                {
+                    var tl = this.timeline as TimelineControl;
+                    if (tl != null)
+                    {
+                        tl.Dispose();
+                        tl = null;
+                    }
+                }
+                this.timeline = null;
+                this.tabDelivery = null;
+                base.Dispose(disposing);
+                this.isDisposeTabControls = true;
+            }
         }
 
         #endregion
@@ -363,11 +357,11 @@ namespace Shrimp.ControlParts.Tabs
         /// <summary>
         /// ロードが終わったら実行してください
         /// </summary>
-        public void SetFinishedLoading ()
+        public void SetFinishedLoading()
         {
-            if ( this.tabDelivery != null )
+            if (this.tabDelivery != null)
             {
-                if ( !this.tabDelivery.isTimeline )
+                if (!this.tabDelivery.isTimeline)
                 {
                     var res = this.timeline as UserStatusControl;
                     res.isLoadingFinished = true;
@@ -387,21 +381,22 @@ namespace Shrimp.ControlParts.Tabs
         public string tabText
         {
             get { return this.sourceTabName; }
-            set {
-                Task.Factory.StartNew ( () =>
+            set
+            {
+                Task.Factory.StartNew(() =>
                 {
-                    if ( this.InvokeRequired )
+                    if (this.InvokeRequired)
                     {
-                        this.Invoke ( (MethodInvoker)delegate ()
+                        this.Invoke((MethodInvoker)delegate()
                         {
                             this.Text = value;
-                        } );
+                        });
                     }
                     else
                     {
                         this.Text = value;
                     }
-                } );
+                });
                 this.sourceTabName = value;
             }
         }
@@ -412,12 +407,12 @@ namespace Shrimp.ControlParts.Tabs
             get { return this._isVisible; }
             set
             {
-                if ( _isVisible != value )
+                if (_isVisible != value)
                 {
                     _isVisible = value;
-                    if ( this.tabDelivery != null )
+                    if (this.tabDelivery != null)
                     {
-                        if ( !this.tabDelivery.isTimeline )
+                        if (!this.tabDelivery.isTimeline)
                         {
                             UserStatusControl u = this.timeline as UserStatusControl;
                             u.Visible = value;
@@ -435,7 +430,7 @@ namespace Shrimp.ControlParts.Tabs
         /// <summary>
         /// テキスト
         /// </summary>
-        public void SetTextReset ()
+        public void SetTextReset()
         {
             //  元に戻す
             this.tabText = this.sourceTabName;
@@ -447,14 +442,14 @@ namespace Shrimp.ControlParts.Tabs
         /// </summary>
         /// <param name="num"></param>
         /// <returns></returns>
-        public int CalcPercentage ( int num )
+        public int CalcPercentage(int num)
         {
-            if ( this.tabDelivery == null || !this.tabDelivery.isTimeline )
+            if (this.tabDelivery == null || !this.tabDelivery.isTimeline)
                 return 0;
             var res = this.timeline as TimelineControl;
-            if ( res == null )
+            if (res == null)
                 return 0;
-            int per = (int)( ( (double)num / res.TweetCount ) * 100 );
+            int per = (int)(((double)num / res.TweetCount) * 100);
             return per;
         }
 
@@ -462,40 +457,40 @@ namespace Shrimp.ControlParts.Tabs
         /// ツイートを挿入
         /// </summary>
         /// <param name="tweet"></param>
-        public void InsertTweet ( TwitterStatus tweet )
+        public void InsertTweet(TwitterStatus tweet)
         {
-            if ( this.tabDelivery == null || !this.tabDelivery.isTimeline )
+            if (this.tabDelivery == null || !this.tabDelivery.isTimeline)
                 return;
             var res = this.timeline as TimelineControl;
-            if ( res == null )
+            if (res == null)
                 return;
-            if ( !this.isMatchQuery ( tweet ) )
+            if (!this.isMatchQuery(tweet))
             {
-                res.InsertTimeline ( tweet );
+                res.InsertTimeline(tweet);
                 this.unreadNum++;
-                if ( this.isFlash )
+                if (this.isFlash)
                 {
                     //  ウィンドウフラッシュ
-                    FlashWindow ();
+                    FlashWindow();
                 }
 
-                Task.Factory.StartNew ( () =>
+                Task.Factory.StartNew(() =>
                 {
-                    if ( !isVisible )
+                    if (!isVisible)
                     {
-                        if ( this.InvokeRequired )
+                        if (this.InvokeRequired)
                         {
-                            this.Invoke ( (MethodInvoker)delegate ()
+                            this.Invoke((MethodInvoker)delegate()
                             {
                                 this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
-                            } );
+                            });
                         }
                         else
                         {
                             this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
                         }
                     }
-                } );
+                });
             }
         }
 
@@ -503,40 +498,40 @@ namespace Shrimp.ControlParts.Tabs
         /// ツイートをいっきに挿入
         /// </summary>
         /// <param name="tweet"></param>
-        public int InsertTimelineRange ( List<TwitterStatus> tweet, bool isSQL = false )
+        public int InsertTimelineRange(List<TwitterStatus> tweet, bool isSQL = false)
         {
-            if ( this.tabDelivery == null || !this.tabDelivery.isTimeline || tweet.Count == 0 )
+            if (this.tabDelivery == null || !this.tabDelivery.isTimeline || tweet.Count == 0)
                 return 0;
             var res = this.timeline as TimelineControl;
-            if ( res == null )
+            if (res == null)
                 return 0;
-            int newTweetNum = res.InsertTimelineRange ( tweet.FindAll ( (t)=> !this.isMatchQuery ( t ) ) );
-            if ( !isSQL )
+            int newTweetNum = res.InsertTimelineRange(tweet.FindAll((t) => !this.isMatchQuery(t)));
+            if (!isSQL)
             {
                 this.unreadNum += newTweetNum;
-                if ( this.isFlash )
+                if (this.isFlash)
                 {
                     //  ウィンドウフラッシュ
-                    FlashWindow ();
+                    FlashWindow();
                 }
 
-                Task.Factory.StartNew ( () =>
+                Task.Factory.StartNew(() =>
                 {
-                    if ( !isVisible && newTweetNum != 0 )
+                    if (!isVisible && newTweetNum != 0)
                     {
-                        if ( this.InvokeRequired )
+                        if (this.InvokeRequired)
                         {
-                            this.Invoke ( (MethodInvoker)delegate ()
+                            this.Invoke((MethodInvoker)delegate()
                             {
                                 this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
-                            } );
+                            });
                         }
                         else
                         {
                             this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
                         }
                     }
-                } );
+                });
 
             }
             return newTweetNum;
@@ -555,12 +550,12 @@ namespace Shrimp.ControlParts.Tabs
         /// ユーザー情報を変更する
         /// </summary>
         /// <param name="tweet"></param>
-        public void ChangeUserStatus ( TwitterUserStatus user )
+        public void ChangeUserStatus(TwitterUserStatus user)
         {
-            if ( this.tabDelivery != null && !this.tabDelivery.isTimeline )
+            if (this.tabDelivery != null && !this.tabDelivery.isTimeline)
             {
                 var res = this.timeline as UserStatusControl;
-                res.ChangeUserStatus ( user );
+                res.ChangeUserStatus(user);
             }
         }
 
@@ -572,34 +567,38 @@ namespace Shrimp.ControlParts.Tabs
             get { return this.Parent; }
             set
             {
-                if ( this.InvokeRequired )
+                if (this.InvokeRequired)
                 {
-                    this.Invoke ( (MethodInvoker)delegate ()
+                    this.Invoke((MethodInvoker)delegate()
                     {
-                        if ( value.InvokeRequired )
+                        if (value.InvokeRequired)
                         {
-                            this.Invoke ( (MethodInvoker)delegate ()
+                            this.Invoke((MethodInvoker)delegate()
                             {
                                 value.Dock = DockStyle.Fill;
-                            } );
-                        } else {
+                            });
+                        }
+                        else
+                        {
                             value.Dock = DockStyle.Fill;
                         }
-                        this.Controls.Add ( value );
-                    } );
+                        this.Controls.Add(value);
+                    });
                 }
                 else
                 {
-                    if ( value.InvokeRequired )
+                    if (value.InvokeRequired)
                     {
-                        this.Invoke ( (MethodInvoker)delegate ()
+                        this.Invoke((MethodInvoker)delegate()
                         {
                             value.Dock = DockStyle.Fill;
-                        } );
-                    } else {
+                        });
+                    }
+                    else
+                    {
                         value.Dock = DockStyle.Fill;
                     }
-                    this.Controls.Add ( value );
+                    this.Controls.Add(value);
                 }
             }
         }
@@ -610,10 +609,10 @@ namespace Shrimp.ControlParts.Tabs
             get { return this.timeline; }
         }
 
-        public void FlashWindow ()
+        public void FlashWindow()
         {
-            if ( this.FlashWindowHandler != null )
-                this.FlashWindowHandler.Invoke ();
+            if (this.FlashWindowHandler != null)
+                this.FlashWindowHandler.Invoke();
         }
     }
 }

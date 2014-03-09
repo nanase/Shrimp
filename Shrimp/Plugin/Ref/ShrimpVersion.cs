@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Shrimp.Plugin.Ref
 {
     /// <summary>
@@ -13,7 +9,7 @@ namespace Shrimp.Plugin.Ref
         public readonly uint version;
         public readonly double version_str;
 
-        public ShrimpVersion ()
+        public ShrimpVersion()
         {
             this.version = 110;
             this.version_str = 1.10;

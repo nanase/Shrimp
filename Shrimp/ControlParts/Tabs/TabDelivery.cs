@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Shrimp.Twitter.REST.List;
 
 namespace Shrimp.ControlParts.Tabs
 {
@@ -25,19 +22,19 @@ namespace Shrimp.ControlParts.Tabs
         /// </summary>
         //public string ignoreTweet;
 
-        public TabDelivery ()
+        public TabDelivery()
         {
         }
 
-        public TabDelivery ( TimelineCategory Category, List<decimal> DeliveryFromUsers)
+        public TabDelivery(TimelineCategory Category, List<decimal> DeliveryFromUsers)
         {
-            this.Category = (TimelineCategory)Category.Clone ();
-            this.DeliveryFromUsers = new List<decimal> ();
-            if ( DeliveryFromUsers != null )
+            this.Category = (TimelineCategory)Category.Clone();
+            this.DeliveryFromUsers = new List<decimal>();
+            if (DeliveryFromUsers != null)
             {
-                foreach ( decimal i in DeliveryFromUsers )
+                foreach (decimal i in DeliveryFromUsers)
                 {
-                    this.DeliveryFromUsers.Add ( i );
+                    this.DeliveryFromUsers.Add(i);
                 }
             }
             //this.containsTweet = ( containsTweet == null ? "" : containsTweet );
@@ -48,17 +45,17 @@ namespace Shrimp.ControlParts.Tabs
         /// コピーをとります
         /// </summary>
         /// <returns></returns>
-        public object Clone ()
+        public object Clone()
         {
-            var dest = new TabDelivery ();
+            var dest = new TabDelivery();
             //dest.ignoreTweet = (string)this.ignoreTweet.Clone ();
             //dest.containsTweet = (string)this.containsTweet.Clone ();
-            dest.DeliveryFromUsers = new List<decimal> ();
-            foreach ( decimal i in this.DeliveryFromUsers )
+            dest.DeliveryFromUsers = new List<decimal>();
+            foreach (decimal i in this.DeliveryFromUsers)
             {
-                dest.DeliveryFromUsers.Add ( i );
+                dest.DeliveryFromUsers.Add(i);
             }
-            dest.Category = (TimelineCategory)this.Category.Clone ();
+            dest.Category = (TimelineCategory)this.Category.Clone();
             return dest;
         }
     }

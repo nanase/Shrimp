@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Timers;
 using System.Drawing;
 
 namespace Shrimp.ControlParts.Timeline.Animation
@@ -14,18 +10,18 @@ namespace Shrimp.ControlParts.Timeline.Animation
         #endregion
 
         #region コンストラクタ
-        public TweetInsertAnimation ()
+        public TweetInsertAnimation()
         {
         }
 
-        ~TweetInsertAnimation ()
+        ~TweetInsertAnimation()
         {
-            this.Dispose ();
+            this.Dispose();
         }
 
-        public void Dispose ()
+        public void Dispose()
         {
-            GC.SuppressFinalize ( this );
+            GC.SuppressFinalize(this);
         }
         #endregion
 
@@ -33,7 +29,7 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// <summary>
         /// アニメーション開始
         /// </summary>
-        public void StartAnimation ( object[] obj = null )
+        public void StartAnimation(object[] obj = null)
         {
             this.Enable = true;
             this.Frame = 0;
@@ -41,10 +37,10 @@ namespace Shrimp.ControlParts.Timeline.Animation
             //this.timer.Start ();
         }
 
-         /// <summary>
+        /// <summary>
         /// アニメーションストップ
         /// </summary>
-        public void StopAnimation ()
+        public void StopAnimation()
         {
             this.Enable = false;
             this.Frame = 0;
@@ -56,9 +52,9 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// 舞フレームごとに行うデリゲート処理
         /// </summary>
         /// <returns></returns>
-        public bool FrameExecute ()
+        public bool FrameExecute()
         {
-            if ( this.Enable && this.Frame < 16 )
+            if (this.Enable && this.Frame < 16)
             {
                 Frame++;
                 return true;
@@ -106,11 +102,11 @@ namespace Shrimp.ControlParts.Timeline.Animation
         {
             get
             {
-                return (int)( (double)-this.YOffset + Math.Sin ( Math.PI / 2 / 16 * ( this.Frame ) ) * this.YOffset );
+                return (int)((double)-this.YOffset + Math.Sin(Math.PI / 2 / 16 * (this.Frame)) * this.YOffset);
             }
         }
 
-        public void Draw ( Graphics g, int maxWidth, ControlParts.Timeline.Draw.TweetDraw.SetClickLinkDelegate del )
+        public void Draw(Graphics g, int maxWidth, ControlParts.Timeline.Draw.TweetDraw.SetClickLinkDelegate del)
         {
         }
 

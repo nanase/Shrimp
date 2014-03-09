@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Shrimp.Twitter.Entities
 {
     public class TwitterEntitiesHashTags
@@ -11,12 +7,12 @@ namespace Shrimp.Twitter.Entities
         #endregion
 
         #region コンストラクタ
-        public TwitterEntitiesHashTags ( dynamic raw_data )
+        public TwitterEntitiesHashTags(dynamic raw_data)
         {
             this.text = raw_data.text;
             this.indices = new int[] { (int)raw_data.indices[0], (int)raw_data.indices[1] };
         }
-        public TwitterEntitiesHashTags ( string text, int[] indices )
+        public TwitterEntitiesHashTags(string text, int[] indices)
         {
             this.text = text;
             this.indices = indices;

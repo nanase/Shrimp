@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
-using System.Timers;
 using System.IO;
 using System.Net;
-using Shrimp.Twitter;
 using System.Threading;
+using System.Timers;
 using Shrimp.Log;
 
 namespace Shrimp.Module.ImageUtil
@@ -20,7 +17,7 @@ namespace Shrimp.Module.ImageUtil
     {
         #region 定義
 
-        private delegate void loadWorkerDelegate ( string url, bool isIcon );
+        private delegate void loadWorkerDelegate(string url, bool isIcon);
 
         private static volatile Dictionary<string, ImageCacheData> cacheData;
         private static volatile Queue<ImageCacheData> loadingCacheData;
@@ -28,7 +25,7 @@ namespace Shrimp.Module.ImageUtil
         private static Thread thread;
         private static volatile object lockWorker = new object();
         private static volatile bool isStopCrawling = false;
-        private static volatile List<ImageCacheData> tmpData = new List<ImageCacheData> ();
+        private static volatile List<ImageCacheData> tmpData = new List<ImageCacheData>();
         private static volatile bool isCrawling = false;
         private static decimal syncNum = 0;
         #endregion
@@ -37,33 +34,33 @@ namespace Shrimp.Module.ImageUtil
 
         static ImageCache()
         {
-            cacheData = new Dictionary<string, ImageCacheData> ();
-            loadingCacheData = new Queue<ImageCacheData> ();
+            cacheData = new Dictionary<string, ImageCacheData>();
+            loadingCacheData = new Queue<ImageCacheData>();
             thread = new Thread(new ThreadStart(loadAsync));
             thread.Start();
             checkTimer = new System.Timers.Timer();
             checkTimer.Interval = 500;
-            checkTimer.Elapsed += new ElapsedEventHandler ( checkTimer_Elapsed );
-            checkTimer.Start ();
+            checkTimer.Elapsed += new ElapsedEventHandler(checkTimer_Elapsed);
+            checkTimer.Start();
         }
 
-        ~ImageCache ()
+        ~ImageCache()
         {
             StopCrawling();
-            this.Dispose ();
+            this.Dispose();
         }
 
         public void Dispose()
         {
-            foreach ( ImageCacheData data in cacheData.Values )
+            foreach (ImageCacheData data in cacheData.Values)
             {
-                data.bitmap.Dispose ();
+                data.bitmap.Dispose();
             }
 
             cacheData = null;
 
-            checkTimer.Stop ();
-            checkTimer.Elapsed -= new ElapsedEventHandler ( checkTimer_Elapsed );
+            checkTimer.Stop();
+            checkTimer.Elapsed -= new ElapsedEventHandler(checkTimer_Elapsed);
             checkTimer = null;
             loadingCacheData = null;
         }
@@ -76,14 +73,14 @@ namespace Shrimp.Module.ImageUtil
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void checkTimer_Elapsed ( object sender, ElapsedEventArgs e )
+        static void checkTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if ( loadingCacheData.Count != 0 )
+            if (loadingCacheData.Count != 0)
             {
                 System.Timers.Timer t = sender as System.Timers.Timer;
-                t.Stop ();
+                t.Stop();
                 loadAsync();
-                t.Start ();
+                t.Start();
             }
         }
 
@@ -100,57 +97,57 @@ namespace Shrimp.Module.ImageUtil
         /// <summary>
         /// ロードシンク
         /// </summary>
-        private static void loadAsync ()
+        private static void loadAsync()
         {
             for (; ; )
             {
-                if ( isCrawling )
+                if (isCrawling)
                     return;
 
                 isCrawling = true;
-                lock ( lockWorker )
+                lock (lockWorker)
                 {
-                    tmpData.Clear ();
+                    tmpData.Clear();
 
-                    if ( loadingCacheData.Count != 0 )
+                    if (loadingCacheData.Count != 0)
                     {
-                        for ( int i = 0; i < loadingCacheData.Count && i < 5; i++ )
+                        for (int i = 0; i < loadingCacheData.Count && i < 5; i++)
                         {
-                            ImageCacheData tmp = loadingCacheData.Dequeue ();
-                            if ( tmp == null )
+                            ImageCacheData tmp = loadingCacheData.Dequeue();
+                            if (tmp == null)
                                 break;
-                            tmpData.Add ( tmp );
+                            tmpData.Add(tmp);
                         }
                     }
                 }
 
-                foreach ( ImageCacheData t in tmpData )
+                foreach (ImageCacheData t in tmpData)
                 {
-                    if ( isStopCrawling )
+                    if (isStopCrawling)
                         break;
-                    loadWorker ( t.url, t.isIcon );
+                    loadWorker(t.url, t.isIcon);
                 }
 
                 syncNum++;
 
-                if ( syncNum % 60000 == 0 )
+                if (syncNum % 60000 == 0)
                 {
-                    List<string> keys = new List<string> ();
-                    lock ( lockWorker )
+                    List<string> keys = new List<string>();
+                    lock (lockWorker)
                     {
-                        foreach ( KeyValuePair<string, ImageCacheData> value in cacheData )
+                        foreach (KeyValuePair<string, ImageCacheData> value in cacheData)
                         {
                             //  
-                            if ( value.Value.UseCount < -5000 && value.Value.bitmap != null )
+                            if (value.Value.UseCount < -5000 && value.Value.bitmap != null)
                             {
-                                value.Value.bitmap.Dispose ();
+                                value.Value.bitmap.Dispose();
                                 value.Value.bitmap = null;
-                                keys.Add ( value.Key );
+                                keys.Add(value.Key);
                             }
                         }
-                        foreach ( string key in keys )
+                        foreach (string key in keys)
                         {
-                            cacheData.Remove ( key );
+                            cacheData.Remove(key);
                         }
                     }
                 }
@@ -167,27 +164,27 @@ namespace Shrimp.Module.ImageUtil
         /// 非同期で行われる処理の内容
         /// </summary>
         /// <param name="srv"></param>
-        private static void loadWorker ( string url, bool isIcon )
+        private static void loadWorker(string url, bool isIcon)
         {
-            Bitmap res = loadImageFromURL ( url );
-            if ( res != null )
+            Bitmap res = loadImageFromURL(url);
+            if (res != null)
             {
-                Point p = new Point ();
-                if ( isIcon )
+                Point p = new Point();
+                if (isIcon)
                 {
-                    Bitmap new_res = ImageGenerateUtil.AppendDropShadow ( res, 1, new Point ( 2, 2 ), Color.Gray, out p );
-                    res.Dispose (); res = new_res;
+                    Bitmap new_res = ImageGenerateUtil.AppendDropShadow(res, 1, new Point(2, 2), Color.Gray, out p);
+                    res.Dispose(); res = new_res;
                 }
-                if ( isIcon )
+                if (isIcon)
                 {
-                    if ( res.Width != Setting.Timeline.IconSize || res.Height != Setting.Timeline.IconSize )
-                        res = ImageGenerateUtil.ResizeIcon ( res, true );
+                    if (res.Width != Setting.Timeline.IconSize || res.Height != Setting.Timeline.IconSize)
+                        res = ImageGenerateUtil.ResizeIcon(res, true);
                 }
                 else
                 {
-                    res = ImageGenerateUtil.ResizeImage ( res, Setting.Timeline.ImageWidth, Setting.Timeline.ImageHeight );
+                    res = ImageGenerateUtil.ResizeImage(res, Setting.Timeline.ImageWidth, Setting.Timeline.ImageHeight);
                 }
-                setCache ( url, isIcon, res );
+                setCache(url, isIcon, res);
             }
             res = null;
         }
@@ -197,12 +194,12 @@ namespace Shrimp.Module.ImageUtil
         /// </summary>
         /// <param name="url">URL</param>
         /// <returns>イメージデータ</returns>
-        private static Bitmap loadImageFromURL ( string url )
+        private static Bitmap loadImageFromURL(string url)
         {
             int buffSize = 65536; // 一度に読み込むサイズ
-            MemoryStream imgStream = new MemoryStream ();
+            MemoryStream imgStream = new MemoryStream();
             Bitmap bmp = null;
-            if ( url == null || url.Trim ().Length <= 0 )
+            if (url == null || url.Trim().Length <= 0)
             {
                 return null;
             }
@@ -210,29 +207,30 @@ namespace Shrimp.Module.ImageUtil
             try
             {
                 //  あんまつかいたくないけど、例外処理
-                WebRequest req = WebRequest.Create ( url );
-                BinaryReader reader = new BinaryReader ( req.GetResponse ().GetResponseStream () );
+                WebRequest req = WebRequest.Create(url);
+                BinaryReader reader = new BinaryReader(req.GetResponse().GetResponseStream());
 
-                while ( true )
+                while (true)
                 {
                     byte[] buff = new byte[buffSize];
 
                     // 応答データの取得
-                    int readBytes = reader.Read ( buff, 0, buffSize );
-                    if ( readBytes <= 0 )
+                    int readBytes = reader.Read(buff, 0, buffSize);
+                    if (readBytes <= 0)
                     {
                         // 最後まで取得した->ループを抜ける
                         break;
                     }
 
                     // バッファに追加
-                    imgStream.Write ( buff, 0, readBytes );
+                    imgStream.Write(buff, 0, readBytes);
                 }
 
-                bmp = new Bitmap ( imgStream ); 
-            } catch ( Exception e )
+                bmp = new Bitmap(imgStream);
+            }
+            catch (Exception e)
             {
-                LogControl.AddLogs ( "画像読み込みの際にエラーが発生しました。:" + e.StackTrace + "" );
+                LogControl.AddLogs("画像読み込みの際にエラーが発生しました。:" + e.StackTrace + "");
                 return null;
             }
 
@@ -246,10 +244,10 @@ namespace Shrimp.Module.ImageUtil
         /// <param name="value">ビットマップデータ</param>
         private static void setCache(string key, bool isIcon, Bitmap value)
         {
-            lock ( lockWorker )
+            lock (lockWorker)
             {
-                Bitmap b = ( value != null ? (Bitmap)value.Clone () : null );
-                cacheData[key] = new ImageCacheData ( key, isIcon, b );
+                Bitmap b = (value != null ? (Bitmap)value.Clone() : null);
+                cacheData[key] = new ImageCacheData(key, isIcon, b);
             }
         }
 
@@ -259,9 +257,9 @@ namespace Shrimp.Module.ImageUtil
         /// </summary>
         /// <param name="key">URL</param>
         /// <returns>キャッシュがあればtrue、なければfalse</returns>
-        public static bool isCached ( string key )
+        public static bool isCached(string key)
         {
-            return cacheData.ContainsKey ( key );
+            return cacheData.ContainsKey(key);
         }
 
         /// <summary>
@@ -272,20 +270,20 @@ namespace Shrimp.Module.ImageUtil
         /// <returns>キャッシュのBitmapを返します。cloneをさしあげるので、各自廃棄してください</returns>
         public static Bitmap getCache(string key)
         {
-            if ( !cacheData.ContainsKey ( key ) )
+            if (!cacheData.ContainsKey(key))
                 return null;
-            lock ( lockWorker )
+            lock (lockWorker)
             {
                 Bitmap b = cacheData[key].bitmap;
-                if ( b == null )
+                if (b == null)
                     return null;
-                foreach ( ImageCacheData value in cacheData.Values )
+                foreach (ImageCacheData value in cacheData.Values)
                 {
                     //  
                     value.UseCount--;
                 }
                 cacheData[key].UseCount = 100;
-                return (Bitmap)b.Clone ();
+                return (Bitmap)b.Clone();
             }
         }
 
@@ -293,10 +291,10 @@ namespace Shrimp.Module.ImageUtil
         /// 画像をキューにいれる
         /// </summary>
         /// <param name="url">URL</param>
-        public static void SetQueueImage ( string url, bool isIcon )
+        public static void SetQueueImage(string url, bool isIcon)
         {
-            setCache ( url, isIcon, null );
-            loadingCacheData.Enqueue ( new ImageCacheData ( url, isIcon, null ) );
+            setCache(url, isIcon, null);
+            loadingCacheData.Enqueue(new ImageCacheData(url, isIcon, null));
         }
 
         /// <summary>
@@ -305,18 +303,18 @@ namespace Shrimp.Module.ImageUtil
         /// <param name="url"></param>
         /// <param name="isIcon"></param>
         /// <returns></returns>
-        public static Bitmap AutoCache ( string url, bool isIcon )
+        public static Bitmap AutoCache(string url, bool isIcon)
         {
             Bitmap tmp = null;
-            if ( url == null )
+            if (url == null)
                 return null;
-            if ( !isCached ( url ) )
+            if (!isCached(url))
             {
-                ImageCache.SetQueueImage ( url, isIcon );
+                ImageCache.SetQueueImage(url, isIcon);
             }
             else
             {
-                tmp = ImageCache.getCache ( url );
+                tmp = ImageCache.getCache(url);
             }
             return tmp;
         }

@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Shrimp.Twitter.Status
 {
     public class TwitterNotifyStatus : ICloneable
     {
-        public TwitterNotifyStatus ()
+        public TwitterNotifyStatus()
         {
         }
 
-        public TwitterNotifyStatus ( TwitterUserStatus source, TwitterUserStatus target, TwitterStatus status )
+        public TwitterNotifyStatus(TwitterUserStatus source, TwitterUserStatus target, TwitterStatus status)
         {
             //  リツイート
             this.source = source;
@@ -20,19 +17,19 @@ namespace Shrimp.Twitter.Status
             this.notify_event = "retweeted";
         }
 
-        public TwitterNotifyStatus ( dynamic raw_data )
+        public TwitterNotifyStatus(dynamic raw_data)
         {
-            if ( raw_data.IsDefined ( "target" ) && raw_data.target != null )
-                this.target = new TwitterUserStatus ( raw_data.target );
-            if ( raw_data.IsDefined ( "source" ) && raw_data.source != null )
-                this.source = new TwitterUserStatus ( raw_data.source );
-            this.notify_event = ( raw_data.IsDefined( "event" ) ? raw_data["event"] : null );
-            if ( raw_data.IsDefined ( "target_object" ) && raw_data.target_object != null )
+            if (raw_data.IsDefined("target") && raw_data.target != null)
+                this.target = new TwitterUserStatus(raw_data.target);
+            if (raw_data.IsDefined("source") && raw_data.source != null)
+                this.source = new TwitterUserStatus(raw_data.source);
+            this.notify_event = (raw_data.IsDefined("event") ? raw_data["event"] : null);
+            if (raw_data.IsDefined("target_object") && raw_data.target_object != null)
                 this.target_object = raw_data.target_object;
-            this.created_at = DateTime.ParseExact (
+            this.created_at = DateTime.ParseExact(
                                         raw_data.created_at,
                                         "ddd MMM dd HH:mm:ss K yyyy",
-                                        System.Globalization.DateTimeFormatInfo.InvariantInfo );
+                                        System.Globalization.DateTimeFormatInfo.InvariantInfo);
         }
 
         /// <summary>
@@ -129,31 +126,32 @@ namespace Shrimp.Twitter.Status
         {
             get
             {
-                return ( this.notify_event == "follow" || this.notify_event == "unfollow" );
+                return (this.notify_event == "follow" || this.notify_event == "unfollow");
             }
         }
 
         public bool isRetweeted
         {
-            get {
-                return ( this.notify_event == "retweeted" );
+            get
+            {
+                return (this.notify_event == "retweeted");
             }
         }
 
-         public object Clone ()
-         {
-             var dest = new TwitterNotifyStatus ();
-             dest.isFav = this.isFav;
-             dest.isFaved = this.isFaved;
-             dest.isOwnFav = this.isOwnFav;
-             dest.isOwnUnFav = this.isOwnUnFav;
-             dest.isUnFav = this.isUnFav;
-             dest.isUnFaved = this.isUnFaved;
-             dest.notify_event = (string)this.notify_event.Clone ();
-             dest.source = (TwitterUserStatus)this.source.Clone ();
-             dest.target = (TwitterUserStatus)this.target.Clone ();
-             dest.target_object = ( this.target_object != null ? ( (TwitterStatus)this.target_object ).Clone () : null );
-             return dest;
-         }
+        public object Clone()
+        {
+            var dest = new TwitterNotifyStatus();
+            dest.isFav = this.isFav;
+            dest.isFaved = this.isFaved;
+            dest.isOwnFav = this.isOwnFav;
+            dest.isOwnUnFav = this.isOwnUnFav;
+            dest.isUnFav = this.isUnFav;
+            dest.isUnFaved = this.isUnFaved;
+            dest.notify_event = (string)this.notify_event.Clone();
+            dest.source = (TwitterUserStatus)this.source.Clone();
+            dest.target = (TwitterUserStatus)this.target.Clone();
+            dest.target_object = (this.target_object != null ? ((TwitterStatus)this.target_object).Clone() : null);
+            return dest;
+        }
     }
 }

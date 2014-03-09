@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using Shrimp.Twitter;
-using System.Xml.Serialization;
-using System.IO;
-using System.Collections;
 
 namespace Shrimp.Account
 {
@@ -17,23 +11,23 @@ namespace Shrimp.Account
         /// <summary>
         /// アカウント集
         /// </summary>
-        public List<TwitterInfo> accounts = new List<TwitterInfo> ();
+        public List<TwitterInfo> accounts = new List<TwitterInfo>();
 
         /// <summary>
         /// アカウントの追加
         /// </summary>
         /// <param name="twitterAccount">アカウントデータ</param>
-        public bool AddNewAccount ( TwitterInfo twitterAccount )
+        public bool AddNewAccount(TwitterInfo twitterAccount)
         {
-            foreach ( TwitterInfo tmp in this.accounts )
+            foreach (TwitterInfo tmp in this.accounts)
             {
-                if ( tmp.Equals ( twitterAccount ) )
+                if (tmp.Equals(twitterAccount))
                 {
                     //  おなじやん！！
                     return false;
                 }
             }
-            this.accounts.Add ( twitterAccount );
+            this.accounts.Add(twitterAccount);
             return true;
         }
 
@@ -41,24 +35,26 @@ namespace Shrimp.Account
         /// アカウントを削除する
         /// </summary>
         /// <param name="num"></param>
-        public void RemoveAccount ( int num )
+        public void RemoveAccount(int num)
         {
-            this.accounts.RemoveAt ( num );
-            if ( selNum < 0 )
+            this.accounts.RemoveAt(num);
+            if (selNum < 0)
                 selNum = 0;
-            if ( selNum >= this.accounts.Count - 1 )
+            if (selNum >= this.accounts.Count - 1)
                 selNum = this.accounts.Count - 1;
         }
 
         /// <summary>
         /// 次のアカウントへ勧める
         /// </summary>
-        public void NextAccount ()
+        public void NextAccount()
         {
-            if ( this.accounts.Count == 0 )
+            if (this.accounts.Count == 0)
                 return;
+
             selNum++;
-            if ( selNum >= this.accounts.Count )
+
+            if (selNum >= this.accounts.Count)
                 selNum = 0;
         }
 
@@ -69,12 +65,15 @@ namespace Shrimp.Account
         {
             get
             {
-                if ( this.accounts.Count == 0 )
+                if (this.accounts.Count == 0)
                     return null;
-                if ( selNum < 0 )
+
+                if (selNum < 0)
                     selNum = 0;
-                if ( selNum >= this.accounts.Count - 1 )
+
+                if (selNum >= this.accounts.Count - 1)
                     selNum = this.accounts.Count - 1;
+
                 return this.accounts[selNum];
             }
         }
@@ -82,10 +81,6 @@ namespace Shrimp.Account
         /// <summary>
         /// 選択中の位置
         /// </summary>
-        public int selNum
-        {
-            get;
-            set;
-        }
+        public int selNum { get; set; }
     }
 }

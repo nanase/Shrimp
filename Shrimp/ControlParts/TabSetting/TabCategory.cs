@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Shrimp.ControlParts.Tabs;
 using Shrimp.Twitter.REST.List;
@@ -19,102 +13,102 @@ namespace Shrimp.ControlParts.TabSetting
         private ListSelectView listControl;
         private NotifySelectView notifyControl;
 
-        public TabCategory ( TabDelivery delivery, listDataCollection listDatas )
+        public TabCategory(TabDelivery delivery, listDataCollection listDatas)
         {
-            InitializeComponent ();
+            InitializeComponent();
             this._category = delivery.Category;
             this._listDatas = listDatas;
 
-            this.listControl = new ListSelectView ( this._listDatas );
-            this.listControl.OnChangedDetail += new EventHandler ( listOnChangedDetail );
-            if ( this._category.notifyFilter == null )
-                this._category.notifyFilter = new Twitter.Status.NotifyFilter ();
-            this.notifyControl = new NotifySelectView ( this._category.notifyFilter );
-            this.notifyControl.OnChangedDetail += new EventHandler ( notifyOnChangedDetail );
+            this.listControl = new ListSelectView(this._listDatas);
+            this.listControl.OnChangedDetail += new EventHandler(listOnChangedDetail);
+            if (this._category.notifyFilter == null)
+                this._category.notifyFilter = new Twitter.Status.NotifyFilter();
+            this.notifyControl = new NotifySelectView(this._category.notifyFilter);
+            this.notifyControl.OnChangedDetail += new EventHandler(notifyOnChangedDetail);
 
             this.TabCategoryBox.SelectedIndex = TimelineCategoriesConverter(_category.category);
-            if ( this._category.category == TimelineCategories.ListTimeline )
-                AddControl ( listControl );
-            if ( this._category.category == TimelineCategories.NotifyTimeline )
-                AddControl ( notifyControl );
+            if (this._category.category == TimelineCategories.ListTimeline)
+                AddControl(listControl);
+            if (this._category.category == TimelineCategories.NotifyTimeline)
+                AddControl(notifyControl);
         }
 
-        ~TabCategory ()
+        ~TabCategory()
         {
-            this.listControl.OnChangedDetail -= new EventHandler ( listOnChangedDetail );
-            this.notifyControl.OnChangedDetail -= new EventHandler ( notifyOnChangedDetail );
+            this.listControl.OnChangedDetail -= new EventHandler(listOnChangedDetail);
+            this.notifyControl.OnChangedDetail -= new EventHandler(notifyOnChangedDetail);
         }
 
-        private void listOnChangedDetail ( object sender, EventArgs e )
+        private void listOnChangedDetail(object sender, EventArgs e)
         {
-            this._category.ListData = this.listControl.getNowSelectedList ();
+            this._category.ListData = this.listControl.getNowSelectedList();
             this.Tag = true;
         }
 
 
-        private void notifyOnChangedDetail ( object sender, EventArgs e )
+        private void notifyOnChangedDetail(object sender, EventArgs e)
         {
             this.Tag = true;
         }
 
-        private int TimelineCategoriesConverter ( TimelineCategories category )
+        private int TimelineCategoriesConverter(TimelineCategories category)
         {
-            if ( category == TimelineCategories.None )
+            if (category == TimelineCategories.None)
                 return 0;
-            if ( category == TimelineCategories.HomeTimeline )
+            if (category == TimelineCategories.HomeTimeline)
                 return 1;
-            if ( category == TimelineCategories.MentionTimeline )
+            if (category == TimelineCategories.MentionTimeline)
                 return 2;
-            if ( category == TimelineCategories.DirectMessageTimeline )
+            if (category == TimelineCategories.DirectMessageTimeline)
                 return 3;
-            if ( category == TimelineCategories.ListTimeline )
+            if (category == TimelineCategories.ListTimeline)
                 return 4;
-            if ( category == TimelineCategories.NotifyTimeline )
+            if (category == TimelineCategories.NotifyTimeline)
                 return 5;
             return 0;
         }
 
-        private void AddControl ( Control c )
+        private void AddControl(Control c)
         {
-            this.otherBox.Controls.Clear ();
+            this.otherBox.Controls.Clear();
             c.Dock = DockStyle.Fill;
-            this.otherBox.Controls.Add ( c );
+            this.otherBox.Controls.Add(c);
         }
 
-        private TimelineCategories TabCategoryConverter ( int category )
+        private TimelineCategories TabCategoryConverter(int category)
         {
-            if ( category == 0 )
+            if (category == 0)
                 return TimelineCategories.None;
-            if ( category == 1 )
+            if (category == 1)
                 return TimelineCategories.HomeTimeline;
-            if ( category == 2 )
+            if (category == 2)
                 return TimelineCategories.MentionTimeline;
-            if ( category == 3 )
+            if (category == 3)
                 return TimelineCategories.DirectMessageTimeline;
-            if ( category == 4 )
+            if (category == 4)
                 return TimelineCategories.ListTimeline;
-            if ( category == 5 )
+            if (category == 5)
                 return TimelineCategories.NotifyTimeline;
             return TimelineCategories.None;
         }
 
-        private void TabCategoryBox_SelectedIndexChanged ( object sender, EventArgs e )
+        private void TabCategoryBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            this._category.category = TabCategoryConverter ( this.TabCategoryBox.SelectedIndex );
-            if ( this._category.category == TimelineCategories.ListTimeline )
+            this._category.category = TabCategoryConverter(this.TabCategoryBox.SelectedIndex);
+            if (this._category.category == TimelineCategories.ListTimeline)
             {
-                AddControl ( listControl );
+                AddControl(listControl);
                 return;
             }
-            if ( this._category.category == TimelineCategories.NotifyTimeline )
+            if (this._category.category == TimelineCategories.NotifyTimeline)
             {
-                if ( this._category.notifyFilter == null )
-                    this._category.notifyFilter = new NotifyFilter ();
-                AddControl ( notifyControl );
+                if (this._category.notifyFilter == null)
+                    this._category.notifyFilter = new NotifyFilter();
+                AddControl(notifyControl);
                 return;
             }
             this.Tag = true;
-            this.otherBox.Controls.Clear ();
+            this.otherBox.Controls.Clear();
         }
     }
 }

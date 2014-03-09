@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Shrimp.ControlParts.Tabs;
+﻿using Shrimp.ControlParts.Tabs;
 
 namespace Shrimp.Module.Queue
 {
@@ -11,7 +7,7 @@ namespace Shrimp.Module.Queue
         private readonly TabControls _sender;
         private readonly object _raw_data;
 
-        public TabQueueData ( TabControls sender, object raw_data )
+        public TabQueueData(TabControls sender, object raw_data)
         {
             //
             this._sender = sender;

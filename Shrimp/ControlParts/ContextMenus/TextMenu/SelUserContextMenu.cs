@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace Shrimp.ControlParts.ContextMenus.TextMenu
 {
@@ -23,9 +19,9 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
 
         #endregion
 
-        public SelUserContextMenu ()
+        public SelUserContextMenu()
         {
-            InitializeComponent ();
+            InitializeComponent();
             this.OpenUserTimelineTabMenu.Image = Setting.ResourceImages.TextImage;
             this.OpenReplyToUserTabMenu.Image = Setting.ResourceImages.RepliesImage;
             this.OpenUserFavTimelineTabMenu.Image = Setting.ResourceImages.FavsImage;
@@ -33,30 +29,30 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
             this.OpenConversationTabMenu.Image = Setting.ResourceImages.ConversationImage;
         }
 
-        void Menu_Opening ( object sender, CancelEventArgs e )
+        void Menu_Opening(object sender, CancelEventArgs e)
         {
             this.isClosed = false;
-            if ( this.MenuOpening != null )
-                this.MenuOpening ( sender, e );
+            if (this.MenuOpening != null)
+                this.MenuOpening(sender, e);
         }
 
         /// <summary>
         /// ユーザーメニュー表示
         /// </summary>
         /// <param name="p"></param>
-        public void ShowMenu ( Point screen_location, string screen_name )
+        public void ShowMenu(Point screen_location, string screen_name)
         {
             this.screen_name = screen_name;
-            this.UserMenu.Show ( screen_location );
+            this.UserMenu.Show(screen_location);
         }
 
         /// <summary>
         /// ユーザーメニュー表示
         /// </summary>
         /// <param name="p"></param>
-        public void MenuClose ()
+        public void MenuClose()
         {
-            this.UserMenu.Close ();
+            this.UserMenu.Close();
         }
 
         /// <summary>
@@ -72,12 +68,12 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Menu_Closed ( object sender, ToolStripDropDownClosedEventArgs e )
+        private void Menu_Closed(object sender, ToolStripDropDownClosedEventArgs e)
         {
             this.isClosed = true;
-            if ( MenuClosed != null )
+            if (MenuClosed != null)
             {
-                MenuClosed ( sender, e );
+                MenuClosed(sender, e);
             }
         }
 
@@ -86,11 +82,11 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
             get { return this.UserMenu; }
         }
 
-        private void UserMenu_ItemClicked ( object sender, ToolStripItemClickedEventArgs e )
+        private void UserMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            if ( MenuItemClicked != null )
+            if (MenuItemClicked != null)
             {
-                MenuItemClicked.Invoke ( screen_name, e );
+                MenuItemClicked.Invoke(screen_name, e);
             }
         }
     }

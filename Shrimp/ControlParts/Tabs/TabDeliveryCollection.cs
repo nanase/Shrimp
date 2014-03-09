@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Shrimp.Twitter.Status;
-using Shrimp.Twitter.REST.List;
 using System.Xml.Serialization;
+using Shrimp.Twitter.REST.List;
+using Shrimp.Twitter.Status;
 
 namespace Shrimp.ControlParts.Tabs
 {
@@ -15,22 +13,22 @@ namespace Shrimp.ControlParts.Tabs
         #endregion
 
         #region コンストラクター
-        public TabDeliveryCollection ()
+        public TabDeliveryCollection()
         {
-            this.delivery = new List<TabDelivery> ();
+            this.delivery = new List<TabDelivery>();
         }
 
-        public TabDeliveryCollection ( int capacity )
+        public TabDeliveryCollection(int capacity)
         {
-            this.delivery = new List<TabDelivery> ( capacity );
+            this.delivery = new List<TabDelivery>(capacity);
         }
 
-        public object Clone ()
+        public object Clone()
         {
-            var tmp = new TabDeliveryCollection ();
-            foreach ( TabDelivery t in this.delivery )
+            var tmp = new TabDeliveryCollection();
+            foreach (TabDelivery t in this.delivery)
             {
-                tmp.AddDelivery ( (TabDelivery)t.Clone () );
+                tmp.AddDelivery((TabDelivery)t.Clone());
             }
             return tmp;
         }
@@ -64,7 +62,7 @@ namespace Shrimp.ControlParts.Tabs
         {
             get
             {
-                if ( this.delivery.Count == 0 )
+                if (this.delivery.Count == 0)
                     return TimelineCategories.None;
                 return this.delivery[0].Category.category;
             }
@@ -78,7 +76,7 @@ namespace Shrimp.ControlParts.Tabs
         {
             get
             {
-                return ( TopCategory == TimelineCategories.UserInformation ? false : true );
+                return (TopCategory == TimelineCategories.UserInformation ? false : true);
             }
         }
 
@@ -87,11 +85,11 @@ namespace Shrimp.ControlParts.Tabs
         /// </summary>
         /// <param name="category"></param>
         /// <returns></returns>
-        public bool isContainsCategory ( TimelineCategories category )
+        public bool isContainsCategory(TimelineCategories category)
         {
-            foreach ( TabDelivery t in this.delivery )
+            foreach (TabDelivery t in this.delivery)
             {
-                if ( t.Category.category == category )
+                if (t.Category.category == category)
                     return true;
             }
             return false;
@@ -102,19 +100,19 @@ namespace Shrimp.ControlParts.Tabs
         /// </summary>
         /// <param name="user_id"></param>
         /// <returns></returns>
-        public listDataCollection FindListData ( decimal user_id )
+        public listDataCollection FindListData(decimal user_id)
         {
             listDataCollection dest = null;
-            foreach ( TabDelivery tmp in this.deliveries )
+            foreach (TabDelivery tmp in this.deliveries)
             {
                 TimelineCategory cat = tmp.Category;
-                if ( cat.category != TimelineCategories.ListTimeline )
+                if (cat.category != TimelineCategories.ListTimeline)
                     continue;
-                if ( cat.ListData != null && cat.ListData.create_user_id == user_id )
+                if (cat.ListData != null && cat.ListData.create_user_id == user_id)
                 {
-                    if ( dest == null )
-                        dest = new listDataCollection ();
-                    dest.Addlist ( cat.ListData );
+                    if (dest == null)
+                        dest = new listDataCollection();
+                    dest.Addlist(cat.ListData);
                 }
             }
             return dest;
@@ -127,37 +125,37 @@ namespace Shrimp.ControlParts.Tabs
         /// <param name="isAll"></param>
         /// <param name="category"></param>
         /// <returns></returns>
-        public bool isMatch ( decimal user_id, TimelineCategories destCategory, object checkObject )
+        public bool isMatch(decimal user_id, TimelineCategories destCategory, object checkObject)
         {
-            if ( ( destCategory != TimelineCategories.ListTimeline && destCategory != TimelineCategories.BookmarkTimeline ) && this.deliveries.FindIndex ( ( tabs ) => tabs.Category.isAllUserAccept ) < 0 )
+            if ((destCategory != TimelineCategories.ListTimeline && destCategory != TimelineCategories.BookmarkTimeline) && this.deliveries.FindIndex((tabs) => tabs.Category.isAllUserAccept) < 0)
             {
-                var isMatchID = this.deliveries.FindIndex ( ( tabs ) =>
-                                tabs.DeliveryFromUsers.FindIndex ( ( tmpID ) => tmpID == user_id ) >= 0 ) >= 0;
-                if ( !isMatchID )
+                var isMatchID = this.deliveries.FindIndex((tabs) =>
+                                tabs.DeliveryFromUsers.FindIndex((tmpID) => tmpID == user_id) >= 0) >= 0;
+                if (!isMatchID)
                     return false;
             }
-            if ( this.deliveries.FindIndex ( ( tabs ) => tabs.Category.category == destCategory ) < 0 )
+            if (this.deliveries.FindIndex((tabs) => tabs.Category.category == destCategory) < 0)
             {
                 return false;
             }
 
-            if ( destCategory == TimelineCategories.ListTimeline )
+            if (destCategory == TimelineCategories.ListTimeline)
             {
-                foreach ( TabDelivery tmp in this.deliveries )
+                foreach (TabDelivery tmp in this.deliveries)
                 {
                     TimelineCategory cat = tmp.Category;
-                    if ( cat.ListData != null && cat.ListData.list_id == (decimal)checkObject )
+                    if (cat.ListData != null && cat.ListData.list_id == (decimal)checkObject)
                         return true;
                 }
                 return false;
             }
 
-            if ( destCategory == TimelineCategories.NotifyTimeline )
+            if (destCategory == TimelineCategories.NotifyTimeline)
             {
-                foreach ( TabDelivery tmp in this.deliveries )
+                foreach (TabDelivery tmp in this.deliveries)
                 {
                     TimelineCategory cat = tmp.Category;
-                    if ( cat.notifyFilter != null && cat.notifyFilter.isHit ( (TwitterNotifyStatus)checkObject ) )
+                    if (cat.notifyFilter != null && cat.notifyFilter.isHit((TwitterNotifyStatus)checkObject))
                     {
                         return true;
                     }
@@ -171,18 +169,18 @@ namespace Shrimp.ControlParts.Tabs
         /// 配達条件を増やす。
         /// </summary>
         /// <param name="delivery"></param>
-        public void AddDelivery ( TabDelivery delivery )
+        public void AddDelivery(TabDelivery delivery)
         {
-            this.delivery.Add ( delivery );
+            this.delivery.Add(delivery);
         }
 
         /// <summary>
         /// 配達条件を削除する
         /// </summary>
         /// <param name="i"></param>
-        public void RemoveDeliveryAt ( int i )
+        public void RemoveDeliveryAt(int i)
         {
-            this.delivery.RemoveAt ( i );
+            this.delivery.RemoveAt(i);
         }
     }
 }

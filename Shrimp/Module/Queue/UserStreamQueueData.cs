@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Shrimp.Twitter.REST;
+﻿using Shrimp.Twitter.REST;
 using Shrimp.Twitter.Streaming;
 
 namespace Shrimp.Module.Queue
@@ -13,10 +9,10 @@ namespace Shrimp.Module.Queue
         private readonly UserStreaming _sender;
         private readonly object _EventHandler;
 
-        public UserStreamQueueData ( UserStreaming sender, TwitterCompletedEventArgs args, object EventHandler )
+        public UserStreamQueueData(UserStreaming sender, TwitterCompletedEventArgs args, object EventHandler)
         {
             //
-            this._args = (TwitterCompletedEventArgs)args.Clone ();
+            this._args = (TwitterCompletedEventArgs)args.Clone();
             this._sender = sender;
             this._EventHandler = EventHandler;
         }

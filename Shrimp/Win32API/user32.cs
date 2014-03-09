@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 
 namespace Shrimp.Win32API
 {
     public class user32
     {
-        [DllImport ( "user32.dll" )]
-        static extern Int32 FlashWindowEx ( ref FLASHWINFO pwfi );
+        [DllImport("user32.dll")]
+        static extern Int32 FlashWindowEx(ref FLASHWINFO pwfi);
 
-        [StructLayout ( LayoutKind.Sequential )]
+        [StructLayout(LayoutKind.Sequential)]
         public struct FLASHWINFO
         {
             public UInt32 cbSize;    // FLASHWINFO構造体のサイズ
@@ -29,16 +26,16 @@ namespace Shrimp.Win32API
         public const UInt32 FLASHW_TIMER = 4;       // FLASHW_STOPが指定されるまでずっと点滅させる
         public const UInt32 FLASHW_TIMERNOFG = 12;  // ウィンドウが最前面に来るまでずっと点滅させる
 
-        public static void FlashWindow ( IntPtr hWnd, bool isStop = false )
+        public static void FlashWindow(IntPtr hWnd, bool isStop = false)
         {
-            FLASHWINFO fInfo = new FLASHWINFO ();
-            fInfo.cbSize = Convert.ToUInt32 ( Marshal.SizeOf ( fInfo ) );
+            FLASHWINFO fInfo = new FLASHWINFO();
+            fInfo.cbSize = Convert.ToUInt32(Marshal.SizeOf(fInfo));
             fInfo.hwnd = hWnd;
-            fInfo.dwFlags = ( isStop ? FLASHW_STOP : FLASHW_ALL );
+            fInfo.dwFlags = (isStop ? FLASHW_STOP : FLASHW_ALL);
             fInfo.uCount = 5; // 点滅回数
             fInfo.dwTimeout = 0;
 
-            FlashWindowEx ( ref fInfo );
+            FlashWindowEx(ref fInfo);
         }
     }
 }

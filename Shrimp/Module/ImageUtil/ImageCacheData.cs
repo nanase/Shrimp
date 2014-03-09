@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace Shrimp.Module.ImageUtil
 {
@@ -17,7 +13,7 @@ namespace Shrimp.Module.ImageUtil
         /// </summary>
         /// <param name="_isIcon"></param>
         /// <param name="bitmap"></param>
-        public ImageCacheData ( string url, bool _isIcon, Bitmap bitmap )
+        public ImageCacheData(string url, bool _isIcon, Bitmap bitmap)
         {
             this.url = url;
             this.isIcon = _isIcon;

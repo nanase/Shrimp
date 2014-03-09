@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Shrimp.Twitter
 {
     public class TwitterUpdateImage
@@ -12,7 +8,7 @@ namespace Shrimp.Twitter
         private readonly string _status;
         private readonly decimal _in_reply_to_status_id;
 
-        public TwitterUpdateImage ( string filename, byte[] data, string status, decimal in_reply_to_status_id )
+        public TwitterUpdateImage(string filename, byte[] data, string status, decimal in_reply_to_status_id)
         {
             this._filename = filename;
             this._data = data;

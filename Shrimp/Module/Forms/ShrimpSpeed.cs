@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Shrimp.Module.Forms
@@ -19,35 +16,35 @@ namespace Shrimp.Module.Forms
         private object lockSpeedCount = null;
 
         #region デリゲート
-        public delegate void OnChnageSpeedDelegate ( int percentage );
+        public delegate void OnChnageSpeedDelegate(int percentage);
         #endregion
 
-        public ShrimpSpeed ( OnChnageSpeedDelegate OnChangeSpeed )
+        public ShrimpSpeed(OnChnageSpeedDelegate OnChangeSpeed)
         {
             this.OnChangeSpeed = OnChangeSpeed;
-            this.lockSpeedCount = new object ();
+            this.lockSpeedCount = new object();
             this.Interval = 10000;
-            this.Tick += new EventHandler ( ShrimpSpeed_Tick );
-            this.Start ();
+            this.Tick += new EventHandler(ShrimpSpeed_Tick);
+            this.Start();
         }
 
-        void ShrimpSpeed_Tick ( object sender, EventArgs e )
+        void ShrimpSpeed_Tick(object sender, EventArgs e)
         {
             var speed = 0;
-            lock ( this.lockSpeedCount )
+            lock (this.lockSpeedCount)
             {
-                speed = (int)( (double)this.shrimpSpeedCount / 100.0 ) * 100;
+                speed = (int)((double)this.shrimpSpeedCount / 100.0) * 100;
                 this.shrimpSpeedCount = 0;
             }
-            OnChangeSpeed.Invoke ( speed );
+            OnChangeSpeed.Invoke(speed);
         }
 
         /// <summary>
         /// スピードを加速させる
         /// </summary>
-        public void IncreaseSpeedCount ()
+        public void IncreaseSpeedCount()
         {
-            lock ( this.lockSpeedCount )
+            lock (this.lockSpeedCount)
             {
                 this.shrimpSpeedCount++;
             }

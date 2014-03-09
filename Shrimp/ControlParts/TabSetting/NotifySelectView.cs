@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Shrimp.Twitter.Status;
 
@@ -15,41 +9,41 @@ namespace Shrimp.ControlParts.TabSetting
         public EventHandler OnChangedDetail;
         private NotifyFilter tmpFilter = null;
         private bool isInitialized = false;
-        public NotifySelectView ( NotifyFilter notifyFilter )
+        public NotifySelectView(NotifyFilter notifyFilter)
         {
-            InitializeComponent ();
-            notifyBox.SetItemChecked ( 0, notifyFilter.Favorited );
-            notifyBox.SetItemChecked ( 1, notifyFilter.UnFavorited );
-            notifyBox.SetItemChecked ( 2, notifyFilter.Followed );
-            notifyBox.SetItemChecked ( 3, notifyFilter.Unfollowed );
+            InitializeComponent();
+            notifyBox.SetItemChecked(0, notifyFilter.Favorited);
+            notifyBox.SetItemChecked(1, notifyFilter.UnFavorited);
+            notifyBox.SetItemChecked(2, notifyFilter.Followed);
+            notifyBox.SetItemChecked(3, notifyFilter.Unfollowed);
             tmpFilter = notifyFilter;
             this.isInitialized = true;
         }
 
-        public void setNotifyFilter ()
+        public void setNotifyFilter()
         {
             //NotifyFilter notify = new NotifyFilter ();
-            foreach ( string item in this.notifyBox.SelectedItems )
+            foreach (string item in this.notifyBox.SelectedItems)
             {
-                if ( item == "お気に入りに追加されたとき" )
+                if (item == "お気に入りに追加されたとき")
                     tmpFilter.Favorited = !tmpFilter.Favorited;
-                if ( item == "お気に入りから削除されたとき" )
+                if (item == "お気に入りから削除されたとき")
                     tmpFilter.UnFavorited = !tmpFilter.UnFavorited;
-                if ( item == "フォローされたとき" )
+                if (item == "フォローされたとき")
                     tmpFilter.Followed = !tmpFilter.Followed;
-                if ( item == "アンフォローしたとき" )
+                if (item == "アンフォローしたとき")
                     tmpFilter.Unfollowed = !tmpFilter.Unfollowed;
             }
             //return notify;
         }
-        
-        private void notifyBox_SelectedValueChanged ( object sender, EventArgs e )
+
+        private void notifyBox_SelectedValueChanged(object sender, EventArgs e)
         {
-            if ( !this.isInitialized )
+            if (!this.isInitialized)
                 return;
-            this.setNotifyFilter ();
-            if ( OnChangedDetail != null )
-                OnChangedDetail.Invoke ( sender, e );
+            this.setNotifyFilter();
+            if (OnChangedDetail != null)
+                OnChangedDetail.Invoke(sender, e);
         }
     }
 }

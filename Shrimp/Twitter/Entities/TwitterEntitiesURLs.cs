@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Shrimp.Twitter.Entities
 {
     /// <summary>
@@ -14,14 +10,14 @@ namespace Shrimp.Twitter.Entities
         #endregion
 
         #region コンストラクタ
-        public TwitterEntitiesURLs ( dynamic raw_data )
+        public TwitterEntitiesURLs(dynamic raw_data)
         {
             this.url = raw_data.url;
             this.expanded_url = raw_data.expanded_url;
             this.display_url = raw_data.display_url;
             this.indices = new int[] { (int)raw_data.indices[0], (int)raw_data.indices[1] };
         }
-        public TwitterEntitiesURLs ( string url, int[] indices )
+        public TwitterEntitiesURLs(string url, int[] indices)
         {
             this.url = url;
             this.indices = indices;

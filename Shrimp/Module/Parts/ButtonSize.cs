@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace Shrimp.Module.Parts
 {
@@ -31,7 +27,7 @@ namespace Shrimp.Module.Parts
         /// </summary>
         public Rectangle ReplyIconRect
         {
-            get { return new Rectangle ( ReplyIconPosition, ReplyIconSize ); }
+            get { return new Rectangle(ReplyIconPosition, ReplyIconSize); }
         }
 
         /// <summary>
@@ -57,7 +53,7 @@ namespace Shrimp.Module.Parts
         /// </summary>
         public Rectangle RetweetIconRect
         {
-            get { return new Rectangle ( RetweetIconPosition, RetweetIconSize ); }
+            get { return new Rectangle(RetweetIconPosition, RetweetIconSize); }
         }
 
         /// <summary>
@@ -83,7 +79,7 @@ namespace Shrimp.Module.Parts
         /// </summary>
         public Rectangle FavIconRect
         {
-            get { return new Rectangle ( FavIconPosition, FavIconSize ); }
+            get { return new Rectangle(FavIconPosition, FavIconSize); }
         }
 
         /// <summary>
@@ -93,7 +89,7 @@ namespace Shrimp.Module.Parts
         {
             get
             {
-                return new Rectangle ( ReplyIconPosition, new Size ( ReplyIconSize.Width + RetweetIconSize.Width + FavIconSize.Width + ( Setting.Timeline.ButtonPadding * 3 ), RetweetIconSize.Height ) );
+                return new Rectangle(ReplyIconPosition, new Size(ReplyIconSize.Width + RetweetIconSize.Width + FavIconSize.Width + (Setting.Timeline.ButtonPadding * 3), RetweetIconSize.Height));
             }
         }
     }

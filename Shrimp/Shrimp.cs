@@ -914,7 +914,7 @@ namespace Shrimp
                     q.Add ( new OAuthBase.QueryParameter ( "replies", "all" ) );
                 if ( Setting.UserStream.isIncludeFollowingsActivity )
                     q.Add ( new OAuthBase.QueryParameter ( "include_followings_activity", "true" ) );
-                q.Add ( new OAuthBase.QueryParameter ( "track", "@" ) );
+                //q.Add ( new OAuthBase.QueryParameter ( "track", "@" ) );
                 foreach ( TwitterInfo t in accountManager.accounts )
                 {
                     us.loadAsync ( t, q );

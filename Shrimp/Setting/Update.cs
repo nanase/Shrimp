@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Shrimp.Setting
 {
@@ -16,25 +13,25 @@ namespace Shrimp.Setting
         /// <summary>
         /// 静的コンストラクタ
         /// </summary>
-        public static void initialize ()
+        public static void initialize()
         {
             isUpdateEnable = true;
             isIgnoreUpdate = false;
         }
 
-        public static void load ( Dictionary<string, bool> obj )
+        public static void load(Dictionary<string, bool> obj)
         {
-            if ( obj == null )
+            if (obj == null)
                 return;
-            if ( obj.ContainsKey ( "isUpdateEnable" ) )
+            if (obj.ContainsKey("isUpdateEnable"))
                 isUpdateEnable = (bool)obj["isUpdateEnable"];
-            if ( obj.ContainsKey ( "isIgnoreUpdate" ) )
+            if (obj.ContainsKey("isIgnoreUpdate"))
                 isIgnoreUpdate = (bool)obj["isIgnoreUpdate"];
         }
 
-        public static Dictionary<string, bool> save ()
+        public static Dictionary<string, bool> save()
         {
-            var dest = new Dictionary<string, bool> ();
+            var dest = new Dictionary<string, bool>();
             dest["isUpdateEnable"] = isUpdateEnable;
             dest["isIgnoreUpdate"] = isIgnoreUpdate;
             return dest;

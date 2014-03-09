@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using Shrimp.Twitter.Status;
-using Shrimp.ControlParts.Timeline;
 using Shrimp.ControlParts.Tabs;
+using Shrimp.ControlParts.Timeline;
+using Shrimp.Twitter.Status;
 
 namespace Shrimp.ControlParts.User
 {
@@ -30,56 +25,56 @@ namespace Shrimp.ControlParts.User
         private Shrimp.OnUserStatusControlAPIDelegate OnUserStatusControlAPI;
         private bool isTimeline, isFavoriteTimeline, isConversationTimeline;
 
-        public UserStatusControl ( TwitterUserStatus user, TimelineControl.TabControlOperationgDelegate TabControlOperatingHandler, 
-            TimelineControl.OnUseTwitterAPIDelegate OnUseTwitterAPIHandler, Shrimp.OnUserStatusControlAPIDelegate OnUserStatusControlAPI )
+        public UserStatusControl(TwitterUserStatus user, TimelineControl.TabControlOperationgDelegate TabControlOperatingHandler,
+            TimelineControl.OnUseTwitterAPIDelegate OnUseTwitterAPIHandler, Shrimp.OnUserStatusControlAPIDelegate OnUserStatusControlAPI)
         {
-            InitializeComponent ();
-            this.userBase = new UserStatusControlBase ( user, TabControlOperatingHandler, OnUseTwitterAPIHandler );
+            InitializeComponent();
+            this.userBase = new UserStatusControlBase(user, TabControlOperatingHandler, OnUseTwitterAPIHandler);
             this.userBase.Dock = DockStyle.Fill;
             this.OnUserStatusControlAPI = OnUserStatusControlAPI;
 
-            this.usertimeline = new TimelineControl ();
+            this.usertimeline = new TimelineControl();
             this.usertimeline.Dock = DockStyle.Fill;
-            
-            this.UserTimelinePage.Controls.Add ( this.usertimeline );
+
+            this.UserTimelinePage.Controls.Add(this.usertimeline);
             this.UserTimelinePage.Tag = this.usertimeline;
 
-            this.userfavoritetimeline = new TimelineControl ();
+            this.userfavoritetimeline = new TimelineControl();
             this.userfavoritetimeline.Dock = DockStyle.Fill;
-            
-            this.UserFavoritePage.Controls.Add ( this.userfavoritetimeline );
+
+            this.UserFavoritePage.Controls.Add(this.userfavoritetimeline);
             this.UserFavoritePage.Tag = this.userfavoritetimeline;
 
-            this.userconversation = new TimelineControl ();
+            this.userconversation = new TimelineControl();
             this.userconversation.Dock = DockStyle.Fill;
-            
-            this.ConversationPage.Controls.Add ( this.userconversation );
+
+            this.ConversationPage.Controls.Add(this.userconversation);
             this.ConversationPage.Tag = this.userconversation;
 
-            this.MainContainer.Panel1.Controls.Add ( this.userBase );
+            this.MainContainer.Panel1.Controls.Add(this.userBase);
         }
 
-        public void SetTimelineControlHander ( TimelineControl obj )
+        public void SetTimelineControlHander(TimelineControl obj)
         {
-            if ( OnChangedTweetDelay != null )
+            if (OnChangedTweetDelay != null)
                 obj.OnChangedTweetDelayPercentage += OnChangedTweetDelay;
-            if ( OnChangedTweetHandler != null )
+            if (OnChangedTweetHandler != null)
                 obj.OnChangeTweet += OnChangedTweetHandler;
-            if ( OnUserTwitterAPI != null )
+            if (OnUserTwitterAPI != null)
                 obj.OnUseTwitterAPI += OnUserTwitterAPI;
-            if ( OnRequiredAccountInfo != null )
+            if (OnRequiredAccountInfo != null)
                 obj.OnRequiredAccountInfo += OnRequiredAccountInfo;
-            if ( OnCreatedReplyData != null )
+            if (OnCreatedReplyData != null)
                 obj.OnCreatedReplyData += OnCreatedReplyData;
-            if ( TabControlOperationHandler != null )
+            if (TabControlOperationHandler != null)
                 obj.TabControlOperatingHandler += TabControlOperationHandler;
         }
 
-        public void SetHandlers ( TimelineControl.OnChangedTweetHandler OnChangedTweetHandler, TimelineControl.OnUseTwitterAPIDelegate OnUserTwitterAPI,
+        public void SetHandlers(TimelineControl.OnChangedTweetHandler OnChangedTweetHandler, TimelineControl.OnUseTwitterAPIDelegate OnUserTwitterAPI,
                      TimelineControl.OnChangedTweetDelayPercentageHandler OnChangedTweetDelay, TimelineControl.OnRequiredAccountInfoDeleagate OnRequiredAccountInfo,
                      TimelineControl.OnCreatedReplyDataDelegate OnCreatedReplyData, TimelineControl.TabControlOperationgDelegate TabControlOperationHandler,
     TimelineControl.OnRequiredShrimpData OnRequiredShrimpData, TimelineControl.OnReloadShrimp OnReloadShrimp, Shrimp.OnCreatedTweetDelegate OnCreatedTweet,
-    TabControls.FlashWindowDelegate OnFlashWindowDelegate, Shrimp.OnUserStatusControlAPIDelegate OnUserStatusControlAPI )
+    TabControls.FlashWindowDelegate OnFlashWindowDelegate, Shrimp.OnUserStatusControlAPIDelegate OnUserStatusControlAPI)
         {
             //this.OnChangedTweetDelay += OnChangedTweetDelay;
             //this.OnChangedTweetHandler += OnChangedTweetHandler;
@@ -93,36 +88,36 @@ namespace Shrimp.ControlParts.User
             this.OnFlashWindowDelegate += OnFlashWindowDelegate;
             this.OnUserStatusControlAPI += OnUserStatusControlAPI;
 
-            this.SetTimelineControlHander ( this.usertimeline );
-            this.SetTimelineControlHander ( this.userfavoritetimeline );
-            this.SetTimelineControlHander ( this.userconversation );
+            this.SetTimelineControlHander(this.usertimeline);
+            this.SetTimelineControlHander(this.userfavoritetimeline);
+            this.SetTimelineControlHander(this.userconversation);
         }
 
 
         /// <summary>
         /// タイムラインが復帰されるときに使われます
         /// </summary>
-        public void Resume ()
+        public void Resume()
         {
-            this.userBase.Resume ();
+            this.userBase.Resume();
         }
 
         /// <summary>
         /// タイムラインがサスペンドモードに切り替わるときに使われます
         /// </summary>
-        public void Suspend ()
+        public void Suspend()
         {
-            this.userBase.Suspend ();
+            this.userBase.Suspend();
         }
 
         /// <summary>
         /// コントロールを撮影
         /// </summary>
         /// <returns></returns>
-        public Bitmap CaptureControl ()
+        public Bitmap CaptureControl()
         {
-            Bitmap bmp = new Bitmap ( this.Width, this.Height );
-            this.DrawToBitmap ( bmp, this.ClientRectangle );
+            Bitmap bmp = new Bitmap(this.Width, this.Height);
+            this.DrawToBitmap(bmp, this.ClientRectangle);
             return bmp;
         }
 
@@ -132,31 +127,32 @@ namespace Shrimp.ControlParts.User
             set { this.userBase.isLoadingFinished = value; }
         }
 
-        public void ChangeUserStatus ( TwitterUserStatus user )
+        public void ChangeUserStatus(TwitterUserStatus user)
         {
-            this.userBase.ChangeUserStatus ( user );
-            this.usertimeline.initialize ();
+            this.userBase.ChangeUserStatus(user);
+            this.usertimeline.initialize();
 
-            this.userfavoritetimeline.initialize ();
+            this.userfavoritetimeline.initialize();
 
-            this.userconversation.initialize ();
-            this.Invoke ( (MethodInvoker)delegate ()
+            this.userconversation.initialize();
+            this.Invoke((MethodInvoker)delegate()
             {
                 this.UserInfoControl.SelectedIndex = 0;
-            } );
+            });
         }
 
         //
         public TwitterUserStatus UserStatus
         {
-            get {
+            get
+            {
                 return this.userBase.UserStatus;
             }
         }
 
-        public void StartTabChangeAnimation ( Bitmap BeforeControl, Bitmap AfterControl, bool tabLeftRight, bool tabVertical )
+        public void StartTabChangeAnimation(Bitmap BeforeControl, Bitmap AfterControl, bool tabLeftRight, bool tabVertical)
         {
-            this.userBase.StartTabChangeAnimation ( BeforeControl, AfterControl, tabLeftRight, tabVertical );
+            this.userBase.StartTabChangeAnimation(BeforeControl, AfterControl, tabLeftRight, tabVertical);
         }
 
         /// <summary>
@@ -164,41 +160,41 @@ namespace Shrimp.ControlParts.User
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void UserInfoControl_SelectedIndexChanged ( object sender, EventArgs e )
+        private void UserInfoControl_SelectedIndexChanged(object sender, EventArgs e)
         {
             TabControl obj = sender as TabControl;
             TabPage tab = obj.SelectedTab;
 
-            if ( tab.Name == "UserTimelinePage" )
+            if (tab.Name == "UserTimelinePage")
             {
-                if ( OnUserStatusControlAPI != null && this.UserStatus != null && !isTimeline )
-                    OnUserStatusControlAPI ( (TimelineControl)tab.Tag, ActionType.UserTimeline, this.UserStatus.screen_name );
+                if (OnUserStatusControlAPI != null && this.UserStatus != null && !isTimeline)
+                    OnUserStatusControlAPI((TimelineControl)tab.Tag, ActionType.UserTimeline, this.UserStatus.screen_name);
                 this.isTimeline = true;
-                this.usertimeline.Resume ();
-                this.userfavoritetimeline.Suspend ();
-                this.userconversation.Suspend ();
-                ( (TimelineControl)tab.Tag ).Focus ();
+                this.usertimeline.Resume();
+                this.userfavoritetimeline.Suspend();
+                this.userconversation.Suspend();
+                ((TimelineControl)tab.Tag).Focus();
             }
-            if ( tab.Name == "UserFavoritePage" )
+            if (tab.Name == "UserFavoritePage")
             {
-                if ( OnUserStatusControlAPI != null && this.UserStatus != null && !isFavoriteTimeline )
-                    OnUserStatusControlAPI ( (TimelineControl)tab.Tag, ActionType.UserFavoriteTimeline, this.UserStatus.screen_name );
+                if (OnUserStatusControlAPI != null && this.UserStatus != null && !isFavoriteTimeline)
+                    OnUserStatusControlAPI((TimelineControl)tab.Tag, ActionType.UserFavoriteTimeline, this.UserStatus.screen_name);
                 this.isFavoriteTimeline = true;
-                this.usertimeline.Suspend ();
-                this.userfavoritetimeline.Resume ();
-                this.userconversation.Suspend ();
-                ( (TimelineControl)tab.Tag ).Focus ();
+                this.usertimeline.Suspend();
+                this.userfavoritetimeline.Resume();
+                this.userconversation.Suspend();
+                ((TimelineControl)tab.Tag).Focus();
             }
-            if ( tab.Name == "ConversationPage" )
+            if (tab.Name == "ConversationPage")
             {
-                if ( OnUserStatusControlAPI != null && this.UserStatus != null && !isConversationTimeline )
-                    OnUserStatusControlAPI ( (TimelineControl)tab.Tag, ActionType.UserConversation, this.UserStatus.screen_name );
+                if (OnUserStatusControlAPI != null && this.UserStatus != null && !isConversationTimeline)
+                    OnUserStatusControlAPI((TimelineControl)tab.Tag, ActionType.UserConversation, this.UserStatus.screen_name);
 
                 this.isConversationTimeline = true;
-                this.usertimeline.Suspend ();
-                this.userfavoritetimeline.Suspend ();
-                this.userconversation.Resume ();
-                ((TimelineControl)tab.Tag).Focus ();
+                this.usertimeline.Suspend();
+                this.userfavoritetimeline.Suspend();
+                this.userconversation.Resume();
+                ((TimelineControl)tab.Tag).Focus();
             }
         }
     }

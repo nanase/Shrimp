@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 
 namespace Shrimp.Setting
 {
@@ -18,20 +15,20 @@ namespace Shrimp.Setting
 
         #region コンストラクタ
 
-        internal static void initialize ()
+        internal static void initialize()
         {
             //  初期設定
-            NameFont = new Font ( "Meiryo", 9 );
-            TweetFont = new Font ( "Meiryo", 10 );
-            ViaFont = new Font ( "Meiryo", 9 );
-            RetweetNotify = new Font ( "Meiryo", 9 );
+            NameFont = new Font("Meiryo", 9);
+            TweetFont = new Font("Meiryo", 10);
+            ViaFont = new Font("Meiryo", 9);
+            RetweetNotify = new Font("Meiryo", 9);
         }
 
-        public static void load ( Dictionary<string, string> obj )
+        public static void load(Dictionary<string, string> obj)
         {
             if (obj == null)
                 return;
-            if ( obj.ContainsKey ( "NameFont" ) )
+            if (obj.ContainsKey("NameFont"))
                 NameFontConverted = (string)obj["NameFont"];
             if (obj.ContainsKey("TweetFont"))
                 TweetFontCoverted = (string)obj["TweetFont"];
@@ -41,7 +38,7 @@ namespace Shrimp.Setting
                 RetweetNotifyFontConverted = (string)obj["RetweetNotify"];
         }
 
-        public static Dictionary<string, string> save ()
+        public static Dictionary<string, string> save()
         {
             var dest = new Dictionary<string, string>();
             dest["NameFont"] = (string)NameFontConverted;
@@ -55,11 +52,11 @@ namespace Shrimp.Setting
         {
             get
             {
-                return TypeDescriptor.GetConverter ( typeof ( Font ) ).ConvertToString ( NameFont );
+                return TypeDescriptor.GetConverter(typeof(Font)).ConvertToString(NameFont);
             }
             set
             {
-                NameFont = (Font)TypeDescriptor.GetConverter ( typeof ( Font ) ).ConvertFromString ( value );
+                NameFont = (Font)TypeDescriptor.GetConverter(typeof(Font)).ConvertFromString(value);
             }
         }
 
@@ -67,11 +64,11 @@ namespace Shrimp.Setting
         {
             get
             {
-                return TypeDescriptor.GetConverter ( typeof ( Font ) ).ConvertToString ( TweetFont );
+                return TypeDescriptor.GetConverter(typeof(Font)).ConvertToString(TweetFont);
             }
             set
             {
-                TweetFont = (Font)TypeDescriptor.GetConverter ( typeof ( Font ) ).ConvertFromString ( value );
+                TweetFont = (Font)TypeDescriptor.GetConverter(typeof(Font)).ConvertFromString(value);
             }
         }
 
@@ -79,11 +76,11 @@ namespace Shrimp.Setting
         {
             get
             {
-                return TypeDescriptor.GetConverter ( typeof ( Font ) ).ConvertToString ( ViaFont );
+                return TypeDescriptor.GetConverter(typeof(Font)).ConvertToString(ViaFont);
             }
             set
             {
-                ViaFont = (Font)TypeDescriptor.GetConverter ( typeof ( Font ) ).ConvertFromString ( value );
+                ViaFont = (Font)TypeDescriptor.GetConverter(typeof(Font)).ConvertFromString(value);
             }
         }
 
@@ -91,11 +88,11 @@ namespace Shrimp.Setting
         {
             get
             {
-                return TypeDescriptor.GetConverter ( typeof ( Font ) ).ConvertToString ( RetweetNotify );
+                return TypeDescriptor.GetConverter(typeof(Font)).ConvertToString(RetweetNotify);
             }
             set
             {
-                RetweetNotify = (Font)TypeDescriptor.GetConverter ( typeof ( Font ) ).ConvertFromString ( value );
+                RetweetNotify = (Font)TypeDescriptor.GetConverter(typeof(Font)).ConvertFromString(value);
             }
         }
 
@@ -116,9 +113,9 @@ namespace Shrimp.Setting
             }
             set
             {
-                TweetUnderLineFont = new Font ( value, FontStyle.Underline );
-                TweetUnderLineBoldFont = new Font ( value, FontStyle.Underline | FontStyle.Bold );
-                TweetFontBold = new Font ( value, FontStyle.Bold );
+                TweetUnderLineFont = new Font(value, FontStyle.Underline);
+                TweetUnderLineBoldFont = new Font(value, FontStyle.Underline | FontStyle.Bold);
+                TweetFontBold = new Font(value, FontStyle.Bold);
                 _TweetFont = value;
             }
         }

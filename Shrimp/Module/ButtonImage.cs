@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace Shrimp.Module
 {
@@ -12,7 +8,7 @@ namespace Shrimp.Module
     class ButtonImage
     {
         #region コンストラクタ
-        public ButtonImage ( Image normal, Image hover )
+        public ButtonImage(Image normal, Image hover)
         {
             this.normal = normal;
             this.hover = hover;

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
+﻿using System.IO;
 using System.Reflection;
 
 namespace Shrimp.Setting
@@ -10,9 +6,9 @@ namespace Shrimp.Setting
     class ShrimpSettings
     {
         private static string DefaultPath;
-        static ShrimpSettings ()
+        static ShrimpSettings()
         {
-            DefaultPath = Path.GetDirectoryName ( Assembly.GetExecutingAssembly ().Location );
+            DefaultPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         }
 
         /// <summary>

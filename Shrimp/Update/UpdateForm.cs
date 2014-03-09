@@ -1,28 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Shrimp.Update
 {
     public partial class UpdateForm : Form
     {
-        public UpdateForm ()
+        public UpdateForm()
         {
-            InitializeComponent ();
+            InitializeComponent();
         }
 
-        public void SetLog ( string log )
+        public void SetLog(string log)
         {
-            this.logBox.Text = (string)log.Clone ();
+            this.logBox.Text = (string)log.Clone();
             this.logBox.SelectionStart = this.logBox.TextLength;
         }
 
-        private void IgnoreNotifyButton_Click ( object sender, EventArgs e )
+        private void IgnoreNotifyButton_Click(object sender, EventArgs e)
         {
             this.Tag = "Ignore";
         }

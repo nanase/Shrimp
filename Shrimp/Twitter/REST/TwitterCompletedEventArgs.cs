@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Shrimp.Module;
-using Shrimp.Twitter.Status;
 using System.Net;
 
 namespace Shrimp.Twitter.REST
@@ -18,7 +13,7 @@ namespace Shrimp.Twitter.REST
         private readonly object ret;
         private readonly TwitterSocket _raw_data;
 
-        public TwitterCompletedEventArgs ( TwitterInfo account_source, HttpStatusCode error_code, object ret, TwitterSocket raw_data )
+        public TwitterCompletedEventArgs(TwitterInfo account_source, HttpStatusCode error_code, object ret, TwitterSocket raw_data)
         {
             this._error_code = error_code;
             this._account_source = account_source;
@@ -58,9 +53,9 @@ namespace Shrimp.Twitter.REST
             get { return this._account_source; }
         }
 
-        public object Clone ()
+        public object Clone()
         {
-            var dest = new TwitterCompletedEventArgs ( this.account_source, this.error_code, this.ret, ( this.raw_data != null ? (TwitterSocket)this.raw_data.Clone () : null ) );
+            var dest = new TwitterCompletedEventArgs(this.account_source, this.error_code, this.ret, (this.raw_data != null ? (TwitterSocket)this.raw_data.Clone() : null));
             return dest;
         }
     }

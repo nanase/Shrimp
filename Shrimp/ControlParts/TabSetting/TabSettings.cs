@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using Shrimp.Account;
 using Shrimp.ControlParts.Tabs;
@@ -23,22 +18,22 @@ namespace Shrimp.ControlParts.TabSetting
         private string _ignoreTweet = "";
         private bool isChanged = false;
 
-        public TabSettings ( AccountManager manager, TabDeliveryCollection tabData, string ignoreTweet, listDataCollection listDatas )
+        public TabSettings(AccountManager manager, TabDeliveryCollection tabData, string ignoreTweet, listDataCollection listDatas)
         {
-            InitializeComponent ();
-            
+            InitializeComponent();
+
             this._manager = manager;
-            this._tabDataClone = (TabDeliveryCollection)tabData.Clone ();
+            this._tabDataClone = (TabDeliveryCollection)tabData.Clone();
             this._tabData = tabData;
             this._listDatas = listDatas;
-            this._ignoreTweetClone = ( ignoreTweet == null ? "" : (string)ignoreTweet.Clone () );
+            this._ignoreTweetClone = (ignoreTweet == null ? "" : (string)ignoreTweet.Clone());
             this._ignoreTweet = ignoreTweet;
 
-            foreach ( TabDelivery tab in this._tabDataClone.deliveries )
+            foreach (TabDelivery tab in this._tabDataClone.deliveries)
             {
-                this.tabTreeView.Nodes[0].Nodes.Add ( CreateTreeNode ( tab ) );
+                this.tabTreeView.Nodes[0].Nodes.Add(CreateTreeNode(tab));
             }
-            this.tabTreeView.ExpandAll ();
+            this.tabTreeView.ExpandAll();
         }
 
         /// <summary>
@@ -46,24 +41,24 @@ namespace Shrimp.ControlParts.TabSetting
         /// </summary>
         /// <param name="tab"></param>
         /// <returns></returns>
-        private TreeNode CreateTreeNode ( TabDelivery tab )
+        private TreeNode CreateTreeNode(TabDelivery tab)
         {
             TreeNode[] nodes = new TreeNode[1];
-            nodes[0] = new TreeNode ( "振り分け元ユーザーの選択" );
+            nodes[0] = new TreeNode("振り分け元ユーザーの選択");
             nodes[0].Name = "DeliveryFromUserMenu";
             nodes[0].Tag = tab;
-            TreeNode topNode = new TreeNode ( "" + tab.Category.CategoryName + "の設定", nodes );
+            TreeNode topNode = new TreeNode("" + tab.Category.CategoryName + "の設定", nodes);
             topNode.Name = "CategoryMenu";
             topNode.Tag = tab;
             return topNode;
         }
 
-        private void RedrawName ()
+        private void RedrawName()
         {
-            foreach ( TreeNode t in this.tabTreeView.Nodes[0].Nodes )
+            foreach (TreeNode t in this.tabTreeView.Nodes[0].Nodes)
             {
-                TimelineCategory c = ( (TabDelivery)t.Tag ).Category;
-                if ( t.Text != "" + c.CategoryName + "の設定" )
+                TimelineCategory c = ((TabDelivery)t.Tag).Category;
+                if (t.Text != "" + c.CategoryName + "の設定")
                 {
                     t.Text = "" + c.CategoryName + "の設定";
                 }
@@ -73,135 +68,135 @@ namespace Shrimp.ControlParts.TabSetting
         /// <summary>
         /// タブを新しく追加
         /// </summary>
-        private void AddNewTabs ()
+        private void AddNewTabs()
         {
-            TabDelivery d = new TabDelivery ( new TimelineCategory ( TimelineCategories.None, null, false ), null) ;
-            this._tabDataClone.deliveries.Add ( d );
-            this.tabTreeView.Nodes[0].Nodes.Add ( CreateTreeNode ( d ) );
+            TabDelivery d = new TabDelivery(new TimelineCategory(TimelineCategories.None, null, false), null);
+            this._tabDataClone.deliveries.Add(d);
+            this.tabTreeView.Nodes[0].Nodes.Add(CreateTreeNode(d));
         }
 
 
         /// <summary>
         /// タブを削除
         /// </summary>
-        private void RemoveTabs ( TabDelivery tab )
+        private void RemoveTabs(TabDelivery tab)
         {
-            if ( this._tabDataClone.deliveries.Count == 1 )
+            if (this._tabDataClone.deliveries.Count == 1)
                 return;
-            int i = this._tabDataClone.deliveries.FindIndex ( ( t ) => t == tab );
-            this._tabDataClone.deliveries.Remove ( tab );
-            this.tabTreeView.Nodes[0].Nodes.RemoveAt ( i ) ;
+            int i = this._tabDataClone.deliveries.FindIndex((t) => t == tab);
+            this._tabDataClone.deliveries.Remove(tab);
+            this.tabTreeView.Nodes[0].Nodes.RemoveAt(i);
         }
 
-        private void tabTreeView_NodeMouseClick ( object sender, TreeNodeMouseClickEventArgs e )
+        private void tabTreeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            if ( e.Node.Name == "DeliveryFromUserMenu" )
+            if (e.Node.Name == "DeliveryFromUserMenu")
             {
-                InitializeForm ( this.beforeSelected );
-                DeliverFromUser user = new DeliverFromUser (_manager, (TabDelivery)e.Node.Tag) { Dock = DockStyle.Fill };
+                InitializeForm(this.beforeSelected);
+                DeliverFromUser user = new DeliverFromUser(_manager, (TabDelivery)e.Node.Tag) { Dock = DockStyle.Fill };
                 this.control = user;
-                this.MainSplit.Panel2.Controls.Clear ();
-                this.MainSplit.Panel2.Controls.Add ( control );
-                RedrawName ();
+                this.MainSplit.Panel2.Controls.Clear();
+                this.MainSplit.Panel2.Controls.Add(control);
+                RedrawName();
                 this.beforeSelected = e.Node.Name;
             }
 
-            if ( e.Node.Name == "CategoryMenu" )
+            if (e.Node.Name == "CategoryMenu")
             {
-                InitializeForm ( this.beforeSelected );
-                this.control = new TabCategory ( (TabDelivery)e.Node.Tag, _listDatas ) { Dock = DockStyle.Fill };
-                this.MainSplit.Panel2.Controls.Clear ();
-                this.MainSplit.Panel2.Controls.Add ( this.control );
-                RedrawName ();
+                InitializeForm(this.beforeSelected);
+                this.control = new TabCategory((TabDelivery)e.Node.Tag, _listDatas) { Dock = DockStyle.Fill };
+                this.MainSplit.Panel2.Controls.Clear();
+                this.MainSplit.Panel2.Controls.Add(this.control);
+                RedrawName();
                 this.beforeSelected = e.Node.Name;
             }
 
-            if ( e.Node.Name == "TweetIgnoreMenu" )
+            if (e.Node.Name == "TweetIgnoreMenu")
             {
-                InitializeForm ( this.beforeSelected );
-                this.control = new MuteTweet ( this._ignoreTweet ) { Dock = DockStyle.Fill };
-                this.MainSplit.Panel2.Controls.Clear ();
-                this.MainSplit.Panel2.Controls.Add ( this.control );
-                RedrawName ();
+                InitializeForm(this.beforeSelected);
+                this.control = new MuteTweet(this._ignoreTweet) { Dock = DockStyle.Fill };
+                this.MainSplit.Panel2.Controls.Clear();
+                this.MainSplit.Panel2.Controls.Add(this.control);
+                RedrawName();
                 this.beforeSelected = e.Node.Name;
             }
         }
 
-        private void InitializeForm ( string name, bool isDispose = true )
+        private void InitializeForm(string name, bool isDispose = true)
         {
-            if ( name == "DeliveryFromUserMenu" )
+            if (name == "DeliveryFromUserMenu")
             {
                 DeliverFromUser d = this.control as DeliverFromUser;
-                if ( d.Tag != null && (bool)d.Tag == true )
+                if (d.Tag != null && (bool)d.Tag == true)
                     this.isChanged = true;
-                if ( isDispose )
-                    d.Dispose ();
+                if (isDispose)
+                    d.Dispose();
             }
-            if ( name == "CategoryMenu" )
+            if (name == "CategoryMenu")
             {
                 TabCategory d = this.control as TabCategory;
-                if ( d.Tag != null && (bool)d.Tag == true )
+                if (d.Tag != null && (bool)d.Tag == true)
                     this.isChanged = true;
-                if ( isDispose )
-                    d.Dispose ();
+                if (isDispose)
+                    d.Dispose();
             }
-            if ( name == "TweetIgnoreMenu" )
+            if (name == "TweetIgnoreMenu")
             {
                 MuteTweet d = this.control as MuteTweet;
-                if ( d.Tag != null )
+                if (d.Tag != null)
                 {
                     this._ignoreTweetClone = d.Tag as string;
                     this.isChanged = true;
                 }
-                if ( isDispose )
-                    d.Dispose ();
+                if (isDispose)
+                    d.Dispose();
             }
         }
-        
-        private void OnChangedDeliveryUsersDelegate ( List<decimal> data )
+
+        private void OnChangedDeliveryUsersDelegate(List<decimal> data)
         {
         }
 
-        private void Button_Click ( object sender, EventArgs e )
+        private void Button_Click(object sender, EventArgs e)
         {
             Button bt = sender as Button;
             TreeNode node = this.tabTreeView.SelectedNode;
-            if ( bt.Name == "addTabsButton" && node != null )
+            if (bt.Name == "addTabsButton" && node != null)
             {
                 //  追加
-                if ( node.Name == "CategoryMenu" || node.Name == "TopNode" )
+                if (node.Name == "CategoryMenu" || node.Name == "TopNode")
                 {
-                    AddNewTabs ();
+                    AddNewTabs();
                     this.isChanged = true;
                 }
             }
 
-            if ( bt.Name == "delTabsButton" )
+            if (bt.Name == "delTabsButton")
             {
                 //  削除
-                if ( node.Name == "CategoryMenu" || node.Name == "DeliveryFromUserMenu" )
+                if (node.Name == "CategoryMenu" || node.Name == "DeliveryFromUserMenu")
                 {
                     //
-                    RemoveTabs ( (TabDelivery)node.Tag );
+                    RemoveTabs((TabDelivery)node.Tag);
                     this.isChanged = true;
                 }
             }
         }
 
-        private void TabSettings_FormClosing ( object sender, FormClosingEventArgs e )
+        private void TabSettings_FormClosing(object sender, FormClosingEventArgs e)
         {
-            InitializeForm ( this.beforeSelected, false );
-            if ( this.isChanged )
+            InitializeForm(this.beforeSelected, false);
+            if (this.isChanged)
             {
-                DialogResult d = MessageBox.Show ( "変更された設定を適用しますか？", "注意", MessageBoxButtons.YesNoCancel );
-                if ( d == DialogResult.Cancel )
+                DialogResult d = MessageBox.Show("変更された設定を適用しますか？", "注意", MessageBoxButtons.YesNoCancel);
+                if (d == DialogResult.Cancel)
                 {
                     e.Cancel = true;
                     return;
                 }
-                if ( d == DialogResult.No )
+                if (d == DialogResult.No)
                     return;
-                this.Tag = new object[] { this._tabDataClone.Clone (),this._ignoreTweetClone.Clone () }; 
+                this.Tag = new object[] { this._tabDataClone.Clone(), this._ignoreTweetClone.Clone() };
             }
         }
 

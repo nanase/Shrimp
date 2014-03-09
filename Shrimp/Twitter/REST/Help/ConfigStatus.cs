@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Shrimp.Twitter.REST.Help
 {
@@ -13,13 +10,13 @@ namespace Shrimp.Twitter.REST.Help
         private readonly int _characters_reserved_per_media;
         private readonly int _photo_size_limit;
 
-        public ConfigStatus ( int _characters_reserved_per_media, int _photo_size_limit )
+        public ConfigStatus(int _characters_reserved_per_media, int _photo_size_limit)
         {
             this._characters_reserved_per_media = _characters_reserved_per_media;
             this._photo_size_limit = _photo_size_limit;
         }
 
-        public ConfigStatus ( dynamic data )
+        public ConfigStatus(dynamic data)
         {
             this._characters_reserved_per_media = (int)data.characters_reserved_per_media;
             this._photo_size_limit = (int)data.photo_size_limit;
@@ -41,9 +38,9 @@ namespace Shrimp.Twitter.REST.Help
             get { return this._photo_size_limit; }
         }
 
-        public object Clone ()
+        public object Clone()
         {
-            return new ConfigStatus ( characters_reserved_per_media, photo_size_limit );
+            return new ConfigStatus(characters_reserved_per_media, photo_size_limit);
         }
     }
 }

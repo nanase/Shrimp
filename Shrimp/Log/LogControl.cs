@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Shrimp.Log
 {
     class LogControl
     {
         #region 定義
-        static List<string> logs = new List<string> ();
-        static object addObject = new object ();
+        static List<string> logs = new List<string>();
+        static object addObject = new object();
         #endregion
 
-        public static void AddLogs ( string text )
+        public static void AddLogs(string text)
         {
-            lock ( addObject )
+            lock (addObject)
             {
-                logs.Add ( text );
+                logs.Add(text);
             }
         }
 
@@ -35,14 +33,15 @@ namespace Shrimp.Log
 
         public static string allLogData
         {
-            get {
-                return string.Join ( "\r\n", logs.ToArray () );
+            get
+            {
+                return string.Join("\r\n", logs.ToArray());
             }
         }
 
-        public static string getAllLogs ()
+        public static string getAllLogs()
         {
-            return String.Join ( "\n", logs );
+            return String.Join("\n", logs);
         }
     }
 }

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
-using Shrimp.Module.Parts;
 
 namespace Shrimp.ControlParts.Timeline.Select
 {
@@ -16,21 +12,21 @@ namespace Shrimp.ControlParts.Timeline.Select
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public SelectControl ()
+        public SelectControl()
         {
-            BeforeRevPosition = startDown = endDown = new Point ();
+            BeforeRevPosition = startDown = endDown = new Point();
             selTextPosition = new int[2];
             selCellPosition = -1;
         }
 
-        ~SelectControl ()
+        ~SelectControl()
         {
         }
 
-        public void Dispose ()
+        public void Dispose()
         {
             this.selTextPosition = null;
-            GC.SuppressFinalize ( this );
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -56,7 +52,8 @@ namespace Shrimp.ControlParts.Timeline.Select
         /// </summary>
         public bool selectReverse
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -82,7 +79,8 @@ namespace Shrimp.ControlParts.Timeline.Select
         /// </summary>
         public Point BeforeRevPosition
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -116,10 +114,10 @@ namespace Shrimp.ControlParts.Timeline.Select
         {
             get
             {
-                if ( endDown != null && startDown != null )
+                if (endDown != null && startDown != null)
                 {
-                    return Math.Sqrt ( Math.Pow ( endDown.X - startDown.X, 2 )
-                        + Math.Pow ( endDown.Y - startDown.Y, 2 ) );
+                    return Math.Sqrt(Math.Pow(endDown.X - startDown.X, 2)
+                        + Math.Pow(endDown.Y - startDown.Y, 2));
                 }
                 else
                 {
@@ -132,12 +130,12 @@ namespace Shrimp.ControlParts.Timeline.Select
         /// 全選択を行う
         /// </summary>
         /// <param name="textlen"></param>
-        public void SelectAll ( string text, decimal tweetID )
+        public void SelectAll(string text, decimal tweetID)
         {
             this.isMouseDown = true;
             this.selectAll = true;
             this.selectReverse = false;
-            this.selText = (string)text.Clone ();
+            this.selText = (string)text.Clone();
             this.selCellPosition = tweetID;
             this.selTextPosition[0] = 0;
             this.selTextPosition[1] = this.selText.Length;
@@ -146,7 +144,7 @@ namespace Shrimp.ControlParts.Timeline.Select
         /// <summary>
         /// 選択時に初期化を行う
         /// </summary>
-        public void SelectInitialize ()
+        public void SelectInitialize()
         {
             this.isMouseDown = false;
             this.selectAll = false;
@@ -161,7 +159,7 @@ namespace Shrimp.ControlParts.Timeline.Select
         /// </summary>
         /// <param name="MouseLocation"></param>
         /// <param name="selCellPosition"></param>
-        public void SelectStart ( Point MouseLocation, decimal selCellPosition )
+        public void SelectStart(Point MouseLocation, decimal selCellPosition)
         {
             this.isMouseDown = true;
             this.startDown = this.endDown = MouseLocation;
@@ -172,13 +170,13 @@ namespace Shrimp.ControlParts.Timeline.Select
         /// マウスが移動した際にカーソルを移動させる
         /// </summary>
         /// <param name="MouseLocation"></param>
-        public void SelectNow ( Point MouseLocation )
+        public void SelectNow(Point MouseLocation)
         {
-            if ( this.selectReverse )
+            if (this.selectReverse)
             {
                 //  逆側を走っているらしい・・・
                 this.startDown = MouseLocation;
-                if ( MouseLocation.X > this.BeforeRevPosition.X && MouseLocation.Y > this.BeforeRevPosition.Y )
+                if (MouseLocation.X > this.BeforeRevPosition.X && MouseLocation.Y > this.BeforeRevPosition.Y)
                 {
                     this.selectReverse = false;
                     this.startDown = this.endDown = MouseLocation;
@@ -188,7 +186,7 @@ namespace Shrimp.ControlParts.Timeline.Select
             else
             {
                 this.endDown = MouseLocation;
-                if ( this.startDown.X > MouseLocation.X && this.startDown.Y > MouseLocation.Y )
+                if (this.startDown.X > MouseLocation.X && this.startDown.Y > MouseLocation.Y)
                 {
                     //
                     this.selectReverse = true;
@@ -202,7 +200,7 @@ namespace Shrimp.ControlParts.Timeline.Select
         /// 選択終了
         /// </summary>
         /// <param name="MouseLocation"></param>
-        public void SelectEnd ( Point MouseLocation )
+        public void SelectEnd(Point MouseLocation)
         {
             this.isMouseDown = false;
             this.endDown = MouseLocation;
@@ -213,7 +211,7 @@ namespace Shrimp.ControlParts.Timeline.Select
         /// </summary>
         public bool isSelecting
         {
-            get { return this.selCellPosition >= 0 && ( this.selTextPosition[0] != this.selTextPosition[1] ); }
+            get { return this.selCellPosition >= 0 && (this.selTextPosition[0] != this.selTextPosition[1]); }
         }
     }
 }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
 
 namespace Shrimp.Module.Parts
@@ -15,48 +12,48 @@ namespace Shrimp.Module.Parts
         /// 単行表示かどうか
         /// </summary>
         public bool isLine = false;
-		private bool isDisposed = false;
+        private bool isDisposed = false;
         #region コンストラクター
 
-        public DrawCellSize ()
+        public DrawCellSize()
         {
-            this.Name = new Cell ();
-            this.Time = new Cell ();
-            this.Icon = new Cell ();
-            this.ImageTotal = new Cell ();
-            this.StatusesMuch = new Cell ();
-            this.RetweetNotify = new Cell ();
-            this.Tweet = new Cell ();
-            this.Via = new Cell ();
+            this.Name = new Cell();
+            this.Time = new Cell();
+            this.Icon = new Cell();
+            this.ImageTotal = new Cell();
+            this.StatusesMuch = new Cell();
+            this.RetweetNotify = new Cell();
+            this.Tweet = new Cell();
+            this.Via = new Cell();
         }
 
-		public void initialize()
-		{
-			this.Name.initialize();
-			this.Time.initialize();
-			this.Icon.initialize();
-			this.ImageTotal.initialize();
-			this.StatusesMuch.initialize();
-			this.RetweetNotify.initialize();
-			this.Tweet.initialize();
-			this.Via.initialize();
-		}
+        public void initialize()
+        {
+            this.Name.initialize();
+            this.Time.initialize();
+            this.Icon.initialize();
+            this.ImageTotal.initialize();
+            this.StatusesMuch.initialize();
+            this.RetweetNotify.initialize();
+            this.Tweet.initialize();
+            this.Via.initialize();
+        }
 
-		public void Dispose()
-		{
-			if (!isDisposed)
-			{
-				this.Name = null;
-				this.Time = null;
-				this.Icon = null;
-				this.ImageTotal = null;
-				this.StatusesMuch = null;
-				this.RetweetNotify = null;
-				this.Tweet = null;
-				this.Via = null;
-			}
-			this.isDisposed = true;
-		}
+        public void Dispose()
+        {
+            if (!isDisposed)
+            {
+                this.Name = null;
+                this.Time = null;
+                this.Icon = null;
+                this.ImageTotal = null;
+                this.StatusesMuch = null;
+                this.RetweetNotify = null;
+                this.Tweet = null;
+                this.Via = null;
+            }
+            this.isDisposed = true;
+        }
         /*
         public DrawCellSize ( Size _nameSize, Size _tweetSize, Size _retweet_Notify_Size, Size _ViaSize )
         {
@@ -174,16 +171,18 @@ namespace Shrimp.Module.Parts
         /// </summary>
         public int CellSizeWithoutPadding
         {
-            get {
-                if ( this.isLine )
+            get
+            {
+                if (this.isLine)
                     return this.CellSizeLine;
 
-                return ( Name != null ? Name.Size.Height : 0 )
-                    + ( Tweet != null ? Tweet.Size.Height : 0 )
-                    + ( RetweetNotify != null ? RetweetNotify.Size.Height : 0 )
-                    + ( Via != null ? Via.Size.Height : 0 )
-                    + ( ImageTotal != null ? ImageTotal.Rect.Height : 0 )
-                    + ( Buttons != null ? Buttons.FavIconSize.Height : 0 ); }
+                return (Name != null ? Name.Size.Height : 0)
+                    + (Tweet != null ? Tweet.Size.Height : 0)
+                    + (RetweetNotify != null ? RetweetNotify.Size.Height : 0)
+                    + (Via != null ? Via.Size.Height : 0)
+                    + (ImageTotal != null ? ImageTotal.Rect.Height : 0)
+                    + (Buttons != null ? Buttons.FavIconSize.Height : 0);
+            }
         }
 
         /// <summary>
@@ -215,7 +214,7 @@ namespace Shrimp.Module.Parts
         {
             get
             {
-                return new Rectangle ( this.CellStartPosition, new Size ( CellWidthSize, CellSize ) );
+                return new Rectangle(this.CellStartPosition, new Size(CellWidthSize, CellSize));
             }
         }
 
@@ -224,16 +223,18 @@ namespace Shrimp.Module.Parts
         /// </summary>
         public int CellSize
         {
-            get {
-                if ( this.isLine )
+            get
+            {
+                if (this.isLine)
                     return this.CellSizeLine;
-                return CellSizeWithoutPadding + ( DrawTextPadding * 3 ) + ( ImageTotal.Rect.Height <= 0 ? 0 : DrawTextPadding ) + ( RetweetNotify.Rect.Height <= 0 ? 0 : DrawTextPadding );
+                return CellSizeWithoutPadding + (DrawTextPadding * 3) + (ImageTotal.Rect.Height <= 0 ? 0 : DrawTextPadding) + (RetweetNotify.Rect.Height <= 0 ? 0 : DrawTextPadding);
             }
         }
 
         public int CellWidthSize
         {
-            get; set;
+            get;
+            set;
         }
-	}
+    }
 }

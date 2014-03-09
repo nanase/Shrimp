@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using OAuth;
 using Shrimp.Twitter.Status;
-using System.Threading;
 
 namespace Shrimp.Twitter.REST.Search
 {
@@ -16,9 +14,9 @@ namespace Shrimp.Twitter.REST.Search
         #endregion
 
         #region コンストラクタ
-        ~search ()
+        ~search()
         {
-            this.Dispose ();
+            this.Dispose();
         }
 
         /// <summary>
@@ -28,7 +26,7 @@ namespace Shrimp.Twitter.REST.Search
         {
             if (!isDisposed)
             {
-                WaitResult ( searchResult );
+                WaitResult(searchResult);
                 isDisposed = true;
             }
         }
@@ -37,15 +35,15 @@ namespace Shrimp.Twitter.REST.Search
         /// <summary>
         /// リストを取得
         /// </summary>
-        public void searchTweet ( TwitterInfo srv, TwitterCompletedProcessDelegate completedDelegate, TwitterErrorProcessDelegate errorProcess, string query )
+        public void searchTweet(TwitterInfo srv, TwitterCompletedProcessDelegate completedDelegate, TwitterErrorProcessDelegate errorProcess, string query)
         {
-            List<OAuthBase.QueryParameter> q = new List<OAuthBase.QueryParameter> ();
-            if ( query != null )
-                q.Add ( new OAuthBase.QueryParameter ( "q", query ) );
-            q.Add ( new OAuthBase.QueryParameter ( "include_entities", "true" ) );
-            q.Add ( new OAuthBase.QueryParameter ( "result_type", "mixed" ) );
-            q.Add ( new OAuthBase.QueryParameter ( "count", "100" ) );
-            this.searchResult = base.loadAsync ( srv, "GET", workerResult, completedDelegate, errorProcess,"search/tweets.json", q );
+            List<OAuthBase.QueryParameter> q = new List<OAuthBase.QueryParameter>();
+            if (query != null)
+                q.Add(new OAuthBase.QueryParameter("q", query));
+            q.Add(new OAuthBase.QueryParameter("include_entities", "true"));
+            q.Add(new OAuthBase.QueryParameter("result_type", "mixed"));
+            q.Add(new OAuthBase.QueryParameter("count", "100"));
+            this.searchResult = base.loadAsync(srv, "GET", workerResult, completedDelegate, errorProcess, "search/tweets.json", q);
         }
 
 
@@ -54,15 +52,15 @@ namespace Shrimp.Twitter.REST.Search
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        private object workerResult ( dynamic data )
+        private object workerResult(dynamic data)
         {
-            if ( data == null )
+            if (data == null)
                 return null;
-            var result_status = new List<TwitterStatus> ();
-            foreach ( var tweet in data.statuses )
+            var result_status = new List<TwitterStatus>();
+            foreach (var tweet in data.statuses)
             {
-                if ( tweet.IsDefined ( "id" ) )
-                    result_status.Add ( new TwitterStatus ( tweet ) );
+                if (tweet.IsDefined("id"))
+                    result_status.Add(new TwitterStatus(tweet));
             }
             return result_status;
         }

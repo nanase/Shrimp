@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Shrimp.Twitter.Status
 {
@@ -15,7 +12,7 @@ namespace Shrimp.Twitter.Status
         public bool Followed;
         public bool Unfollowed;
 
-        public NotifyFilter ()
+        public NotifyFilter()
         {
             this.Favorited = true;
             this.UnFavorited = true;
@@ -28,24 +25,24 @@ namespace Shrimp.Twitter.Status
         /// </summary>
         /// <param name="status"></param>
         /// <returns></returns>
-        public bool isHit ( TwitterNotifyStatus status )
+        public bool isHit(TwitterNotifyStatus status)
         {
-            if ( this.Favorited && status.notify_event == "favorite" )
+            if (this.Favorited && status.notify_event == "favorite")
                 return true;
-            if ( this.UnFavorited && status.notify_event == "unfavorite" )
+            if (this.UnFavorited && status.notify_event == "unfavorite")
                 return true;
-            if ( this.Followed && status.notify_event == "follow" )
+            if (this.Followed && status.notify_event == "follow")
                 return true;
-            if ( this.Unfollowed && status.notify_event == "unfollow" )
+            if (this.Unfollowed && status.notify_event == "unfollow")
                 return true;
-            if ( !this.Favorited && !this.UnFavorited && !this.Followed && !this.Unfollowed )
+            if (!this.Favorited && !this.UnFavorited && !this.Followed && !this.Unfollowed)
                 return true;
             return false;
         }
 
-        public object Clone ()
+        public object Clone()
         {
-            var dest = new NotifyFilter ();
+            var dest = new NotifyFilter();
             dest.Favorited = this.Favorited;
             dest.UnFavorited = this.UnFavorited;
             dest.Followed = this.Followed;

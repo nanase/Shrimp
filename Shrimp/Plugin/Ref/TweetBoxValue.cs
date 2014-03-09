@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 
 namespace Shrimp.Plugin.Ref
 {
@@ -20,22 +17,22 @@ namespace Shrimp.Plugin.Ref
         /// </summary>
         public bool sendTweet;
 
-        public TweetBoxValue ( string text )
+        public TweetBoxValue(string text)
         {
-            if ( text != null && text.Length == 0 )
+            if (text != null && text.Length == 0)
                 this.text = "";
             else
-                this.text = (string)text.Clone ();
-            this.textUniBytes = Encoding.Unicode.GetBytes ( this.text );
+                this.text = (string)text.Clone();
+            this.textUniBytes = Encoding.Unicode.GetBytes(this.text);
         }
 
         /// <summary>
         /// Unicodeバイト列を指定されると、こちらを優先的に扱います
         /// </summary>
-        public void SetUniTextBytes ( byte[] value )
+        public void SetUniTextBytes(byte[] value)
         {
-            this.text = Encoding.Unicode.GetString ( value );
+            this.text = Encoding.Unicode.GetString(value);
         }
-                
+
     }
 }

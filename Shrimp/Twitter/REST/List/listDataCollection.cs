@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Shrimp.Twitter.REST.List
 {
@@ -12,12 +9,12 @@ namespace Shrimp.Twitter.REST.List
     {
         private List<listData> _lists;
 
-        public listDataCollection ()
+        public listDataCollection()
         {
-            this._lists = new List<listData> ();
+            this._lists = new List<listData>();
         }
 
-        ~listDataCollection ()
+        ~listDataCollection()
         {
             /*
             if ( this._lists != null )
@@ -49,7 +46,7 @@ namespace Shrimp.Twitter.REST.List
         /// </summary>
         /// <param name="num"></param>
         /// <returns></returns>
-        public listData get ( int num )
+        public listData get(int num)
         {
             return this._lists[num];
         }
@@ -58,18 +55,18 @@ namespace Shrimp.Twitter.REST.List
         /// リストを追加する
         /// </summary>
         /// <param name="list"></param>
-        public void Addlist ( listData list )
+        public void Addlist(listData list)
         {
-            this._lists.Add ( list );
+            this._lists.Add(list);
         }
 
         /// <summary>
         /// いっきに追加する
         /// </summary>
         /// <param name="lists"></param>
-        public void AddlistRange ( listDataCollection lists )
+        public void AddlistRange(listDataCollection lists)
         {
-            this._lists.AddRange ( lists.lists );
+            this._lists.AddRange(lists.lists);
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Shrimp.Twitter.Status;
+﻿using Shrimp.Twitter.Status;
 
 namespace Shrimp.Plugin.Ref
 {
@@ -21,7 +17,7 @@ namespace Shrimp.Plugin.Ref
         /// </summary>
         public bool isModified;
 
-        public OnCreatedTweetHook ( TwitterStatus status )
+        public OnCreatedTweetHook(TwitterStatus status)
         {
             this.status = status;
         }

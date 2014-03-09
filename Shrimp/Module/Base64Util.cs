@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Shrimp.Module
 {
@@ -15,11 +12,11 @@ namespace Shrimp.Module
         /// </summary>
         /// <param name="value">バイナリデータ</param>
         /// <returns>変換結果</returns>
-        public static string ToBase64 ( byte[] value )
+        public static string ToBase64(byte[] value)
         {
-            if ( value == null )
+            if (value == null)
                 return null;
-            return Convert.ToBase64String ( value );
+            return Convert.ToBase64String(value);
         }
     }
 }

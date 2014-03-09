@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Shrimp.Setting
 {
     /// <summary>
@@ -15,13 +11,13 @@ namespace Shrimp.Setting
         /// <summary>
         /// 静的コンストラクタ
         /// </summary>
-        public static void initialize ()
+        public static void initialize()
         {
-            HomeTimeline = ( 60 );
-            MentionTimeline = ( 60 );
-            DirectMessage = ( 60 * 30 );
-            Search = ( 60 );
-            UserTimeline = ( 60 * 2 );
+            HomeTimeline = (60);
+            MentionTimeline = (60);
+            DirectMessage = (60 * 30);
+            Search = (60);
+            UserTimeline = (60 * 2);
         }
 
         #endregion

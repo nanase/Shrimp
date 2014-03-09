@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Shrimp.Twitter.Status;
+﻿using Shrimp.Twitter.Status;
 
 namespace Shrimp.Module
 {
@@ -17,14 +13,16 @@ namespace Shrimp.Module
         /// <param name="src"></param>
         /// <param name="retweet_text"></param>
         /// <returns></returns>
-        public static TwitterStatus GenerateRetweetStatus ( TwitterStatus src, out string retweet_text )
+        public static TwitterStatus GenerateRetweetStatus(TwitterStatus src, out string retweet_text)
         {
             retweet_text = null;
-            if ( src.retweeted_status != null )
+            if (src.retweeted_status != null)
             {
                 retweet_text = "" + src.user.name + "さんがリツイートしました";
                 return src.retweeted_status;
-            } else {
+            }
+            else
+            {
                 return src;
             }
         }
@@ -35,13 +33,13 @@ namespace Shrimp.Module
         /// <param name="src"></param>
         /// <param name="fav_text"></param>
         /// <returns></returns>
-        public static TwitterStatus GenerateFavedStatus ( TwitterStatus src, out string fav_text )
+        public static TwitterStatus GenerateFavedStatus(TwitterStatus src, out string fav_text)
         {
             fav_text = null;
-            if ( src.NotifyStatus != null && src.NotifyStatus.isFaved )
+            if (src.NotifyStatus != null && src.NotifyStatus.isFaved)
             {
                 fav_text = "" + src.NotifyStatus.source.name + "にお気に入りに追加されました";
-                return new TwitterStatus ( src.NotifyStatus.target_object );
+                return new TwitterStatus(src.NotifyStatus.target_object);
             }
             else
             {
@@ -55,9 +53,9 @@ namespace Shrimp.Module
         /// <param name="src"></param>
         /// <param name="retweet_text"></param>
         /// <returns></returns>
-        public static string GenerateName ( TwitterStatus src )
+        public static string GenerateName(TwitterStatus src)
         {
-            if ( src == null || src.user == null )
+            if (src == null || src.user == null)
                 return null;
             return "" + src.user.name + " / @" + src.user.screen_name + "";
         }

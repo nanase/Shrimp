@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
-using Shrimp.ControlParts.Timeline.Click;
-using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace Shrimp.Setting
@@ -18,24 +12,24 @@ namespace Shrimp.Setting
         Move,
         Fade
     };
-	/// <summary>
-	/// Timeline Setting
-	/// タイムラインの設定
-	/// </summary>
-	class Timeline
-	{
-		#region 定義
+    /// <summary>
+    /// Timeline Setting
+    /// タイムラインの設定
+    /// </summary>
+    class Timeline
+    {
+        #region 定義
 
-		private static int _refTimeline = 500;
+        private static int _refTimeline = 500;
 
-		#endregion
+        #endregion
 
-		#region コンストラクタ
+        #region コンストラクタ
 
         /// <summary>
         /// 静的コンストラクタ
         /// </summary>
-        public static void initialize ()
+        public static void initialize()
         {
             isEnableSourceLink = false;
             isEnableRetweetLink = true;
@@ -46,17 +40,17 @@ namespace Shrimp.Setting
             TabChangeAnimation = TabAnimation.None;
             isEnableInsertAnimation = true;
             isEnableNotifyAnimation = true;
-			GlobalMuteString = "";
+            GlobalMuteString = "";
             ShrimpTabAlignment = TabAlignment.Top;
             isNotifyBold = true;
             isRetweetBold = false;
             isReplyBold = false;
-			isConfirmFav = true;
-			isConfirmRT = true;
+            isConfirmFav = true;
+            isConfirmRT = true;
         }
 
-		public static void load ( Dictionary<string, object> obj )
-		{
+        public static void load(Dictionary<string, object> obj)
+        {
             if (obj == null)
                 return;
             if (obj.ContainsKey("refTimeline"))
@@ -75,32 +69,32 @@ namespace Shrimp.Setting
                 isConfirmFav = (bool)obj["isConfirmFav"];
             if (obj.ContainsKey("isConfirmRT"))
                 isConfirmRT = (bool)obj["isConfirmRT"];
-            if ( obj.ContainsKey ( "SelectTabWhenCreatedTab" ) )
+            if (obj.ContainsKey("SelectTabWhenCreatedTab"))
                 SelectTabWhenCreatedTab = (bool)obj["SelectTabWhenCreatedTab"];
-            if ( obj.ContainsKey ( "isHoverSelectMode" ) )
+            if (obj.ContainsKey("isHoverSelectMode"))
                 isHoverSelectMode = (bool)obj["isHoverSelectMode"];
-            if ( obj.ContainsKey ( "SavedTimelineTweetNum" ) )
+            if (obj.ContainsKey("SavedTimelineTweetNum"))
                 SavedTimelineTweetNum = (int)obj["SavedTimelineTweetNum"];
-            if ( obj.ContainsKey ( "TabChangeAnimation" ) )
+            if (obj.ContainsKey("TabChangeAnimation"))
                 TabChangeAnimation = (TabAnimation)((int)obj["TabChangeAnimation"]);
-            if ( obj.ContainsKey ( "isEnableInsertAnimation" ) )
+            if (obj.ContainsKey("isEnableInsertAnimation"))
                 isEnableInsertAnimation = (bool)obj["isEnableInsertAnimation"];
-            if ( obj.ContainsKey ( "isEnableNotifyAnimation" ) )
+            if (obj.ContainsKey("isEnableNotifyAnimation"))
                 isEnableNotifyAnimation = (bool)obj["isEnableNotifyAnimation"];
-			if (obj.ContainsKey("GlobalMuteString"))
-				GlobalMuteString = (string)((string)obj["GlobalMuteString"]).Clone();
-            if ( obj.ContainsKey ( "ShrimpTabAlignment" ) )
+            if (obj.ContainsKey("GlobalMuteString"))
+                GlobalMuteString = (string)((string)obj["GlobalMuteString"]).Clone();
+            if (obj.ContainsKey("ShrimpTabAlignment"))
                 ShrimpTabAlignment = (TabAlignment)obj["ShrimpTabAlignment"];
-            if ( obj.ContainsKey ( "isNotifyBold" ) )
+            if (obj.ContainsKey("isNotifyBold"))
                 isNotifyBold = (bool)obj["isNotifyBold"];
-            if ( obj.ContainsKey ( "isRetweetBold" ) )
+            if (obj.ContainsKey("isRetweetBold"))
                 isRetweetBold = (bool)obj["isRetweetBold"];
-            if ( obj.ContainsKey ( "isReplyBold" ) )
+            if (obj.ContainsKey("isReplyBold"))
                 isReplyBold = (bool)obj["isReplyBold"];
-		}
+        }
 
         public static Dictionary<string, object> save()
-		{
+        {
             var dest = new Dictionary<string, object>();
             dest["refTimeline"] = refTimeline;
             dest["isEnableSourceLink"] = isEnableSourceLink;
@@ -116,24 +110,24 @@ namespace Shrimp.Setting
             dest["TabChangeAnimation"] = (int)TabChangeAnimation;
             dest["isEnableInsertAnimation"] = isEnableInsertAnimation;
             dest["isEnableNotifyAnimation"] = isEnableNotifyAnimation;
-			dest["GlobalMuteString"] = GlobalMuteString;
+            dest["GlobalMuteString"] = GlobalMuteString;
             dest["ShrimpTabAlignment"] = (int)ShrimpTabAlignment;
             dest["isNotifyBold"] = isNotifyBold;
             dest["isRetweetBold"] = isRetweetBold;
             dest["isReplyBold"] = isReplyBold;
             return dest;
-		}
+        }
 
-		#endregion
+        #endregion
 
-		/// <summary>
-		/// タイムラインへの反映までの時間
-		/// </summary>
-		public static int refTimeline
-		{
-			get { return ( _refTimeline <= 0 ? 1 : _refTimeline ); }
-			set { _refTimeline = value; }
-		}
+        /// <summary>
+        /// タイムラインへの反映までの時間
+        /// </summary>
+        public static int refTimeline
+        {
+            get { return (_refTimeline <= 0 ? 1 : _refTimeline); }
+            set { _refTimeline = value; }
+        }
 
         /// <summary>
         /// 挿入アニメーションを有効化するかどうか
@@ -190,14 +184,14 @@ namespace Shrimp.Setting
             set;
         }
 
-		/// <summary>
-		/// グローバルミュート文字列
-		/// </summary>
-		public static string GlobalMuteString
-		{
-			get;
-			set;
-		}
+        /// <summary>
+        /// グローバルミュート文字列
+        /// </summary>
+        public static string GlobalMuteString
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// viaをクリックしたとき、反応するかどうか
@@ -345,5 +339,5 @@ namespace Shrimp.Setting
             get;
             set;
         }
-	}
+    }
 }

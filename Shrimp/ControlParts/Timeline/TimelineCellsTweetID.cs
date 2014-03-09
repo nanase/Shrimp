@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Shrimp.ControlParts.Timeline
 {
     /// <summary>
@@ -13,7 +9,7 @@ namespace Shrimp.ControlParts.Timeline
         public readonly decimal id;
         public readonly bool isConversation = false;
 
-        public TimelineCellsTweetID ( decimal id, bool isConv )
+        public TimelineCellsTweetID(decimal id, bool isConv)
         {
             this.id = id;
             this.isConversation = isConv;

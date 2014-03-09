@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Shrimp.Plugin.Ref
 {
@@ -16,7 +13,7 @@ namespace Shrimp.Plugin.Ref
         public string text;
         public string tooltipText;
 
-        public OnRegistTweetBoxMenuHook ( Plugin callPlugin )
+        public OnRegistTweetBoxMenuHook(Plugin callPlugin)
         {
             this._callPlugin = callPlugin;
         }
@@ -24,11 +21,11 @@ namespace Shrimp.Plugin.Ref
         /// <summary>
         /// 呼び出しもとプラグイン
         /// </summary>
-        public object[] CallBackPlugin ( object[] args )
+        public object[] CallBackPlugin(object[] args)
         {
-            if ( String.IsNullOrEmpty ( this.callbackFunction ) )
+            if (String.IsNullOrEmpty(this.callbackFunction))
                 return null;
-            return this._callPlugin.FunctionCall ( this.callbackFunction, args );
+            return this._callPlugin.FunctionCall(this.callbackFunction, args);
         }
     }
 }

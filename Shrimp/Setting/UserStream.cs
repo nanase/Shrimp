@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Shrimp.Setting
 {
@@ -9,7 +6,7 @@ namespace Shrimp.Setting
     {
         #region コンストラクタ
 
-        internal static void initialize ()
+        internal static void initialize()
         {
             //  初期設定
             isRepliesAll = false;
@@ -17,21 +14,21 @@ namespace Shrimp.Setting
             isEnableUserstream = true;
         }
 
-        public static void load ( Dictionary<string, bool> obj )
+        public static void load(Dictionary<string, bool> obj)
         {
-            if ( obj == null )
+            if (obj == null)
                 return;
-            if ( obj.ContainsKey ( "isRepliesAll" ) )
+            if (obj.ContainsKey("isRepliesAll"))
                 isRepliesAll = obj["isRepliesAll"];
-            if ( obj.ContainsKey ( "isIncludeFollowingsActivity" ) )
+            if (obj.ContainsKey("isIncludeFollowingsActivity"))
                 isIncludeFollowingsActivity = obj["isIncludeFollowingsActivity"];
-            if ( obj.ContainsKey ( "isEnableUserstream" ) )
+            if (obj.ContainsKey("isEnableUserstream"))
                 isEnableUserstream = obj["isEnableUserstream"];
         }
 
-        public static Dictionary<string, bool> save ()
+        public static Dictionary<string, bool> save()
         {
-            var dest = new Dictionary<string, bool> ();
+            var dest = new Dictionary<string, bool>();
             dest["isIncludeFollowingsActivity"] = isIncludeFollowingsActivity;
             dest["isRepliesAll"] = isRepliesAll;
             dest["isEnableUserstream"] = isEnableUserstream;

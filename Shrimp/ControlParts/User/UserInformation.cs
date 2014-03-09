@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace Shrimp.ControlParts.User
 {
@@ -22,7 +15,7 @@ namespace Shrimp.ControlParts.User
             set
             {
                 value.Dock = DockStyle.Fill;
-                this.UserInformationSplit.Panel1.Controls.Add ( value );
+                this.UserInformationSplit.Panel1.Controls.Add(value);
             }
         }
     }

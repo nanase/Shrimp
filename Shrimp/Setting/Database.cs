@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Shrimp.Setting
 {
@@ -9,23 +6,23 @@ namespace Shrimp.Setting
     {
         #region コンストラクタ
 
-        internal static void initialize ()
+        internal static void initialize()
         {
             //  初期設定
             SaveDatabaseNum = 200;
         }
 
-        public static void load ( Dictionary<string, int> obj )
+        public static void load(Dictionary<string, int> obj)
         {
-            if ( obj == null )
+            if (obj == null)
                 return;
-            if ( obj.ContainsKey ( "SaveDatabaseNum" ) )
+            if (obj.ContainsKey("SaveDatabaseNum"))
                 SaveDatabaseNum = obj["SaveDatabaseNum"];
         }
 
-        public static Dictionary<string, int> save ()
+        public static Dictionary<string, int> save()
         {
-            var dest = new Dictionary<string, int> ();
+            var dest = new Dictionary<string, int>();
             dest["SaveDatabaseNum"] = 1000;
             return dest;
         }

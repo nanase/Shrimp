@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Timers;
-using Shrimp.Module.Parts;
 using System.Drawing;
+using Shrimp.Module.Parts;
 using Shrimp.Twitter.Entities;
 
 namespace Shrimp.ControlParts.Timeline.Animation
@@ -18,7 +14,7 @@ namespace Shrimp.ControlParts.Timeline.Animation
         #endregion
 
         #region コンストラクタ
-        public TweetNotifyAnimation ( )
+        public TweetNotifyAnimation()
         {
             this.ShowEnable = true;
             /*
@@ -29,7 +25,7 @@ namespace Shrimp.ControlParts.Timeline.Animation
             */
         }
 
-        ~TweetNotifyAnimation ()
+        ~TweetNotifyAnimation()
         {
             /*
             this.timer.Stop ();
@@ -37,9 +33,9 @@ namespace Shrimp.ControlParts.Timeline.Animation
             */
         }
 
-        public void Dispose ()
+        public void Dispose()
         {
-            GC.SuppressFinalize ( this );
+            GC.SuppressFinalize(this);
         }
         #endregion
 
@@ -47,15 +43,15 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// <summary>
         /// アニメーション開始
         /// </summary>
-        public void StartAnimation ( object[] obj = null )
+        public void StartAnimation(object[] obj = null)
         {
-            
+
         }
 
-         /// <summary>
+        /// <summary>
         /// アニメーションストップ
         /// </summary>
-        public void StopAnimation ()
+        public void StopAnimation()
         {
             //this.TimerEnable = false;
         }
@@ -63,7 +59,7 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// <summary>
         /// 隠す
         /// </summary>
-        public void Hide ()
+        public void Hide()
         {
             this.ShowEnable = false;
             this.Frame = 0;
@@ -74,13 +70,13 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// 舞フレームごとに行うデリゲート処理
         /// </summary>
         /// <returns></returns>
-        public bool FrameExecute ()
+        public bool FrameExecute()
         {
-            if ( this.notifyText != null )
+            if (this.notifyText != null)
             {
-                if ( !this.Enable )
+                if (!this.Enable)
                 {
-                    if ( this.Frame > 0 )
+                    if (this.Frame > 0)
                     {
                         this.Frame--;
                     }
@@ -91,7 +87,7 @@ namespace Shrimp.ControlParts.Timeline.Animation
                 }
                 else
                 {
-                    if ( this.Frame < 16 )
+                    if (this.Frame < 16)
                     {
                         this.Frame++;
                     }
@@ -112,7 +108,8 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// </summary>
         public int Frame
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -138,7 +135,8 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// </summary>
         public int YOffset
         {
-            get; set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -146,11 +144,12 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// </summary>
         public int StartDrawOffset
         {
-            get {
-                return (int)( (double)-this.YOffset + Math.Sin ( Math.PI / 2 / 16 * ( this.Frame ) ) * this.YOffset );
+            get
+            {
+                return (int)((double)-this.YOffset + Math.Sin(Math.PI / 2 / 16 * (this.Frame)) * this.YOffset);
             }
         }
-        
+
         /// <summary>
         /// テキスト
         /// </summary>
@@ -169,31 +168,31 @@ namespace Shrimp.ControlParts.Timeline.Animation
             set;
         }
 
-        public void Draw ( Graphics g, int maxWidth, ControlParts.Timeline.Draw.TweetDraw.SetClickLinkDelegate setClickLink )
+        public void Draw(Graphics g, int maxWidth, ControlParts.Timeline.Draw.TweetDraw.SetClickLinkDelegate setClickLink)
         {
-            if ( this.ShowEnable && this.notifyText != null )
+            if (this.ShowEnable && this.notifyText != null)
             {
                 //string notifyText = "新着ツイート\n" + ( this.newTweetNum ) + "件";
-                if ( this.YOffset == 0 )
-                    this.YOffset = ( DrawTextUtil.GetDrawTextSizeTrim ( "t", Setting.Fonts.NameFont, maxWidth ).Height * 2 ) + 2;
+                if (this.YOffset == 0)
+                    this.YOffset = (DrawTextUtil.GetDrawTextSizeTrim("t", Setting.Fonts.NameFont, maxWidth).Height * 2) + 2;
                 int drawNotifyStartY = this.StartDrawOffset;
-                var cRect = new Rectangle ( 0, drawNotifyStartY, maxWidth, this.YOffset );
-                g.FillRectangle ( Setting.Colors.NotifyBackgroundColor, cRect );
+                var cRect = new Rectangle(0, drawNotifyStartY, maxWidth, this.YOffset);
+                g.FillRectangle(Setting.Colors.NotifyBackgroundColor, cRect);
                 bool isFirst = false;
-                foreach ( string text in notifyText.Split ( '\n' ) )
+                foreach (string text in notifyText.Split('\n'))
                 {
-                    Size s = DrawTextUtil.GetDrawTextSizeTrim ( text, Setting.Fonts.NameFont, maxWidth );
+                    Size s = DrawTextUtil.GetDrawTextSizeTrim(text, Setting.Fonts.NameFont, maxWidth);
                     StringFormat sf = StringFormat.GenericDefault;
                     sf.Trimming = StringTrimming.EllipsisCharacter;
                     sf.FormatFlags = StringFormatFlags.NoWrap;
-                    g.DrawString ( text, Setting.Fonts.NameFont, Setting.Colors.NotifyStringColor, new Rectangle ( new Point ( isFirst ? 5 : ( maxWidth - s.Width ) / 2, drawNotifyStartY ), new Size ( maxWidth, s.Height ) ), sf );
+                    g.DrawString(text, Setting.Fonts.NameFont, Setting.Colors.NotifyStringColor, new Rectangle(new Point(isFirst ? 5 : (maxWidth - s.Width) / 2, drawNotifyStartY), new Size(maxWidth, s.Height)), sf);
                     drawNotifyStartY += s.Height;
-                    if ( isFirst )
+                    if (isFirst)
                         break;
                     isFirst = true;
                 }
-                if ( setClickLink != null )
-                    setClickLink ( cRect, new TwitterEntitiesPosition ( offsetTweetID.ToString (),  "notify" ) );
+                if (setClickLink != null)
+                    setClickLink(cRect, new TwitterEntitiesPosition(offsetTweetID.ToString(), "notify"));
             }
         }
     }

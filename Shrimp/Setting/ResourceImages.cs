@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Drawing;
 using System.IO;
 using System.Reflection;
-using System.Drawing;
 using Shrimp.Module;
 
 namespace Shrimp.Setting
@@ -14,44 +10,44 @@ namespace Shrimp.Setting
         /// <summary>
         /// 静的コンストラクタ
         /// </summary>
-        static ResourceImages ()
+        static ResourceImages()
         {
             // コピーしたMemoryStreamからBitmapを作成し、背景に設定
-            Fav = new ButtonImage (
-                Image.FromStream ( getResourceFile ( "Shrimp.Images.c_fav.png" ) ),
-                Image.FromStream ( getResourceFile ( "Shrimp.Images.fav.png" ) )
+            Fav = new ButtonImage(
+                Image.FromStream(getResourceFile("Shrimp.Images.c_fav.png")),
+                Image.FromStream(getResourceFile("Shrimp.Images.fav.png"))
             );
 
             // コピーしたMemoryStreamからBitmapを作成し、背景に設定
-            UnFav = new ButtonImage (
-                Image.FromStream ( getResourceFile ( "Shrimp.Images.c_unfav.png" ) ),
-                Image.FromStream ( getResourceFile ( "Shrimp.Images.unfav.png" ) )
+            UnFav = new ButtonImage(
+                Image.FromStream(getResourceFile("Shrimp.Images.c_unfav.png")),
+                Image.FromStream(getResourceFile("Shrimp.Images.unfav.png"))
             );
 
             // コピーしたMemoryStreamからBitmapを作成し、背景に設定
-            Retweet = new ButtonImage (
-                Image.FromStream ( getResourceFile ( "Shrimp.Images.c_retweet.png" ) ),
-                Image.FromStream ( getResourceFile ( "Shrimp.Images.retweet.png" ) )
+            Retweet = new ButtonImage(
+                Image.FromStream(getResourceFile("Shrimp.Images.c_retweet.png")),
+                Image.FromStream(getResourceFile("Shrimp.Images.retweet.png"))
             );
 
             // コピーしたMemoryStreamからBitmapを作成し、背景に設定
-            Reply = new ButtonImage (
-                Image.FromStream ( getResourceFile ( "Shrimp.Images.c_reply.png" ) ),
-                Image.FromStream ( getResourceFile ( "Shrimp.Images.reply.png" ) )
+            Reply = new ButtonImage(
+                Image.FromStream(getResourceFile("Shrimp.Images.c_reply.png")),
+                Image.FromStream(getResourceFile("Shrimp.Images.reply.png"))
             );
 
-            Protected = Image.FromStream ( getResourceFile ( "Shrimp.Images.protected.png" ) );
-            In_Reply_To_Status_ID_Arrow = Image.FromStream ( getResourceFile ( "Shrimp.Images.in_reply_status_id_arrow.png" ) );
-            LoadingImage = Image.FromStream ( getResourceFile ( "Shrimp.Images.loading.png" ) );
-            UserImage = Image.FromStream ( getResourceFile ( "Shrimp.Images.user.png" ) );
-            SearchImage = Image.FromStream ( getResourceFile ( "Shrimp.Images.search.png" ) );
-            RepliesImage = Image.FromStream ( getResourceFile ( "Shrimp.Images.replies.png" ) );
-            FavsImage = Image.FromStream ( getResourceFile ( "Shrimp.Images.favs.png" ) );
-            BlockImage = Image.FromStream ( getResourceFile ( "Shrimp.Images.block.png" ) );
-            BookmarkImage = Image.FromStream ( getResourceFile ( "Shrimp.Images.bookmark.png" ) );
-            RemoveImage = Image.FromStream ( getResourceFile ( "Shrimp.Images.remove.png" ) );
-            ConversationImage = Image.FromStream ( getResourceFile ( "Shrimp.Images.conversation.png" ) );
-            TextImage = Image.FromStream ( getResourceFile ( "Shrimp.Images.text.png" ) );
+            Protected = Image.FromStream(getResourceFile("Shrimp.Images.protected.png"));
+            In_Reply_To_Status_ID_Arrow = Image.FromStream(getResourceFile("Shrimp.Images.in_reply_status_id_arrow.png"));
+            LoadingImage = Image.FromStream(getResourceFile("Shrimp.Images.loading.png"));
+            UserImage = Image.FromStream(getResourceFile("Shrimp.Images.user.png"));
+            SearchImage = Image.FromStream(getResourceFile("Shrimp.Images.search.png"));
+            RepliesImage = Image.FromStream(getResourceFile("Shrimp.Images.replies.png"));
+            FavsImage = Image.FromStream(getResourceFile("Shrimp.Images.favs.png"));
+            BlockImage = Image.FromStream(getResourceFile("Shrimp.Images.block.png"));
+            BookmarkImage = Image.FromStream(getResourceFile("Shrimp.Images.bookmark.png"));
+            RemoveImage = Image.FromStream(getResourceFile("Shrimp.Images.remove.png"));
+            ConversationImage = Image.FromStream(getResourceFile("Shrimp.Images.conversation.png"));
+            TextImage = Image.FromStream(getResourceFile("Shrimp.Images.text.png"));
         }
 
         /// <summary>
@@ -59,22 +55,22 @@ namespace Shrimp.Setting
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private static MemoryStream getResourceFile ( string path )
+        private static MemoryStream getResourceFile(string path)
         {
             //現在のコードを実行しているAssemblyを取得
             Assembly assm =
-                Assembly.GetExecutingAssembly ();
+                Assembly.GetExecutingAssembly();
             int len = 0;
             BinaryReader reader;
             MemoryStream memory;
             Stream stream;
 
-            stream = assm.GetManifestResourceStream ( path );
+            stream = assm.GetManifestResourceStream(path);
             len = (int)stream.Length;
-            reader = new BinaryReader ( stream );
-            memory = new MemoryStream ( len );
+            reader = new BinaryReader(stream);
+            memory = new MemoryStream(len);
 
-            memory.Write ( reader.ReadBytes ( len ), 0, len );
+            memory.Write(reader.ReadBytes(len), 0, len);
             return memory;
         }
 

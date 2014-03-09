@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 
 namespace Shrimp.Twitter.Streaming
 {
@@ -11,12 +7,12 @@ namespace Shrimp.Twitter.Streaming
         private Thread thread;
         private bool isFinished = false;
 
-        public UserStreamThreadData ()
+        public UserStreamThreadData()
         {
 
         }
 
-        public UserStreamThreadData ( Thread thread, bool isFinished )
+        public UserStreamThreadData(Thread thread, bool isFinished)
         {
             this.thread = thread;
             this.isFinished = isFinished;

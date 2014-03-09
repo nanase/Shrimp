@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Drawing;
 using Shrimp.Setting;
 
@@ -32,12 +29,12 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// アニメーションを開始します
         /// </summary>
         /// <param name="obj"></param>
-        public void StartAnimation ( object[] obj = null )
+        public void StartAnimation(object[] obj = null)
         {
-            if ( !this.Enable )
+            if (!this.Enable)
             {
-                this.BeforeControl = (Bitmap)( (Bitmap)obj[0] ).Clone ();
-                this.AfterControl = (Bitmap)( (Bitmap)obj[1] ).Clone ();
+                this.BeforeControl = (Bitmap)((Bitmap)obj[0]).Clone();
+                this.AfterControl = (Bitmap)((Bitmap)obj[1]).Clone();
                 this.tabLeftRight = (bool)obj[2];
                 this.tabVertical = (bool)obj[3];
                 this.MoveWidth = this.BeforeControl.Width;
@@ -48,14 +45,14 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// <summary>
         /// アニメーションを停止します
         /// </summary>
-        public void StopAnimation ()
+        public void StopAnimation()
         {
             this._Enable = false;
             this.FrameCount = 0;
-            if ( this.BeforeControl != null )
-                this.BeforeControl.Dispose ();
-            if ( this.AfterControl != null )
-                this.AfterControl.Dispose ();
+            if (this.BeforeControl != null)
+                this.BeforeControl.Dispose();
+            if (this.AfterControl != null)
+                this.AfterControl.Dispose();
             this.BeforeControl = null;
             this.AfterControl = null;
         }
@@ -66,68 +63,68 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// <param name="g"></param>
         /// <param name="maxWidth"></param>
         /// <param name="setClickLink"></param>
-        public void Draw ( Graphics g, int maxWidth, ControlParts.Timeline.Draw.TweetDraw.SetClickLinkDelegate setClickLink )
+        public void Draw(Graphics g, int maxWidth, ControlParts.Timeline.Draw.TweetDraw.SetClickLinkDelegate setClickLink)
         {
-            if ( Setting.Timeline.TabChangeAnimation == TabAnimation.Move )
+            if (Setting.Timeline.TabChangeAnimation == TabAnimation.Move)
             {
                 int offset = StartDrawOffset;
-                if ( this.tabLeftRight )
+                if (this.tabLeftRight)
                 {
-                    if ( this.tabVertical )
+                    if (this.tabVertical)
                     {
                         //  上下
-                        g.DrawImage ( AfterControl, new Point ( 0, offset - AfterControl.Width ) );
-                        g.DrawImage ( BeforeControl, new Point ( 0, offset ) );
+                        g.DrawImage(AfterControl, new Point(0, offset - AfterControl.Width));
+                        g.DrawImage(BeforeControl, new Point(0, offset));
                     }
                     else
                     {
-                        g.DrawImage ( AfterControl, new Point ( offset - AfterControl.Width, 0 ) );
-                        g.DrawImage ( BeforeControl, new Point ( offset, 0 ) );
+                        g.DrawImage(AfterControl, new Point(offset - AfterControl.Width, 0));
+                        g.DrawImage(BeforeControl, new Point(offset, 0));
                     }
                 }
                 else
                 {
-                    if ( this.tabVertical )
+                    if (this.tabVertical)
                     {
                         //  上下
-                        g.DrawImage ( BeforeControl, new Point ( 0, -offset ) );
-                        g.DrawImage ( AfterControl, new Point ( 0, -offset + BeforeControl.Width ) );
+                        g.DrawImage(BeforeControl, new Point(0, -offset));
+                        g.DrawImage(AfterControl, new Point(0, -offset + BeforeControl.Width));
                     }
                     else
                     {
-                        g.DrawImage ( BeforeControl, new Point ( -offset, 0 ) );
-                        g.DrawImage ( AfterControl, new Point ( -offset + BeforeControl.Width, 0 ) );
+                        g.DrawImage(BeforeControl, new Point(-offset, 0));
+                        g.DrawImage(AfterControl, new Point(-offset + BeforeControl.Width, 0));
                     }
                 }
             }
-            else if ( Setting.Timeline.TabChangeAnimation == TabAnimation.Fade )
+            else if (Setting.Timeline.TabChangeAnimation == TabAnimation.Fade)
             {
                 float offset = StartDrawFadeout;
                 //imgを半透明にしてtransImgに描画
                 System.Drawing.Imaging.ColorMatrix cm =
-                    new System.Drawing.Imaging.ColorMatrix ();
+                    new System.Drawing.Imaging.ColorMatrix();
                 cm.Matrix00 = 1;
                 cm.Matrix11 = 1;
                 cm.Matrix22 = 1;
                 cm.Matrix33 = 1 - offset;
                 cm.Matrix44 = 1;
                 System.Drawing.Imaging.ImageAttributes ia =
-                    new System.Drawing.Imaging.ImageAttributes ();
-                ia.SetColorMatrix ( cm );
-                g.DrawImage ( BeforeControl, new Rectangle ( 0, 0, BeforeControl.Width, BeforeControl.Height ), 0f, 0f, (float)BeforeControl.Width, (float)BeforeControl.Height, GraphicsUnit.Pixel, ia );
+                    new System.Drawing.Imaging.ImageAttributes();
+                ia.SetColorMatrix(cm);
+                g.DrawImage(BeforeControl, new Rectangle(0, 0, BeforeControl.Width, BeforeControl.Height), 0f, 0f, (float)BeforeControl.Width, (float)BeforeControl.Height, GraphicsUnit.Pixel, ia);
                 System.Drawing.Imaging.ColorMatrix cm2 =
-        new System.Drawing.Imaging.ColorMatrix ();
+        new System.Drawing.Imaging.ColorMatrix();
                 cm2.Matrix00 = 1;
                 cm2.Matrix11 = 1;
                 cm2.Matrix22 = 1;
                 cm2.Matrix33 = offset;
                 cm2.Matrix44 = 1;
                 System.Drawing.Imaging.ImageAttributes ia2 =
-                    new System.Drawing.Imaging.ImageAttributes ();
-                ia2.SetColorMatrix ( cm2 );
-                g.DrawImage ( AfterControl, new Rectangle ( 0, 0, AfterControl.Width, AfterControl.Height ), 0f, 0f, (float)AfterControl.Width, (float)AfterControl.Height, GraphicsUnit.Pixel, ia2 );
+                    new System.Drawing.Imaging.ImageAttributes();
+                ia2.SetColorMatrix(cm2);
+                g.DrawImage(AfterControl, new Rectangle(0, 0, AfterControl.Width, AfterControl.Height), 0f, 0f, (float)AfterControl.Width, (float)AfterControl.Height, GraphicsUnit.Pixel, ia2);
             }
-            
+
         }
 
         /// <summary>
@@ -141,9 +138,9 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// <summary>
         /// オブジェクトを破棄するときに呼び出されます
         /// </summary>
-        public void Dispose ()
+        public void Dispose()
         {
-            this.StopAnimation ();
+            this.StopAnimation();
         }
 
         /// <summary>
@@ -153,7 +150,7 @@ namespace Shrimp.ControlParts.Timeline.Animation
         {
             get
             {
-                return (int)( Math.Sin ( Math.PI / 2 / 16 * ( this.FrameCount) ) * this.MoveWidth );
+                return (int)(Math.Sin(Math.PI / 2 / 16 * (this.FrameCount)) * this.MoveWidth);
             }
         }
 
@@ -164,7 +161,7 @@ namespace Shrimp.ControlParts.Timeline.Animation
         {
             get
             {
-                return ( (float)Math.Sin ( Math.PI / 2 / 16 * ( this.FrameCount ) ) * 1f );
+                return ((float)Math.Sin(Math.PI / 2 / 16 * (this.FrameCount)) * 1f);
             }
         }
 
@@ -172,16 +169,16 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// 毎フレーム毎に行われる計算をいたします
         /// </summary>
         /// <returns></returns>
-        public bool FrameExecute ()
+        public bool FrameExecute()
         {
-            if ( this.Enable && this.FrameCount < 16 )
+            if (this.Enable && this.FrameCount < 16)
             {
                 this.FrameCount++;
                 return true;
             }
             else
             {
-                if ( this.Enable )
+                if (this.Enable)
                 {
                     this._Enable = false;
                     this.FrameCount = 0;

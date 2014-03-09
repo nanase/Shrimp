@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Shrimp.Module;
-using Shrimp.Twitter.Status;
+﻿using Shrimp.Twitter.Status;
 
 namespace Shrimp.Twitter.Streaming
 {
@@ -12,7 +7,7 @@ namespace Shrimp.Twitter.Streaming
         private readonly int _error_code = 0;
         private readonly TwitterStatus ret;
 
-        public UserStreamingEventArgs ( int error_code, TwitterStatus ret )
+        public UserStreamingEventArgs(int error_code, TwitterStatus ret)
         {
             this._error_code = error_code;
             this.ret = ret;

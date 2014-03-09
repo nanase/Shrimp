@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using OAuth;
 
@@ -18,9 +16,9 @@ namespace Shrimp.Twitter.REST.Help
         #endregion
 
         #region コンストラクタ
-        ~help ()
+        ~help()
         {
-            this.Dispose ();
+            this.Dispose();
         }
 
         /// <summary>
@@ -30,7 +28,7 @@ namespace Shrimp.Twitter.REST.Help
         {
             if (!isDisposed)
             {
-                WaitResult ( configurationResult );
+                WaitResult(configurationResult);
                 isDisposed = true;
             }
         }
@@ -40,10 +38,10 @@ namespace Shrimp.Twitter.REST.Help
         /// <summary>
         ///  Twitterの設定を取得
         /// </summary>
-        public void configuration ( TwitterInfo srv, TwitterCompletedProcessDelegate completedDelegate, TwitterErrorProcessDelegate errorProcess )
+        public void configuration(TwitterInfo srv, TwitterCompletedProcessDelegate completedDelegate, TwitterErrorProcessDelegate errorProcess)
         {
-            List<OAuthBase.QueryParameter> q = new List<OAuthBase.QueryParameter> ();
-            this.configurationResult = base.loadAsync ( srv, "GET", workerResult, completedDelegate, errorProcess, "help/configuration.json", q );
+            List<OAuthBase.QueryParameter> q = new List<OAuthBase.QueryParameter>();
+            this.configurationResult = base.loadAsync(srv, "GET", workerResult, completedDelegate, errorProcess, "help/configuration.json", q);
         }
 
 
@@ -52,11 +50,11 @@ namespace Shrimp.Twitter.REST.Help
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        private object workerResult ( dynamic data )
+        private object workerResult(dynamic data)
         {
-            if ( data == null )
+            if (data == null)
                 return null;
-            return new ConfigStatus (data);
+            return new ConfigStatus(data);
         }
 
     }

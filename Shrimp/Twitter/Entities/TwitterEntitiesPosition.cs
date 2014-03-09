@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Shrimp.Twitter.Entities
 {
@@ -13,21 +10,21 @@ namespace Shrimp.Twitter.Entities
         public string source;
         public string type;
 
-        public TwitterEntitiesPosition ( string source, string type )
+        public TwitterEntitiesPosition(string source, string type)
         {
             this.source = source;
             this.type = type;
         }
 
-        protected TwitterEntitiesPosition ( TwitterEntitiesPosition that )
+        protected TwitterEntitiesPosition(TwitterEntitiesPosition that)
         {
             this.source = that.source;
             this.type = that.type;
         }
 
-        public virtual object Clone ()
+        public virtual object Clone()
         {
-            return new TwitterEntitiesPosition ( this ); // コピーコンストラクタを使ってコピーを作成
+            return new TwitterEntitiesPosition(this); // コピーコンストラクタを使ってコピーを作成
         }
     }
 }

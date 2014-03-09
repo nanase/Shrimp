@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Xml.Serialization;
 using Shrimp.Twitter.REST.List;
 using Shrimp.Twitter.Status;
-using System.Xml.Serialization;
 
 namespace Shrimp.ControlParts.Tabs
 {
@@ -54,28 +51,28 @@ namespace Shrimp.ControlParts.Tabs
         /// </summary>
         public NotifyFilter notifyFilter;
 
-        public TimelineCategory ()
+        public TimelineCategory()
         {
         }
 
-        public TimelineCategory ( TimelineCategories category, object categoryDetail, bool isAllUserAccept )
+        public TimelineCategory(TimelineCategories category, object categoryDetail, bool isAllUserAccept)
         {
             this.category = category;
             this.categoryDetail = categoryDetail;
             this.isAllUserAccept = isAllUserAccept;
-            this.notifyFilter = new NotifyFilter ();
+            this.notifyFilter = new NotifyFilter();
         }
 
-        public object Clone ()
+        public object Clone()
         {
-            TimelineCategory dest = new TimelineCategory ();
+            TimelineCategory dest = new TimelineCategory();
             dest.category = this.category;
             dest.categoryDetail = this.categoryDetail;
             dest.isAllUserAccept = this.isAllUserAccept;
-            if ( this.ListData != null )
-                dest.ListData = (listData)this.ListData.Clone ();
-            if ( this.notifyFilter != null )
-                dest.notifyFilter = (NotifyFilter)this.notifyFilter.Clone ();
+            if (this.ListData != null)
+                dest.ListData = (listData)this.ListData.Clone();
+            if (this.notifyFilter != null)
+                dest.notifyFilter = (NotifyFilter)this.notifyFilter.Clone();
             return dest;
         }
 
@@ -87,21 +84,21 @@ namespace Shrimp.ControlParts.Tabs
         {
             get
             {
-                if ( this.category == TimelineCategories.None )
+                if (this.category == TimelineCategories.None)
                     return "なし";
-                if ( this.category == TimelineCategories.DirectMessageTimeline )
+                if (this.category == TimelineCategories.DirectMessageTimeline)
                     return "ダイレクトメッセージ";
-                if ( this.category == TimelineCategories.HomeTimeline )
+                if (this.category == TimelineCategories.HomeTimeline)
                     return "ホームタイムライン";
-                if ( this.category == TimelineCategories.ListTimeline )
+                if (this.category == TimelineCategories.ListTimeline)
                     return "リストタイムライン";
-                if ( this.category == TimelineCategories.MentionTimeline )
+                if (this.category == TimelineCategories.MentionTimeline)
                     return "返信";
-                if ( this.category == TimelineCategories.NotifyTimeline )
+                if (this.category == TimelineCategories.NotifyTimeline)
                     return "通知";
-                if ( this.category == TimelineCategories.SearchTimeline )
+                if (this.category == TimelineCategories.SearchTimeline)
                     return "検索";
-                if ( this.category == TimelineCategories.UserTimeline )
+                if (this.category == TimelineCategories.UserTimeline)
                     return "ユーザータイムライン";
                 return "なし";
             }

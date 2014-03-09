@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace Shrimp.Module
 {
     class ThumURLUtil
@@ -13,15 +9,15 @@ namespace Shrimp.Module
         /// <param name="path">URL</param>
         /// <param name="isThumb">サムネイルかどうかをかえします</param>
         /// <returns>サムネイルへのパス</returns>
-        public static string getThumbURL ( string path, out bool isThumb )
+        public static string getThumbURL(string path, out bool isThumb)
         {
             //
             isThumb = false;
-            if ( path == null )
+            if (path == null)
                 return null;
-            
+
             string thumb_result = path;
-            if ( path.IndexOf ( @"pbs.twimg.com" ) != -1 )
+            if (path.IndexOf(@"pbs.twimg.com") != -1)
             {
                 //  Twitterのイメージでは？
                 thumb_result = path;
@@ -29,7 +25,7 @@ namespace Shrimp.Module
             }
             else
             {
-                thumb_result = RegexUtil.ReplaceThumbURL ( path, out isThumb );
+                thumb_result = RegexUtil.ReplaceThumbURL(path, out isThumb);
             }
             return thumb_result;
         }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Shrimp.ControlParts.Timeline.Animation
 {
@@ -9,35 +6,35 @@ namespace Shrimp.ControlParts.Timeline.Animation
     {
         private bool _Enable;
 
-        public void StartAnimation ( object[] obj = null )
+        public void StartAnimation(object[] obj = null)
         {
-            if ( !Enabled )
+            if (!Enabled)
             {
                 //
             }
         }
 
-        public void StopAnimation ()
+        public void StopAnimation()
         {
-            if ( Enabled )
+            if (Enabled)
             {
                 //
             }
         }
 
-        public bool FrameExecute ()
+        public bool FrameExecute()
         {
-            throw new NotImplementedException ();
+            throw new NotImplementedException();
         }
 
-        public void Draw ( System.Drawing.Graphics g, int maxWidth, Draw.TweetDraw.SetClickLinkDelegate setClickLink )
+        public void Draw(System.Drawing.Graphics g, int maxWidth, Draw.TweetDraw.SetClickLinkDelegate setClickLink)
         {
-            throw new NotImplementedException ();
+            throw new NotImplementedException();
         }
 
-        public void Dispose ()
+        public void Dispose()
         {
-            throw new NotImplementedException ();
+            throw new NotImplementedException();
         }
 
         public bool Enabled

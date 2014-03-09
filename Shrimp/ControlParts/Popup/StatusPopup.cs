@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using Shrimp.Twitter;
 
@@ -13,41 +10,41 @@ namespace Shrimp.ControlParts.Popup
     public partial class StatusPopup : Component
     {
         public event ItemClickedDelegate ItemClicked;
-        public delegate void ItemClickedDelegate ( object sender, ToolStripItemClickedEventArgs e );
-        private Dictionary<decimal, ToolStripMenuItem> accountNames = new Dictionary<decimal, ToolStripMenuItem> ();
+        public delegate void ItemClickedDelegate(object sender, ToolStripItemClickedEventArgs e);
+        private Dictionary<decimal, ToolStripMenuItem> accountNames = new Dictionary<decimal, ToolStripMenuItem>();
 
-        public StatusPopup ()
+        public StatusPopup()
         {
-            InitializeComponent ();
+            InitializeComponent();
         }
 
         /// <summary>
         /// アカウント選択一覧につっこむ
         /// </summary>
         /// <param name="account"></param>
-        public void InsertAccountName ( TwitterInfo t, bool isSelected = false )
+        public void InsertAccountName(TwitterInfo t, bool isSelected = false)
         {
-            var item = new ToolStripMenuItem ( t.screen_name + "", ( t.icon_data ) ) { Name = "" + t.user_id + "" };
-            this.Menu.Items.Insert ( 0, item );
+            var item = new ToolStripMenuItem(t.screen_name + "", (t.icon_data)) { Name = "" + t.user_id + "" };
+            this.Menu.Items.Insert(0, item);
             accountNames[t.user_id] = item;
 
             accountNames[t.user_id].Checked = isSelected;
         }
 
-        public void Show ( Point p )
+        public void Show(Point p)
         {
             this.LineTweetModeMenu.Checked = Setting.Timeline.isLineMode;
             this.UserInformationMenu.Checked = Setting.Timeline.isShowUserInformation;
-            this.Menu.Show ( p );
+            this.Menu.Show(p);
         }
 
         /// <summary>
         /// ユーザーストリームの接続表記を変更する
         /// </summary>
         /// <param name="value"></param>
-        public void ChangeUserStreamMenu ( bool value )
+        public void ChangeUserStreamMenu(bool value)
         {
-            if ( !value )
+            if (!value)
             {
                 ConnectUserStreamNenu.Text = "UserStreamへ接続する";
             }
@@ -62,19 +59,19 @@ namespace Shrimp.ControlParts.Popup
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Menu_ItemClicked ( object sender, ToolStripItemClickedEventArgs e )
+        private void Menu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            if ( ItemClicked != null )
-                ItemClicked.Invoke ( sender, e );
+            if (ItemClicked != null)
+                ItemClicked.Invoke(sender, e);
         }
 
-        private void Menu_Closed ( object sender, ToolStripDropDownClosedEventArgs e )
+        private void Menu_Closed(object sender, ToolStripDropDownClosedEventArgs e)
         {
-            foreach ( var key in this.accountNames.Keys.ToList () )
+            foreach (var key in this.accountNames.Keys.ToList())
             {
-                if ( this.accountNames.ContainsKey ( key ) && this.accountNames[key] != null )
+                if (this.accountNames.ContainsKey(key) && this.accountNames[key] != null)
                 {
-                    this.accountNames[key].Dispose ();
+                    this.accountNames[key].Dispose();
                     this.accountNames[key] = null;
                 }
             }

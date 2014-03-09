@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
+﻿using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace Shrimp.ControlParts.ContextMenus.Tabs
@@ -14,23 +9,23 @@ namespace Shrimp.ControlParts.ContextMenus.Tabs
         private bool _isLock = false;
         private bool _isFlash = false;
 
-        public TabControlContextMenu ()
+        public TabControlContextMenu()
         {
-            InitializeComponent ();
+            InitializeComponent();
             this.SearchMenu.Image = Setting.ResourceImages.SearchImage;
-            this.Menu.Opening += new CancelEventHandler ( Menu_Opening );
+            this.Menu.Opening += new CancelEventHandler(Menu_Opening);
         }
 
-        ~TabControlContextMenu ()
+        ~TabControlContextMenu()
         {
-            this.Menu.Opening -= new CancelEventHandler ( Menu_Opening );
+            this.Menu.Opening -= new CancelEventHandler(Menu_Opening);
         }
 
-        void Menu_Opening ( object sender, CancelEventArgs e )
+        void Menu_Opening(object sender, CancelEventArgs e)
         {
             this.LockTabMenu.Checked = this.isLock;
-            if ( Opening != null )
-                Opening.Invoke ( this, e );
+            if (Opening != null)
+                Opening.Invoke(this, e);
         }
 
         /// <summary>
@@ -57,12 +52,12 @@ namespace Shrimp.ControlParts.ContextMenus.Tabs
             get { return this.SelectedThisTabMenu.Enabled; }
             set
             {
-                if ( this.Menu.InvokeRequired )
+                if (this.Menu.InvokeRequired)
                 {
-                    this.Menu.Invoke ( (MethodInvoker)delegate ()
+                    this.Menu.Invoke((MethodInvoker)delegate()
                     {
                         this.SelectedThisTabMenu.Enabled = value;
-                    } );
+                    });
                 }
                 else
                 {
@@ -79,12 +74,12 @@ namespace Shrimp.ControlParts.ContextMenus.Tabs
             get { return this.TabSettingMenu.Enabled; }
             set
             {
-                if ( this.Menu.InvokeRequired )
+                if (this.Menu.InvokeRequired)
                 {
-                    this.Menu.Invoke ( (MethodInvoker)delegate ()
+                    this.Menu.Invoke((MethodInvoker)delegate()
                     {
                         this.TabSettingMenu.Enabled = value;
-                    } );
+                    });
                 }
                 else
                 {
@@ -101,12 +96,12 @@ namespace Shrimp.ControlParts.ContextMenus.Tabs
             get { return this._isLock; }
             set
             {
-                if ( this.Menu.InvokeRequired )
+                if (this.Menu.InvokeRequired)
                 {
-                    this.Menu.Invoke ( (MethodInvoker)delegate ()
+                    this.Menu.Invoke((MethodInvoker)delegate()
                     {
                         this.DestroyThisTabMenu.Enabled = !value;
-                    } );
+                    });
                 }
                 else
                 {
@@ -124,12 +119,12 @@ namespace Shrimp.ControlParts.ContextMenus.Tabs
             get { return this._isFlash; }
             set
             {
-                if ( this.Menu.InvokeRequired )
+                if (this.Menu.InvokeRequired)
                 {
-                    this.Menu.Invoke ( (MethodInvoker)delegate ()
+                    this.Menu.Invoke((MethodInvoker)delegate()
                     {
                         this.FlashTabMenu.Checked = value;
-                    } );
+                    });
                 }
                 else
                 {

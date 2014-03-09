@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml.Serialization;
 
 namespace Shrimp.Twitter.REST.List
@@ -16,11 +13,11 @@ namespace Shrimp.Twitter.REST.List
         private string _name;
         private decimal _create_user_id;
 
-        public listData ()
+        public listData()
         {
         }
 
-        public listData ( decimal list_id, string slug, string name, decimal create_user_id )
+        public listData(decimal list_id, string slug, string name, decimal create_user_id)
         {
             this._list_id = list_id;
             this._slug = slug;
@@ -28,9 +25,9 @@ namespace Shrimp.Twitter.REST.List
             this._create_user_id = create_user_id;
         }
 
-        public object Clone ()
+        public object Clone()
         {
-            var dest = new listData ( _list_id, _slug, _name, _create_user_id );
+            var dest = new listData(_list_id, _slug, _name, _create_user_id);
             return dest;
         }
 
@@ -43,7 +40,7 @@ namespace Shrimp.Twitter.REST.List
             get { return this._list_id; }
         }
 
-        [XmlElement ( "list_id" )]
+        [XmlElement("list_id")]
         public decimal list_id_
         {
             get { return this._list_id; }
@@ -59,7 +56,7 @@ namespace Shrimp.Twitter.REST.List
             get { return this._slug; }
         }
 
-        [XmlElement ( "slug" )]
+        [XmlElement("slug")]
         public string slug_
         {
             get { return this._slug; }
@@ -75,7 +72,7 @@ namespace Shrimp.Twitter.REST.List
             get { return this._name; }
         }
 
-        [XmlElement ( "name" )]
+        [XmlElement("name")]
         public string name_
         {
             get { return this._name; }
@@ -91,7 +88,7 @@ namespace Shrimp.Twitter.REST.List
             get { return this._create_user_id; }
         }
 
-        [XmlElement ( "create_user_id" )]
+        [XmlElement("create_user_id")]
         public decimal create_user_id_
         {
             get { return this._create_user_id; }

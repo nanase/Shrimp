@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
-using Shrimp.Twitter;
-using Shrimp.Module;
 using Shrimp.Account;
+using Shrimp.Twitter;
 using Shrimp.Twitter.Status;
 
 namespace Shrimp.ControlParts.ContextMenus.TextMenu
@@ -22,17 +18,17 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
         public event EventHandler MenuClosed;
         public event EventHandler MenuOpening;
         public event ToolStripItemClickedEventHandler MenuItemClicked;
-        List<ToolStripMenuItem> accountItems = new List<ToolStripMenuItem> ();
+        List<ToolStripMenuItem> accountItems = new List<ToolStripMenuItem>();
         public bool isClosed = false;
-        private SelUserContextMenu UserMenu = new SelUserContextMenu ();
-        private SelUserContextMenu RetweetedUserMenu = new SelUserContextMenu ();
+        private SelUserContextMenu UserMenu = new SelUserContextMenu();
+        private SelUserContextMenu RetweetedUserMenu = new SelUserContextMenu();
         #endregion
 
-        public SelTweetContextMenu ()
+        public SelTweetContextMenu()
         {
-            InitializeComponent ();
-            this.FavMenu.DropDownItemClicked += new ToolStripItemClickedEventHandler ( Menu_ItemClicked );
-            this.RetweetMenu.DropDownItemClicked += new ToolStripItemClickedEventHandler ( Menu_ItemClicked );
+            InitializeComponent();
+            this.FavMenu.DropDownItemClicked += new ToolStripItemClickedEventHandler(Menu_ItemClicked);
+            this.RetweetMenu.DropDownItemClicked += new ToolStripItemClickedEventHandler(Menu_ItemClicked);
             this.ReplyMenu.Image = Setting.ResourceImages.Reply.hover;
             this.FavMenu.Image = Setting.ResourceImages.Fav.hover;
             this.RetweetMenu.Image = Setting.ResourceImages.Retweet.hover;
@@ -42,34 +38,34 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
 
             this.AboutThisUserMenu.DropDown = this.UserMenu.ContextMenu;
             this.RetweetedByUserMenu.DropDown = this.RetweetedUserMenu.ContextMenu;
-            this.UserMenu.MenuItemClicked += new ToolStripItemClickedEventHandler ( Menu_ItemClicked );
-            this.RetweetedUserMenu.MenuItemClicked += new ToolStripItemClickedEventHandler ( Menu_ItemClicked );
+            this.UserMenu.MenuItemClicked += new ToolStripItemClickedEventHandler(Menu_ItemClicked);
+            this.RetweetedUserMenu.MenuItemClicked += new ToolStripItemClickedEventHandler(Menu_ItemClicked);
         }
 
-        ~SelTweetContextMenu ()
+        ~SelTweetContextMenu()
         {
-            this.FavMenu.DropDownItemClicked -= new ToolStripItemClickedEventHandler ( Menu_ItemClicked );
-            this.RetweetMenu.DropDownItemClicked -= new ToolStripItemClickedEventHandler ( Menu_ItemClicked );
-            this.Menu.Opening -= new CancelEventHandler ( Menu_Opening );
-            this.Menu.Closed -= new ToolStripDropDownClosedEventHandler ( Menu_Closed );
-            this.UserMenu.MenuItemClicked -= new ToolStripItemClickedEventHandler ( Menu_ItemClicked );
-            this.RetweetedUserMenu.MenuItemClicked -= new ToolStripItemClickedEventHandler ( Menu_ItemClicked );
+            this.FavMenu.DropDownItemClicked -= new ToolStripItemClickedEventHandler(Menu_ItemClicked);
+            this.RetweetMenu.DropDownItemClicked -= new ToolStripItemClickedEventHandler(Menu_ItemClicked);
+            this.Menu.Opening -= new CancelEventHandler(Menu_Opening);
+            this.Menu.Closed -= new ToolStripDropDownClosedEventHandler(Menu_Closed);
+            this.UserMenu.MenuItemClicked -= new ToolStripItemClickedEventHandler(Menu_ItemClicked);
+            this.RetweetedUserMenu.MenuItemClicked -= new ToolStripItemClickedEventHandler(Menu_ItemClicked);
         }
 
-        void Menu_Opening ( object sender, CancelEventArgs e )
+        void Menu_Opening(object sender, CancelEventArgs e)
         {
             this.isClosed = false;
-            if ( this.MenuOpening != null )
-                this.MenuOpening ( sender, e );
+            if (this.MenuOpening != null)
+                this.MenuOpening(sender, e);
         }
 
         /// <summary>
         /// メニューを表示
         /// </summary>
         /// <param name="p"></param>
-        public void ShowMenu ( Point p, AccountManager accounts, TwitterStatus status )
+        public void ShowMenu(Point p, AccountManager accounts, TwitterStatus status)
         {
-            if ( !status.isDirectMessage && !status.isNotify )
+            if (!status.isDirectMessage && !status.isNotify)
             {
                 this.DeleteTweetMenu.Text = "ツイートを削除する(&D)";
                 this.FavMenu.Enabled = true;
@@ -77,26 +73,26 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
                 this.RegistBookmarkMenu.Enabled = true;
 
                 var selAccount = accounts.SelectedAccount;
-                if ( selAccount != null )
+                if (selAccount != null)
                 {
-                    this.FavMenu.DropDownItems.Add ( getSelectingAccount ( selAccount ) );
-                    this.RetweetMenu.DropDownItems.Add ( getSelectingAccount ( selAccount ) );
+                    this.FavMenu.DropDownItems.Add(getSelectingAccount(selAccount));
+                    this.RetweetMenu.DropDownItems.Add(getSelectingAccount(selAccount));
                 }
-                var t = getAccountList ( accounts.accounts );
-                foreach ( ToolStripItem item in t )
+                var t = getAccountList(accounts.accounts);
+                foreach (ToolStripItem item in t)
                 {
-                    this.FavMenu.DropDownItems.Add ( item );
+                    this.FavMenu.DropDownItems.Add(item);
                 }
-                t = getAccountList ( accounts.accounts );
-                foreach ( ToolStripItem item in t )
+                t = getAccountList(accounts.accounts);
+                foreach (ToolStripItem item in t)
                 {
-                    this.RetweetMenu.DropDownItems.Add ( item );
+                    this.RetweetMenu.DropDownItems.Add(item);
                 }
-                t.Clear (); t = null;
+                t.Clear(); t = null;
             }
             else
             {
-                if ( status.isDirectMessage )
+                if (status.isDirectMessage)
                     this.DeleteTweetMenu.Text = "DMを削除する(&D)";
                 this.FavMenu.Enabled = false;
                 this.RetweetMenu.Enabled = false;
@@ -105,13 +101,13 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
 
             this.AboutThisUserMenu.Text = "このユーザー(@" + status.DynamicTweet.user.screen_name + ")について(&U)";
             this.UserMenu.screen_name = status.DynamicTweet.user.screen_name;
-            if ( status.retweeted_status != null )
+            if (status.retweeted_status != null)
             {
-                this.RetweetedByUserMenu.Text = "リツイートしたユーザ(@"+ status.user.screen_name +")について(&B)";
+                this.RetweetedByUserMenu.Text = "リツイートしたユーザ(@" + status.user.screen_name + ")について(&B)";
                 this.RetweetedUserMenu.screen_name = status.user.screen_name;
             }
-            this.RetweetedByUserMenu.Enabled = ( status.retweeted_status != null );
-            this.Menu.Show ( p );
+            this.RetweetedByUserMenu.Enabled = (status.retweeted_status != null);
+            this.Menu.Show(p);
         }
 
         /// <summary>
@@ -119,15 +115,15 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
         /// </summary>
         /// <param name="SelectAccount"></param>
         /// <returns></returns>
-        private ToolStripMenuItem getSelectingAccount ( TwitterInfo SelectAccount )
+        private ToolStripMenuItem getSelectingAccount(TwitterInfo SelectAccount)
         {
             var iconImageSel = SelectAccount.icon_data;
-            var dropItemFirst = new ToolStripMenuItem ( "選択中のアカウント(@" + SelectAccount.screen_name + ")", iconImageSel )
+            var dropItemFirst = new ToolStripMenuItem("選択中のアカウント(@" + SelectAccount.screen_name + ")", iconImageSel)
             {
                 Name = "AccountSelected",
                 Tag = SelectAccount
             };
-            accountItems.Add ( dropItemFirst );
+            accountItems.Add(dropItemFirst);
             return dropItemFirst;
         }
 
@@ -136,15 +132,15 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
         /// </summary>
         /// <param name="accounts"></param>
         /// <returns></returns>
-        private List<ToolStripItem> getAccountList ( List<TwitterInfo> accounts )
+        private List<ToolStripItem> getAccountList(List<TwitterInfo> accounts)
         {
-            List<ToolStripItem> items = new List<ToolStripItem> ();
-            foreach ( TwitterInfo t in accounts )
+            List<ToolStripItem> items = new List<ToolStripItem>();
+            foreach (TwitterInfo t in accounts)
             {
                 var iconImage = t.icon_data;
-                var dropItem = new ToolStripMenuItem ( "@" + t.screen_name + "", iconImage ) { Name = "AccountSelected", Tag = t };
-                accountItems.Add ( dropItem );
-                items.Add ( dropItem );
+                var dropItem = new ToolStripMenuItem("@" + t.screen_name + "", iconImage) { Name = "AccountSelected", Tag = t };
+                accountItems.Add(dropItem);
+                items.Add(dropItem);
             }
             return items;
         }
@@ -157,14 +153,14 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
             get { return this.DeleteTweetMenu.Enabled; }
             set
             {
-                if ( isEnableDelTweet != value )
+                if (isEnableDelTweet != value)
                 {
-                    if ( this.Menu.InvokeRequired )
+                    if (this.Menu.InvokeRequired)
                     {
-                        this.Menu.Invoke ( (MethodInvoker)delegate ()
+                        this.Menu.Invoke((MethodInvoker)delegate()
                         {
                             this.DeleteTweetMenu.Enabled = value;
-                        } );
+                        });
                     }
                     else
                     {
@@ -187,18 +183,18 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Menu_Closed ( object sender, ToolStripDropDownClosedEventArgs e )
+        private void Menu_Closed(object sender, ToolStripDropDownClosedEventArgs e)
         {
             this.isClosed = true;
-            foreach ( ToolStripMenuItem items in this.accountItems )
+            foreach (ToolStripMenuItem items in this.accountItems)
             {
-                items.Dispose ();
+                items.Dispose();
             }
-            accountItems.Clear ();
+            accountItems.Clear();
 
-            if ( MenuClosed != null )
+            if (MenuClosed != null)
             {
-                MenuClosed ( sender, e );
+                MenuClosed(sender, e);
             }
         }
 
@@ -207,19 +203,19 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Menu_ItemClicked ( object sender, ToolStripItemClickedEventArgs e )
+        private void Menu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            if ( e.ClickedItem.Name == "FavMenu" || e.ClickedItem.Name == "RetweetMenu" )
+            if (e.ClickedItem.Name == "FavMenu" || e.ClickedItem.Name == "RetweetMenu")
                 return;
-            if ( MenuItemClicked != null )
+            if (MenuItemClicked != null)
             {
-                MenuItemClicked.Invoke ( sender, e );
+                MenuItemClicked.Invoke(sender, e);
             }
         }
 
-        public void MenuClose ()
+        public void MenuClose()
         {
-            this.Menu.Hide ();
+            this.Menu.Hide();
         }
     }
 }

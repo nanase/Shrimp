@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using Shrimp.Setting.ObjectXML;
 
@@ -19,10 +16,10 @@ namespace Shrimp.Setting
 
         #region コンストラクタ
 
-        internal static void initialize ()
+        internal static void initialize()
         {
             //  初期設定
-            ExistUnReadBackgroundColor = new SolidBrush ( Color.FromArgb ( 255, 255, 96, 96 ) );
+            ExistUnReadBackgroundColor = new SolidBrush(Color.FromArgb(255, 255, 96, 96));
             ExistUnReadStringColor = Brushes.Black;
             isBoldUnRead = true;
             UnOpenedBackgroundColor = Brushes.LightYellow;
@@ -36,12 +33,12 @@ namespace Shrimp.Setting
             isBoldSelectedTab = true;
         }
 
-        public static void load ( Dictionary<string, TabColorManager> obj )
+        public static void load(Dictionary<string, TabColorManager> obj)
         {
             if (obj == null)
                 return;
             TabColorManager tab = null;
-            if ( obj.ContainsKey ( "ExistUnRead" ) )
+            if (obj.ContainsKey("ExistUnRead"))
             {
                 tab = obj["ExistUnRead"] as TabColorManager;
                 ExistUnReadBackgroundColor = tab.BackgroundColor.Generate;
@@ -49,7 +46,7 @@ namespace Shrimp.Setting
                 isBoldUnRead = tab.isBold;
             }
 
-            if ( obj.ContainsKey ( "UnOpened" ) )
+            if (obj.ContainsKey("UnOpened"))
             {
                 tab = obj["UnOpened"] as TabColorManager;
                 UnOpenedBackgroundColor = tab.BackgroundColor.Generate;
@@ -57,7 +54,7 @@ namespace Shrimp.Setting
                 isBoldUnOpened = tab.isBold;
             }
 
-            if ( obj.ContainsKey ( "Normal" ) )
+            if (obj.ContainsKey("Normal"))
             {
                 tab = obj["Normal"] as TabColorManager;
                 NormalTabBackground = tab.BackgroundColor.Generate;
@@ -65,7 +62,7 @@ namespace Shrimp.Setting
                 isBoldNormalTab = tab.isBold;
             }
 
-            if ( obj.ContainsKey ( "Selected" ) )
+            if (obj.ContainsKey("Selected"))
             {
                 tab = obj["Selected"] as TabColorManager;
                 SelectedTabBackground = tab.BackgroundColor.Generate;
@@ -74,13 +71,13 @@ namespace Shrimp.Setting
             }
         }
 
-        public static Dictionary<string, TabColorManager> save ()
+        public static Dictionary<string, TabColorManager> save()
         {
-            var dest = new Dictionary<string, TabColorManager> ();
-            dest["ExistUnRead"] = new TabColorManager ( new BrushEX ( ExistUnReadBackgroundColor ), new BrushEX ( ExistUnReadStringColor ), isBoldUnRead );
-            dest["UnOpened"] = new TabColorManager ( new BrushEX ( UnOpenedBackgroundColor ), new BrushEX ( UnOpenedStringColor ), isBoldUnOpened );
-            dest["Normal"] = new TabColorManager ( new BrushEX ( NormalTabBackground ), new BrushEX ( NormalTabString ), isBoldNormalTab );
-            dest["Selected"] = new TabColorManager ( new BrushEX ( SelectedTabBackground ), new BrushEX ( SelectedTabString ), isBoldSelectedTab );
+            var dest = new Dictionary<string, TabColorManager>();
+            dest["ExistUnRead"] = new TabColorManager(new BrushEX(ExistUnReadBackgroundColor), new BrushEX(ExistUnReadStringColor), isBoldUnRead);
+            dest["UnOpened"] = new TabColorManager(new BrushEX(UnOpenedBackgroundColor), new BrushEX(UnOpenedStringColor), isBoldUnOpened);
+            dest["Normal"] = new TabColorManager(new BrushEX(NormalTabBackground), new BrushEX(NormalTabString), isBoldNormalTab);
+            dest["Selected"] = new TabColorManager(new BrushEX(SelectedTabBackground), new BrushEX(SelectedTabString), isBoldSelectedTab);
             return dest;
         }
         #endregion

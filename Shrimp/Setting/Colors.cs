@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using Shrimp.Setting.ObjectXML;
 
@@ -19,31 +16,31 @@ namespace Shrimp.Setting
 
         #region コンストラクタ
 
-        internal static void initialize ()
+        internal static void initialize()
         {
             //  初期設定
-            BackgroundColor = new SolidBrush ( Color.FromArgb ( 255, 202, 202, 202 ) );
-            ReplyBackgroundColor = new SolidBrush ( Color.FromArgb ( 255, 255, 176, 176 ) );
-            RetweetBackgroundColor = new SolidBrush ( Color.FromArgb ( 255, 183, 226, 253 ) );
-            OwnTweetBackgroundColor = new SolidBrush ( Color.FromArgb ( 255, 0, 217, 108 ) );
-            NotifyTweetBackgroundColor = new SolidBrush ( Color.FromArgb ( 255, 255, 157, 172 ) );
-            NotifyBackgroundColor = new SolidBrush ( Color.FromArgb ( 200, 96, 96, 96 ) );
+            BackgroundColor = new SolidBrush(Color.FromArgb(255, 202, 202, 202));
+            ReplyBackgroundColor = new SolidBrush(Color.FromArgb(255, 255, 176, 176));
+            RetweetBackgroundColor = new SolidBrush(Color.FromArgb(255, 183, 226, 253));
+            OwnTweetBackgroundColor = new SolidBrush(Color.FromArgb(255, 0, 217, 108));
+            NotifyTweetBackgroundColor = new SolidBrush(Color.FromArgb(255, 255, 157, 172));
+            NotifyBackgroundColor = new SolidBrush(Color.FromArgb(200, 96, 96, 96));
             NotifyStringColor = Brushes.White;
-            DirectMessageBackgroundColor = new SolidBrush ( Color.FromArgb ( 255, 171, 168, 198 ) );
-            SelectBackgroundColor = new SolidBrush ( Color.FromArgb ( 255, 232, 232, 232 ) );
-            NameColor = new SolidBrush ( Color.FromArgb ( 255, 47, 79, 79 ) );
-            TweetColor = new SolidBrush ( Color.FromArgb ( 255, 64, 0, 64 ) );
-            ViaColor = new SolidBrush ( Color.FromArgb ( 255, 108, 108, 108 ) );
-            LinkColor = new SolidBrush ( Color.FromArgb ( 255, 124, 0, 249 ) );
+            DirectMessageBackgroundColor = new SolidBrush(Color.FromArgb(255, 171, 168, 198));
+            SelectBackgroundColor = new SolidBrush(Color.FromArgb(255, 232, 232, 232));
+            NameColor = new SolidBrush(Color.FromArgb(255, 47, 79, 79));
+            TweetColor = new SolidBrush(Color.FromArgb(255, 64, 0, 64));
+            ViaColor = new SolidBrush(Color.FromArgb(255, 108, 108, 108));
+            LinkColor = new SolidBrush(Color.FromArgb(255, 124, 0, 249));
             ProfileName = "Default";
         }
 
-		public static void load(Dictionary<string, BrushEX> obj)
+        public static void load(Dictionary<string, BrushEX> obj)
         {
             if (obj == null)
                 return;
-            if ( obj.ContainsKey ( "ProfileName" ) )
-                ProfileName = (string)obj["ProfileName"].profileName.Clone ();
+            if (obj.ContainsKey("ProfileName"))
+                ProfileName = (string)obj["ProfileName"].profileName.Clone();
             if (obj.ContainsKey("BackgroundColor"))
                 BackgroundColor = obj["BackgroundColor"].Generate;
             if (obj.ContainsKey("ReplyBackgroundColor"))
@@ -51,44 +48,44 @@ namespace Shrimp.Setting
             if (obj.ContainsKey("RetweetBackgroundColor"))
                 RetweetBackgroundColor = obj["RetweetBackgroundColor"].Generate;
             if (obj.ContainsKey("OwnTweetBackgroundColor"))
-				OwnTweetBackgroundColor = obj["OwnTweetBackgroundColor"].Generate;
+                OwnTweetBackgroundColor = obj["OwnTweetBackgroundColor"].Generate;
             if (obj.ContainsKey("NotifyTweetBackgroundColor"))
-				NotifyTweetBackgroundColor = obj["NotifyTweetBackgroundColor"].Generate;
+                NotifyTweetBackgroundColor = obj["NotifyTweetBackgroundColor"].Generate;
             if (obj.ContainsKey("SelectBackgroundColor"))
-				SelectBackgroundColor = obj["SelectBackgroundColor"].Generate;
-            if ( obj.ContainsKey ( "NotifyBackgroundColor" ) )
+                SelectBackgroundColor = obj["SelectBackgroundColor"].Generate;
+            if (obj.ContainsKey("NotifyBackgroundColor"))
                 NotifyBackgroundColor = obj["NotifyBackgroundColor"].Generate;
-            if ( obj.ContainsKey ( "NotifyStringColor" ) )
+            if (obj.ContainsKey("NotifyStringColor"))
                 NotifyStringColor = obj["NotifyStringColor"].Generate;
             if (obj.ContainsKey("NameColor"))
-				NameColor = obj["NameColor"].Generate;
+                NameColor = obj["NameColor"].Generate;
             if (obj.ContainsKey("TweetColor"))
-				TweetColor = obj["TweetColor"].Generate;
+                TweetColor = obj["TweetColor"].Generate;
             if (obj.ContainsKey("ViaColor"))
-				ViaColor = obj["ViaColor"].Generate;
+                ViaColor = obj["ViaColor"].Generate;
             if (obj.ContainsKey("LinkColor"))
-				LinkColor = obj["LinkColor"].Generate;
-            if ( obj.ContainsKey ( "DirectMessageBackgroundColor" ) )
+                LinkColor = obj["LinkColor"].Generate;
+            if (obj.ContainsKey("DirectMessageBackgroundColor"))
                 DirectMessageBackgroundColor = obj["DirectMessageBackgroundColor"].Generate;
         }
 
-		public static Dictionary<string, BrushEX> save()
+        public static Dictionary<string, BrushEX> save()
         {
-			var dest = new Dictionary<string, BrushEX>();
-            dest["ProfileName"] = new BrushEX ( BackgroundColor ) { profileName = (string)ProfileName.Clone () };
-            dest["BackgroundColor"] = new BrushEX ( BackgroundColor );
-			dest["ReplyBackgroundColor"] = new BrushEX ( ReplyBackgroundColor);
-			dest["RetweetBackgroundColor"] = new BrushEX ( RetweetBackgroundColor);
-			dest["OwnTweetBackgroundColor"] = new BrushEX ( OwnTweetBackgroundColor);
-			dest["NotifyTweetBackgroundColor"] = new BrushEX ( NotifyTweetBackgroundColor);
-			dest["SelectBackgroundColor"] = new BrushEX ( SelectBackgroundColor);
-            dest["NotifyBackgroundColor"] = new BrushEX ( NotifyBackgroundColor );
-            dest["NotifyStringColor"] = new BrushEX ( NotifyStringColor );
-			dest["NameColor"] = new BrushEX ( NameColor);
-			dest["TweetColor"] = new BrushEX ( TweetColor);
-			dest["ViaColor"] = new BrushEX ( ViaColor );
-			dest["LinkColor"] = new BrushEX ( LinkColor );
-            dest["DirectMessageBackgroundColor"] = new BrushEX ( DirectMessageBackgroundColor );
+            var dest = new Dictionary<string, BrushEX>();
+            dest["ProfileName"] = new BrushEX(BackgroundColor) { profileName = (string)ProfileName.Clone() };
+            dest["BackgroundColor"] = new BrushEX(BackgroundColor);
+            dest["ReplyBackgroundColor"] = new BrushEX(ReplyBackgroundColor);
+            dest["RetweetBackgroundColor"] = new BrushEX(RetweetBackgroundColor);
+            dest["OwnTweetBackgroundColor"] = new BrushEX(OwnTweetBackgroundColor);
+            dest["NotifyTweetBackgroundColor"] = new BrushEX(NotifyTweetBackgroundColor);
+            dest["SelectBackgroundColor"] = new BrushEX(SelectBackgroundColor);
+            dest["NotifyBackgroundColor"] = new BrushEX(NotifyBackgroundColor);
+            dest["NotifyStringColor"] = new BrushEX(NotifyStringColor);
+            dest["NameColor"] = new BrushEX(NameColor);
+            dest["TweetColor"] = new BrushEX(TweetColor);
+            dest["ViaColor"] = new BrushEX(ViaColor);
+            dest["LinkColor"] = new BrushEX(LinkColor);
+            dest["DirectMessageBackgroundColor"] = new BrushEX(DirectMessageBackgroundColor);
             return dest;
         }
 

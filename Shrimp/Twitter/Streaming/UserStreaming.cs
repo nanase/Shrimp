@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net;
-using System.Threading;
-using Shrimp.Twitter.REST;
-using OAuth;
 using System.IO;
 using System.IO.Compression;
-using Shrimp.Log;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading;
 using Codeplex.Data;
-using Shrimp.Twitter.Status;
+using OAuth;
+using Shrimp.Log;
 using Shrimp.Module.Queue;
+using Shrimp.Twitter.REST;
+using Shrimp.Twitter.Status;
 
 namespace Shrimp.Twitter.Streaming
 {
@@ -20,28 +20,28 @@ namespace Shrimp.Twitter.Streaming
         #region 定義
 
         //  ロード完了時のイベントハンドラ
-        public delegate void TweetEventDelegate ( object sender, TwitterCompletedEventArgs e );
-        public delegate void NotifyEventDelegate ( object sender, TwitterCompletedEventArgs e );
-        public delegate void UserStreamingconnectStatusEventDelegate ( object sender, TwitterCompletedEventArgs e );
+        public delegate void TweetEventDelegate(object sender, TwitterCompletedEventArgs e);
+        public delegate void NotifyEventDelegate(object sender, TwitterCompletedEventArgs e);
+        public delegate void UserStreamingconnectStatusEventDelegate(object sender, TwitterCompletedEventArgs e);
 
         public event TweetEventDelegate completedHandler;
         public event UserStreamingconnectStatusEventDelegate disconnectHandler;
         public event NotifyEventDelegate notifyHandler;
 
-        private delegate void loadWorkerDelegate ( List<OAuthBase.QueryParameter> param, UserStreaming.TweetEventDelegate completedHandler, UserStreaming.NotifyEventDelegate notifyHandler,
-                                UserStreaming.UserStreamingconnectStatusEventDelegate disconnectHandler, UserStreamThreadData sender );
-        private volatile Dictionary<decimal, UserStreamThreadData> workerThreads = new Dictionary<decimal, UserStreamThreadData> ();
+        private delegate void loadWorkerDelegate(List<OAuthBase.QueryParameter> param, UserStreaming.TweetEventDelegate completedHandler, UserStreaming.NotifyEventDelegate notifyHandler,
+                                UserStreaming.UserStreamingconnectStatusEventDelegate disconnectHandler, UserStreamThreadData sender);
+        private volatile Dictionary<decimal, UserStreamThreadData> workerThreads = new Dictionary<decimal, UserStreamThreadData>();
         private volatile bool _isStartedStreaming = false;
-        private Encoding enc = Encoding.GetEncoding ( 932 );
+        private Encoding enc = Encoding.GetEncoding(932);
 
         #endregion
 
-        public UserStreaming ()
+        public UserStreaming()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
         }
 
-        ~UserStreaming ()
+        ~UserStreaming()
         {
             //StopStreamingAll ();
         }
@@ -49,15 +49,15 @@ namespace Shrimp.Twitter.Streaming
         /// <summary>
         /// ロードシンク
         /// </summary>
-        public void loadAsync ( TwitterInfo srv, List<OAuthBase.QueryParameter> param )
+        public void loadAsync(TwitterInfo srv, List<OAuthBase.QueryParameter> param)
         {
-            if ( this.workerThreads.ContainsKey ( srv.user_id ) )
-                this.stopStreaming ( srv );
+            if (this.workerThreads.ContainsKey(srv.user_id))
+                this.stopStreaming(srv);
 
-            var thread = new Thread ( new ParameterizedThreadStart ( this.StartStreaming ) );
-            this.workerThreads[srv.user_id] = new UserStreamThreadData ( thread, false );
-            thread.Start ( new object[6] { srv, param, completedHandler, notifyHandler, disconnectHandler, this.workerThreads[srv.user_id] } );
-            
+            var thread = new Thread(new ParameterizedThreadStart(this.StartStreaming));
+            this.workerThreads[srv.user_id] = new UserStreamThreadData(thread, false);
+            thread.Start(new object[6] { srv, param, completedHandler, notifyHandler, disconnectHandler, this.workerThreads[srv.user_id] });
+
             this.isStartedStreaming = true;
         }
 
@@ -66,31 +66,31 @@ namespace Shrimp.Twitter.Streaming
         /// </summary>
         /// <param name="srv"></param>
         /// <param name="isJoin"></param>
-        public void stopStreaming ( TwitterInfo srv, bool isJoin = false )
+        public void stopStreaming(TwitterInfo srv, bool isJoin = false)
         {
-            if ( !this.workerThreads.ContainsKey ( srv.user_id ) )
+            if (!this.workerThreads.ContainsKey(srv.user_id))
                 return;
 
 
-            if ( this.workerThreads[srv.user_id] != null && this.workerThreads[srv.user_id].Thread.ThreadState == ThreadState.Running )
+            if (this.workerThreads[srv.user_id] != null && this.workerThreads[srv.user_id].Thread.ThreadState == ThreadState.Running)
             {
                 //
                 //Thread.Sleep ( 1 );
                 this.workerThreads[srv.user_id].isStopFlag = true;
-                Thread.Sleep ( 0 );
-                this.workerThreads[srv.user_id].Thread.Join ();
-               // this.workerThreads[srv.user_id] = null;
-               // this.workerThreads.Remove ( srv.user_id );
+                Thread.Sleep(0);
+                this.workerThreads[srv.user_id].Thread.Join();
+                // this.workerThreads[srv.user_id] = null;
+                // this.workerThreads.Remove ( srv.user_id );
             }
         }
 
-        public void CheckStopped ()
+        public void CheckStopped()
         {
-            if ( this.workerThreads.All((d)=>d.Value.isFinishedThread == true ) )
+            if (this.workerThreads.All((d) => d.Value.isFinishedThread == true))
                 this.isStartedStreaming = false;
         }
 
-        public void StopStreamingAll ()
+        public void StopStreamingAll()
         {
             /*
             foreach ( KeyValuePair<decimal,Thread> t in this.workerThreads )
@@ -129,7 +129,7 @@ namespace Shrimp.Twitter.Streaming
         /// HttpWebRequestのパラメータを設定します
         /// </summary>
         /// <param name="webreq"></param>
-        private void SetWebReq ( HttpWebRequest webreq )
+        private void SetWebReq(HttpWebRequest webreq)
         {
             webreq.Method = "GET";
             webreq.UserAgent = "Shrimp";
@@ -146,7 +146,7 @@ namespace Shrimp.Twitter.Streaming
         /// 
         /// </summary>
         /// <param name="param"></param>
-        public void StartStreaming ( object args )
+        public void StartStreaming(object args)
         {
             object[] obj = (object[])args;
             TwitterInfo srv = (TwitterInfo)obj[0];
@@ -155,125 +155,125 @@ namespace Shrimp.Twitter.Streaming
             UserStreaming.NotifyEventDelegate notifyEventHandler = (UserStreaming.NotifyEventDelegate)obj[3];
             UserStreaming.UserStreamingconnectStatusEventDelegate disconnectHandler = (UserStreaming.UserStreamingconnectStatusEventDelegate)obj[4];
             UserStreamThreadData sender = (UserStreamThreadData)obj[5];
-            List<decimal> friends = new List<decimal> ();
-            UserStreamQueue streamQueue = new UserStreamQueue ();
+            List<decimal> friends = new List<decimal>();
+            UserStreamQueue streamQueue = new UserStreamQueue();
             int ReconnectCount = 0;
-            
+
             Uri uri;
-            uri = new Uri ( TwitterInfo.twitterStreamingAPI );
+            uri = new Uri(TwitterInfo.twitterStreamingAPI);
 
             //  再接続処理も含めて。
-            while ( !sender.isStopFlag )
+            while (!sender.isStopFlag)
             {
-                OAuthBase oAuth = new OAuthBase ();
-                string nonce = oAuth.GenerateNonce ();
-                string timestamp = oAuth.GenerateTimeStamp ();
+                OAuthBase oAuth = new OAuthBase();
+                string nonce = oAuth.GenerateNonce();
+                string timestamp = oAuth.GenerateTimeStamp();
 
                 //OAuthBace.csを用いてsignature生成
                 string normalizedUrl, normalizedRequestParameters;
-                string sig = oAuth.GenerateSignature ( uri, param, "oob", srv.consumer_key, srv.consumer_secret, srv.access_token_key, srv.access_token_secret,
-                                                        "GET", timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters );
-                sig = OAuthBase.UrlEncode ( sig );
+                string sig = oAuth.GenerateSignature(uri, param, "oob", srv.consumer_key, srv.consumer_secret, srv.access_token_key, srv.access_token_secret,
+                                                        "GET", timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters);
+                sig = OAuthBase.UrlEncode(sig);
 
-                HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create ( string.Format ( "{0}?{1}&oauth_signature={2}", normalizedUrl, normalizedRequestParameters, sig ) );
-                this.SetWebReq ( webreq );
+                HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(string.Format("{0}?{1}&oauth_signature={2}", normalizedUrl, normalizedRequestParameters, sig));
+                this.SetWebReq(webreq);
                 HttpWebResponse webres = null;
                 Stream st = null;
                 StreamReader sr = null;
                 try
                 {
-                    webres = (HttpWebResponse)webreq.GetResponse ();
-                    st = webres.GetResponseStream ();
+                    webres = (HttpWebResponse)webreq.GetResponse();
+                    st = webres.GetResponseStream();
 
-                    if ( webres != null && webres.ContentEncoding.ToLower () == "gzip" )
+                    if (webres != null && webres.ContentEncoding.ToLower() == "gzip")
                     {
                         //gzip。
-                        GZipStream gzip = new GZipStream ( st, CompressionMode.Decompress );
-                        sr = new StreamReader ( gzip, enc );
+                        GZipStream gzip = new GZipStream(st, CompressionMode.Decompress);
+                        sr = new StreamReader(gzip, enc);
                     }
                     else
                     {
-                        sr = new StreamReader ( st, enc );
+                        sr = new StreamReader(st, enc);
                     }
                     //  接続開始
-                    streamQueue.Enqueue 
-                        ( new UserStreamQueueData ( this, new TwitterCompletedEventArgs ( srv, HttpStatusCode.Unused, null, null ), disconnectHandler ) );
+                    streamQueue.Enqueue
+                        (new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.Unused, null, null), disconnectHandler));
                     bool isFirstTime = false;
 
-                    while ( !sender.isStopFlag && !sr.EndOfStream )
+                    while (!sender.isStopFlag && !sr.EndOfStream)
                     {
-                        string t = sr.ReadLine ();
-                        if ( !String.IsNullOrEmpty ( t ) && !sender.isStopFlag )
+                        string t = sr.ReadLine();
+                        if (!String.IsNullOrEmpty(t) && !sender.isStopFlag)
                         {
-                            var data = DynamicJson.Parse ( t );
+                            var data = DynamicJson.Parse(t);
 
-                            if ( !isFirstTime )
+                            if (!isFirstTime)
                             {
-                                if ( data.IsDefined ( "friends" ) )
+                                if (data.IsDefined("friends"))
                                 {
                                     friends = ((List<decimal>)data.friends);
                                 }
                                 isFirstTime = true;
                                 ReconnectCount = 0;
                                 streamQueue.Enqueue
-                                    ( new UserStreamQueueData ( this, new TwitterCompletedEventArgs ( srv, HttpStatusCode.OK, null, null ), disconnectHandler ) );
+                                    (new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.OK, null, null), disconnectHandler));
                                 continue;
                             }
 
-                            if ( data.IsDefined ( "id" ) )
+                            if (data.IsDefined("id"))
                             {
                                 //  ツイート
                                 streamQueue.Enqueue
-                                    ( new UserStreamQueueData ( this, new TwitterCompletedEventArgs ( srv, HttpStatusCode.OK, new TwitterStatus ( data ), null ), completedHandler ) );
+                                    (new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.OK, new TwitterStatus(data), null), completedHandler));
                             }
-                            else if ( data.IsDefined ( "event" ) )
+                            else if (data.IsDefined("event"))
                             {
                                 //  イベント
-                                if ( data["event"] == "favorite" || data["event"] == "unfavorite" ||
-                                    data["event"] == "follow" || data["event"] == "unfollow" )
+                                if (data["event"] == "favorite" || data["event"] == "unfavorite" ||
+                                    data["event"] == "follow" || data["event"] == "unfollow")
                                 {
                                     streamQueue.Enqueue
-                                        ( new UserStreamQueueData ( this, new TwitterCompletedEventArgs ( srv, HttpStatusCode.OK, new TwitterNotifyStatus ( data ), null ), notifyHandler ) );
+                                        (new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.OK, new TwitterNotifyStatus(data), null), notifyHandler));
                                 }
                             }
-                            else if ( data.IsDefined ( "direct_message" ) )
+                            else if (data.IsDefined("direct_message"))
                             {
                                 //  ダイレクトメッセージ
-                                var directMessage = new TwitterDirectMessageStatus ( data.direct_message );
+                                var directMessage = new TwitterDirectMessageStatus(data.direct_message);
                                 streamQueue.Enqueue
-                                        ( new UserStreamQueueData ( this, new TwitterCompletedEventArgs ( srv, HttpStatusCode.OK, directMessage, null ), completedHandler ) );
+                                        (new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.OK, directMessage, null), completedHandler));
                             }
                             //  深愛
                         }
                     }
                 }
-                catch ( Exception e )
+                catch (Exception e)
                 {
-                    LogControl.AddLogs ( "UserStreamが例外により切断されました: " + e.Message + "" );
+                    LogControl.AddLogs("UserStreamが例外により切断されました: " + e.Message + "");
                 }
                 finally
                 {
-                    if ( sender.isStopFlag )
+                    if (sender.isStopFlag)
                         sender.isFinishedThread = true;
-                    if ( ReconnectCount < 6 )
+                    if (ReconnectCount < 6)
                         ReconnectCount++;
 
                     streamQueue.Enqueue
-                        ( new UserStreamQueueData ( this, 
-                            new TwitterCompletedEventArgs ( srv, ( sender.isStopFlag ? HttpStatusCode.RequestTimeout : HttpStatusCode.Continue ), null, null ), disconnectHandler ) );
+                        (new UserStreamQueueData(this,
+                            new TwitterCompletedEventArgs(srv, (sender.isStopFlag ? HttpStatusCode.RequestTimeout : HttpStatusCode.Continue), null, null), disconnectHandler));
 
-                    if ( sr != null )
-                        sr.Close ();
-                    if ( st != null )
-                        st.Close ();
+                    if (sr != null)
+                        sr.Close();
+                    if (st != null)
+                        st.Close();
 
                     sr = null;
 
-                    streamQueue.Wait ();
+                    streamQueue.Wait();
                 }
-                if ( sender.isStopFlag )
+                if (sender.isStopFlag)
                     break;
-                Thread.Sleep ( ReconnectCount * 10000 );
+                Thread.Sleep(ReconnectCount * 10000);
             }
 
             return;

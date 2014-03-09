@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
+﻿using System.Drawing;
 using Shrimp.Twitter.Entities;
 
 namespace Shrimp.ControlParts.Timeline.Click
@@ -18,7 +14,7 @@ namespace Shrimp.ControlParts.Timeline.Click
         /// <param name="rect"></param>
         /// <param name="detail"></param>
         /// <param name="type"></param>
-        public ClickCellsData ( Rectangle rect, TwitterEntitiesPosition entities_pos )
+        public ClickCellsData(Rectangle rect, TwitterEntitiesPosition entities_pos)
         {
             this.Rect = rect;
             this.entities_pos = entities_pos;
@@ -48,13 +44,13 @@ namespace Shrimp.ControlParts.Timeline.Click
         {
             get
             {
-                if ( this.entities_pos != null )
+                if (this.entities_pos != null)
                     return entities_pos.type;
                 return null;
             }
             set
             {
-                if ( this.entities_pos != null )
+                if (this.entities_pos != null)
                     entities_pos.type = value;
             }
         }
@@ -63,13 +59,13 @@ namespace Shrimp.ControlParts.Timeline.Click
         {
             get
             {
-                if ( this.entities_pos != null )
+                if (this.entities_pos != null)
                     return entities_pos.source;
                 return null;
             }
             set
             {
-                if ( this.entities_pos != null )
+                if (this.entities_pos != null)
                     entities_pos.source = (string)value;
             }
         }

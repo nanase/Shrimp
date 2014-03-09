@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -23,38 +19,38 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
         public bool isClosed = false;
         #endregion
 
-        public SelTextContextMenu ()
+        public SelTextContextMenu()
         {
-            InitializeComponent ();
-            this.Menu.Opening += new CancelEventHandler ( Menu_Opening );
+            InitializeComponent();
+            this.Menu.Opening += new CancelEventHandler(Menu_Opening);
             this.Menu.Closed += new ToolStripDropDownClosedEventHandler(Menu_Closed);
         }
 
-        ~SelTextContextMenu ()
+        ~SelTextContextMenu()
         {
-            this.Menu.Opening -= new CancelEventHandler ( Menu_Opening );
-            this.Menu.Closed -= new ToolStripDropDownClosedEventHandler ( Menu_Closed );
+            this.Menu.Opening -= new CancelEventHandler(Menu_Opening);
+            this.Menu.Closed -= new ToolStripDropDownClosedEventHandler(Menu_Closed);
         }
 
-        void Menu_Opening ( object sender, CancelEventArgs e )
+        void Menu_Opening(object sender, CancelEventArgs e)
         {
             this.isClosed = false;
         }
 
-        public SelTextContextMenu ( IContainer container )
+        public SelTextContextMenu(IContainer container)
         {
-            container.Add ( this );
+            container.Add(this);
 
-            InitializeComponent ();
+            InitializeComponent();
         }
 
         /// <summary>
         /// メニューを表示する
         /// </summary>
         /// <param name="p"></param>
-        public void ShowMenu ( Point p )
+        public void ShowMenu(Point p)
         {
-            this.Menu.Show ( p );
+            this.Menu.Show(p);
         }
 
         /// <summary>
@@ -70,12 +66,12 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Menu_Closed ( object sender, ToolStripDropDownClosedEventArgs e )
+        private void Menu_Closed(object sender, ToolStripDropDownClosedEventArgs e)
         {
             this.isClosed = true;
-            if ( MenuClosed != null )
+            if (MenuClosed != null)
             {
-                MenuClosed ( sender, e );
+                MenuClosed(sender, e);
             }
         }
 
@@ -84,10 +80,10 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Menu_ItemClicked ( object sender, ToolStripItemClickedEventArgs e )
+        private void Menu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            if ( ItemClicked != null )
-                ItemClicked ( sender, e );
+            if (ItemClicked != null)
+                ItemClicked(sender, e);
         }
     }
 }
