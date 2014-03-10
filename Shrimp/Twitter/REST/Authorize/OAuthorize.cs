@@ -71,9 +71,9 @@ namespace Shrimp.Twitter.REST.Authorize
         /// <returns></returns>
         private object workerResult(dynamic data)
         {
-            if (data.status_code == HttpStatusCode.OK)
+            if ((HttpStatusCode)data.StatusCode == HttpStatusCode.OK)
             {
-                string param = data.rawdata;
+                string param = data.RawData;
                 string[] result = new string[4];
                 var p = param.Split('&');
                 foreach (string t in p)
