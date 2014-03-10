@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Shrimp.Win32API
 {
-    public class user32
+    public class User32
     {
         private const UInt32 FLASHW_STOP = 0;        // 点滅を止める
         private const UInt32 FLASHW_CAPTION = 1;     // タイトルバーを点滅させる
