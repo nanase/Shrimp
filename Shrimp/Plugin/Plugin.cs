@@ -59,7 +59,9 @@ namespace Shrimp.Plugin
             string err = null;
             this.pluginPath = (string)filePath.Clone();
             this.LoadCLRPackage();
-            this.RegisterFunction("print", this.GetType().GetMethod("print_lua"));
+            this.RegisterFunction("print", this.GetType().GetMethod("lua_print"));
+            this.RegisterFunction ( "tweet", this.GetType ().GetMethod ( "lua_tweet" ) );
+            this.RegisterFunction ( "update_profile", this.GetType ().GetMethod ( "lua_update_profile" ) );
 
             try
             {
@@ -109,9 +111,32 @@ namespace Shrimp.Plugin
             return (bool)ret[0];
         }
 
-        public void print_lua(string str)
+        /// <summary>
+        /// デバッグ用。Luaでprintを呼び出すと呼ばれます。
+        /// </summary>
+        /// <param name="str"></param>
+        public void lua_tweet(string str)
         {
             LogControl.AddLogs(str);
+        }
+
+        /// <summary>
+        /// Luaでtweetを呼び出すと呼ばれます。
+        /// </summary>
+        /// <param name="str"></param>
+        public void lua_tweet ( string str, decimal in_reply_to_status_id )
+        {
+            //  ツイート処理
+        }
+
+
+        /// <summary>
+        /// Luaでupdate_profileを呼び出すと呼ばれます
+        /// </summary>
+        /// <param name="str"></param>
+        public void lua_update_profile ( string name, string url, string location, string description )
+        {
+            //  プロフィール変更
         }
 
         /// <summary>
@@ -156,6 +181,10 @@ namespace Shrimp.Plugin
             }
         }
 
+        /// <summary>
+        /// ツイートボックス右クリックメニューを追加する宣言をチェックするメソッド
+        /// </summary>
+        /// <returns></returns>
         public LuaFunction OnRegistTweetBoxMenuReady()
         {
             return this.GetFunction("OnRegistTweetBoxMenu");
@@ -193,6 +222,25 @@ namespace Shrimp.Plugin
                 var ret = func.Call(new object[] { hook });
             }
         }
+
+        /// <summary>
+        /// プラグインが有効になったら実行される
+        /// </summary>
+        /// <returns></returns>
+        public LuaFunction OnEnabledPlugin ()
+        {
+            return this.GetFunction ( "OnEnabledPlugin" );
+        }
+
+        /// <summary>
+        /// プラグインが無効になったら実行される
+        /// </summary>
+        /// <returns></returns>
+        public LuaFunction OnDisabledPlugin ()
+        {
+            return this.GetFunction ( "OnDisabledPlugin" );
+        }
+
 
         /// <summary>
         /// プラグインをアンロードする
