@@ -77,7 +77,7 @@ namespace Shrimp.ControlParts.AuthPanel
 
         void oauth_loadCompletedEvent(object sender, Twitter.REST.TwitterCompletedEventArgs e)
         {
-            if (e.raw_data.uri.OriginalString.IndexOf("oauth/request_token") >= 0)
+            if (e.raw_data.Uri.OriginalString.IndexOf("oauth/request_token") >= 0)
             {
                 if (e.data != null)
                 {
@@ -93,7 +93,7 @@ namespace Shrimp.ControlParts.AuthPanel
                     this.URLLabel = "トークンの取得に失敗しました。ネットワークに繋がっているか、コンピュータの時刻が狂っていないかどうかを確認してください";
                 }
             }
-            if (e.raw_data.uri.OriginalString.IndexOf("oauth/access_token") >= 0)
+            if (e.raw_data.Uri.OriginalString.IndexOf("oauth/access_token") >= 0)
             {
                 if (e.data != null)
                 {

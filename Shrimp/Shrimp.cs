@@ -930,7 +930,7 @@ namespace Shrimp
         /// <param name="e"></param>
         void timelines_loadCompletedEvent(object sender, TwitterCompletedEventArgs e)
         {
-            var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.uri.AbsoluteUri);
+            var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.Uri.AbsoluteUri);
             if (e.error_code == HttpStatusCode.OK)
             {
                 List<TwitterStatus> data = e.data as List<TwitterStatus>;
@@ -1216,27 +1216,27 @@ namespace Shrimp
         {
             if (e.error_code == HttpStatusCode.OK)
             {
-                if (e.raw_data.uri.AbsoluteUri.IndexOf("statuses/update.json") != -1 ||
-                    e.raw_data.uri.AbsoluteUri.IndexOf("statuses/update_with_media.json") != -1)
+                if (e.raw_data.Uri.AbsoluteUri.IndexOf("statuses/update.json") != -1 ||
+                    e.raw_data.Uri.AbsoluteUri.IndexOf("statuses/update_with_media.json") != -1)
                 {
                     this.ShrimpSpringLabelText = "ツイートを送信しました";
                 }
                 else
                 {
-                    var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.uri.AbsoluteUri);
+                    var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.Uri.AbsoluteUri);
                     this.ShrimpSpringLabelText = "@" + e.account_source.screen_name + "で" + apiI + "しました";
                 }
             }
             else
             {
-                if (e.raw_data.uri.AbsoluteUri.IndexOf("statuses/update.json") != -1 || e.raw_data.uri.AbsoluteUri.IndexOf("statuses/update_with_media.json") != -1)
+                if (e.raw_data.Uri.AbsoluteUri.IndexOf("statuses/update.json") != -1 || e.raw_data.Uri.AbsoluteUri.IndexOf("statuses/update_with_media.json") != -1)
                 {
                     this.ShrimpSpringLabelText = "ツイートの送信に失敗しました";
                     this.tweetBox.EnableControls = true;
                 }
                 else
                 {
-                    var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.uri.AbsoluteUri);
+                    var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.Uri.AbsoluteUri);
                     this.ShrimpSpringLabelText = "@" + e.account_source.screen_name + "で" + apiI + "に失敗しました";
                 }
             }
@@ -1251,12 +1251,12 @@ namespace Shrimp
         {
             if (e.error_code == HttpStatusCode.OK)
             {
-                var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.uri.AbsoluteUri);
+                var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.Uri.AbsoluteUri);
                 this.ShrimpSpringLabelText = "@" + e.account_source.screen_name + "で" + apiI + "しました";
             }
             else
             {
-                var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.uri.AbsoluteUri);
+                var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.Uri.AbsoluteUri);
                 this.ShrimpSpringLabelText = "@" + e.account_source.screen_name + "で" + apiI + "に失敗しました";
             }
         }

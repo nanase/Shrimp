@@ -5,32 +5,41 @@ namespace Shrimp.Twitter
 {
     public class TwitterSocket : ICloneable
     {
-        public Uri uri;
+        public Uri Uri { get; private set; }
+
         /// <summary>
         /// 生データ
         /// </summary>
-        public string rawdata;
+        public string RawData { get; private set; }
+
         /// <summary>
         /// ステータスコード
         /// </summary>
-        public HttpStatusCode status_code;
+        public HttpStatusCode StatusCode { get; private set; }
+
+        public TwitterSocket(TwitterSocket baseSocket, HttpStatusCode statusCode)
+            : this(baseSocket.Uri, statusCode, baseSocket.RawData)
+        {
+        }
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="status_code"></param>
+        /// <param name="statusCode"></param>
         /// <param name="rawdata"></param>
-        public TwitterSocket(Uri uri, HttpStatusCode status_code, string rawdata)
+        public TwitterSocket(Uri uri, HttpStatusCode statusCode, string rawdata)
         {
-            this.uri = uri;
-            this.status_code = status_code;
-            this.rawdata = (string)rawdata.Clone();
-        }
+            if (uri == null)
+                throw new ArgumentNullException("uri");
+
+            this.Uri = uri;
+            this.StatusCode = statusCode;
+            this.RawData = (string)rawdata.Clone();
+        }        
 
         public object Clone()
         {
-            var dest = new TwitterSocket(this.uri, this.status_code, this.rawdata);
-            return dest;
+            return new TwitterSocket(this.Uri, this.StatusCode, this.RawData);
         }
     }
 }

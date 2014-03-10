@@ -108,16 +108,16 @@ namespace Shrimp.Twitter.REST
                 res = srv.post(url, q, objects);
 
             dynamic data = null;
-            if (res.rawdata != null && url != "oauth/request_token" && url != "oauth/access_token")
+            if (res.RawData != null && url != "oauth/request_token" && url != "oauth/access_token")
             {
                 try
                 {
-                    data = DynamicJson.Parse(res.rawdata);
+                    data = DynamicJson.Parse(res.RawData);
                 }
                 catch (Exception e)
                 {
                     LogControl.AddLogs("DynamicJSONをパース中にエラーが発生しました\n" + e.StackTrace);
-                    res.status_code = HttpStatusCode.BadGateway;
+                    res = new TwitterSocket(res, HttpStatusCode.BadGateway);
                 }
             }
             else if (url == "oauth/request_token" || url == "oauth/access_token")
@@ -125,7 +125,7 @@ namespace Shrimp.Twitter.REST
                 //  ああ・・・
                 data = res;
             }
-            OnLoadCompleted(completedProcess, errorProcess, new TwitterCompletedEventArgs(srv, res.status_code, workerResult.Invoke(data), res));
+            OnLoadCompleted(completedProcess, errorProcess, new TwitterCompletedEventArgs(srv, res.StatusCode, workerResult.Invoke(data), res));
         }
 
 
