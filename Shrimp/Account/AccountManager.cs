@@ -14,6 +14,31 @@ namespace Shrimp.Account
         public List<TwitterInfo> accounts = new List<TwitterInfo>();
 
         /// <summary>
+        /// 選択中の位置
+        /// </summary>
+        public int selNum { get; set; }
+
+        /// <summary>
+        /// 選択中のアカウント
+        /// </summary>
+        public TwitterInfo SelectedAccount
+        {
+            get
+            {
+                if (this.accounts.Count == 0)
+                    return null;
+
+                if (this.selNum < 0)
+                    this.selNum = 0;
+
+                if (this.selNum >= this.accounts.Count - 1)
+                    this.selNum = this.accounts.Count - 1;
+
+                return this.accounts[selNum];
+            }
+        }
+
+        /// <summary>
         /// アカウントの追加
         /// </summary>
         /// <param name="twitterAccount">アカウントデータ</param>
@@ -27,7 +52,9 @@ namespace Shrimp.Account
                     return false;
                 }
             }
+
             this.accounts.Add(twitterAccount);
+
             return true;
         }
 
@@ -38,49 +65,26 @@ namespace Shrimp.Account
         public void RemoveAccount(int num)
         {
             this.accounts.RemoveAt(num);
-            if (selNum < 0)
-                selNum = 0;
-            if (selNum >= this.accounts.Count - 1)
-                selNum = this.accounts.Count - 1;
+
+            if (this.selNum < 0)
+                this.selNum = 0;
+
+            if (this.selNum >= this.accounts.Count - 1)
+                this.selNum = this.accounts.Count - 1;
         }
 
         /// <summary>
-        /// 次のアカウントへ勧める
+        /// 次のアカウントへ進める
         /// </summary>
         public void NextAccount()
         {
             if (this.accounts.Count == 0)
                 return;
 
-            selNum++;
+            this.selNum++;
 
-            if (selNum >= this.accounts.Count)
-                selNum = 0;
+            if (this.selNum >= this.accounts.Count)
+                this.selNum = 0;
         }
-
-        /// <summary>
-        /// 選択中のアカウント
-        /// </summary>
-        public TwitterInfo SelectedAccount
-        {
-            get
-            {
-                if (this.accounts.Count == 0)
-                    return null;
-
-                if (selNum < 0)
-                    selNum = 0;
-
-                if (selNum >= this.accounts.Count - 1)
-                    selNum = this.accounts.Count - 1;
-
-                return this.accounts[selNum];
-            }
-        }
-
-        /// <summary>
-        /// 選択中の位置
-        /// </summary>
-        public int selNum { get; set; }
     }
 }
