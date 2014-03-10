@@ -57,7 +57,7 @@ namespace Shrimp.Update
                     }
                     else
                     {
-                        OnCreatingDel.Invoke(patch.log);
+                        OnCreatingDel.Invoke(patch.Log);
                     }
                 }
             });
