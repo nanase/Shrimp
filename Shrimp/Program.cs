@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using Shrimp.Log;
 
@@ -12,29 +13,38 @@ namespace Shrimp
         /// アプリケーションのメイン エントリ ポイントです。
         /// </summary>
         [STAThread]
-        static void Main()
+        public static void Main()
         {
             LogControl.AddLogs("Shrimpが起動しました");
-            Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
+
+            Application.ThreadException += ApplicationThreadException;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Shrimp());
+
             LogControl.AddLogs("Shrimpが終了しました");
         }
 
-        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        private static void ApplicationThreadException(object sender, ThreadExceptionEventArgs e)
         {
             try
             {
-                //エラーメッセージを表示する
-                StreamWriter sw = new StreamWriter("errlog_" + DateTime.Now.ToString("yyyy年MM月dd日tthh時mm分ss秒") + ".txt", false, Encoding.UTF8);
-                sw.Write("" + e.Exception.Message + "\n" + e.Exception.StackTrace + "");
-                sw.Close();
-                MessageBox.Show("Shrimp実行中にエラーが発生しました。プログラムを終了します。\n" + e.Exception.Message + "\n" + e.Exception.StackTrace + "", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                string path = string.Format("errlog_{0:yyyy年MM月dd日tthh時mm分ss秒}.txt", DateTime.Now);
+                string errorContent = e.Exception.Message + Environment.NewLine + e.Exception.StackTrace;
+
+                // エラーメッセージを表示する
+                using (StreamWriter sw = new StreamWriter(path, false, Encoding.UTF8))
+                    sw.Write(errorContent);
+
+                MessageBox.Show("Shrimp実行中にエラーが発生しました。プログラムを終了します。" +
+                                Environment.NewLine + errorContent, "エラー",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
             }
             finally
             {
-                //アプリケーションを終了する
+                // アプリケーションを終了する
+                // FIXME: 本当に 0 でいいのか？
                 Environment.Exit(0);
             }
         }
