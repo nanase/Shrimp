@@ -342,6 +342,12 @@
     <Compile Include="Setting\Forms\NewColor.Designer.cs">
       <DependentUpon>NewColor.cs</DependentUpon>
     </Compile>
+    <Compile Include="Setting\Forms\PluginForm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\PluginForm.Designer.cs">
+      <DependentUpon>PluginForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Setting\Forms\SettingUtils.cs" />
     <Compile Include="Setting\Forms\ShortcutKey.cs">
       <SubType>UserControl</SubType>
@@ -559,6 +565,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Setting\Forms\NewColor.resx">
       <DependentUpon>NewColor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setting\Forms\PluginForm.resx">
+      <DependentUpon>PluginForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Setting\Forms\SettingForms.resx">
       <DependentUpon>SettingForms.cs</DependentUpon>

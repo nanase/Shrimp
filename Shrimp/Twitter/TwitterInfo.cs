@@ -25,25 +25,25 @@ namespace Shrimp.Twitter
         /// <summary>
         /// コンシューマーキー
         /// </summary>
-        [XmlAttribute("consumer_key")]
+        [XmlElement ( "consumer_key" )]
         public string ConsumerKey { get; set; }
 
         /// <summary>
         /// コンシューマーシークレット
         /// </summary>
-        [XmlAttribute("consumer_secret")]
+        [XmlElement ( "consumer_secret" )]
         public string ConsumerSecret { get; set; }
 
         /// <summary>
         /// アクセストークンキー
         /// </summary>
-        [XmlAttribute("access_token_key")]
+        [XmlElement ( "access_token_key" )]
         public string AccessTokenKey { get; set; }
 
         /// <summary>
         /// アクセストークンシークレット
         /// </summary>
-        [XmlAttribute("access_token_secret")]
+        [XmlElement ( "access_token_secret" )]
         public string AccessTokenSecret { get; set; }
 
         /// <summary>
@@ -104,13 +104,13 @@ namespace Shrimp.Twitter
         /// <summary>
         /// ユーザーID
         /// </summary>
-        [XmlAttribute("user_id")]
+        [XmlElement ( "user_id" )]
         public decimal UserId { get; set; }
 
         /// <summary>
         /// スクリーンネーム
         /// </summary>
-        [XmlAttribute("screen_name")]
+        [XmlElement ( "screen_name" )]
         public string ScreenName { get; set; }
 
         /// <summary>
@@ -138,6 +138,10 @@ namespace Shrimp.Twitter
         public decimal DirectMessageSendSinceID { get; set; }
 
         #region コンストラクタ
+        public TwitterInfo ()
+        {
+        }
+
         public TwitterInfo(string consumerKey = null,
                            string consumerSecret = null,
                            string accessTokenKey = null,

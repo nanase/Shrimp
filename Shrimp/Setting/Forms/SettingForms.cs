@@ -92,6 +92,11 @@ namespace Shrimp.Setting.Forms
                 BeforeSelectControl = new GlobalMute();
             }
 
+            if ( node.Name == "PluginNode" )
+            {
+                BeforeSelectControl = new PluginForm ();
+            }
+
             if (BeforeSelectControl != null)
             {
                 BeforeSelectControl.Dock = DockStyle.Fill;

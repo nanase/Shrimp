@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Shrimp.Twitter;
+using System.Xml.Serialization;
 
 namespace Shrimp.Account
 {
@@ -11,11 +12,13 @@ namespace Shrimp.Account
         /// <summary>
         /// アカウント集
         /// </summary>
+        [XmlElement ( "accounts" )]
         public List<TwitterInfo> accounts = new List<TwitterInfo>();
 
         /// <summary>
         /// 選択中の位置
         /// </summary>
+        [XmlElement ( "accountSelectedNumber" )]
         public int selNum { get; set; }
 
         /// <summary>

@@ -43,7 +43,8 @@
             treeNode6});
             System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("グローバルミュート");
             System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("ショートカットキーの設定");
-            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("Shrimpの情報");
+            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("プラグイン");
+            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Shrimpの情報");
             this.MainSplit = new System.Windows.Forms.SplitContainer();
             this.SettingListView = new System.Windows.Forms.TreeView();
             ((System.ComponentModel.ISupportInitialize)(this.MainSplit)).BeginInit();
@@ -87,13 +88,16 @@
             treeNode8.Text = "グローバルミュート";
             treeNode9.Name = "ShortcutKeySetting";
             treeNode9.Text = "ショートカットキーの設定";
-            treeNode10.Name = "ShrimpInfo";
-            treeNode10.Text = "Shrimpの情報";
+            treeNode10.Name = "PluginNode";
+            treeNode10.Text = "プラグイン";
+            treeNode11.Name = "ShrimpInfo";
+            treeNode11.Text = "Shrimpの情報";
             this.SettingListView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode7,
             treeNode8,
             treeNode9,
-            treeNode10});
+            treeNode10,
+            treeNode11});
             this.SettingListView.Size = new System.Drawing.Size(145, 441);
             this.SettingListView.TabIndex = 0;
             this.SettingListView.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.SettingListView_NodeMouseClick);
