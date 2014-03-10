@@ -89,9 +89,9 @@ namespace Shrimp.Twitter
                     //区切り文字列
                     if (image == null)
                         throw new WebException("imageがありません");
-                    var media = image.data;
-                    var filename = image.filename;
-                    var status = image.status;
+                    var media = image.Data;
+                    var filename = image.FileName;
+                    var status = image.Status;
                     Encoding enc = Encoding.GetEncoding("utf-8");
                     string boundary = Environment.TickCount.ToString();
                     webreq.ContentType = "multipart/form-data; boundary=" + boundary;

@@ -3,37 +3,20 @@ namespace Shrimp.Twitter
 {
     public class TwitterUpdateImage
     {
-        private readonly string _filename;
-        private readonly byte[] _data;
-        private readonly string _status;
-        private readonly decimal _in_reply_to_status_id;
+        public string FileName { get; private set; }
 
-        public TwitterUpdateImage(string filename, byte[] data, string status, decimal in_reply_to_status_id)
-        {
-            this._filename = filename;
-            this._data = data;
-            this._status = status;
-            this._in_reply_to_status_id = in_reply_to_status_id;
-        }
+        public byte[] Data { get; private set; }
 
-        public string filename
-        {
-            get { return this._filename; }
-        }
+        public string Status { get; private set; }
 
-        public byte[] data
-        {
-            get { return this._data; }
-        }
+        public decimal InReplyToStatusId { get; private set; }
 
-        public string status
+        public TwitterUpdateImage(string filename, byte[] data, string status, decimal inReplyToStatusId)
         {
-            get { return this._status; }
-        }
-
-        public decimal in_reply_to_status_id
-        {
-            get { return this._in_reply_to_status_id; }
+            this.FileName = filename;
+            this.Data = data;
+            this.Status = status;
+            this.InReplyToStatusId = inReplyToStatusId;
         }
     }
 }
