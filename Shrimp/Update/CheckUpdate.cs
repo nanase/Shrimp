@@ -11,48 +11,36 @@ namespace Shrimp.Update
 {
     class CheckUpdate
     {
+        private const string UpdateUrl = "http://shrimp.ga/update/update?version=";
+
         public static void CheckUpdateSync(Shrimp.OnCreatingUpdateFormDelegate OnCreatingDel)
         {
-            string result = null;
-            var task = Task.Factory.StartNew(() =>
+            // TODO: ファイルの取得、取得+JSONの解析用のコードに分離したほうがよさそう
+            Task.Factory.StartNew(() =>
             {
-                FileVersionInfo vi = FileVersionInfo.GetVersionInfo(Application.ExecutablePath);
+                string result;
+                var vi = FileVersionInfo.GetVersionInfo(Application.ExecutablePath);
                 var ver = vi.FileVersion.Replace(".", "");
-                StreamReader sr = null;
-                try
-                {
-                    HttpWebRequest webreq =
-                        (HttpWebRequest)
-                            WebRequest.Create("http://shrimp.ga/update/update?version=" + ver + "");
+                var webreq = (HttpWebRequest)WebRequest.Create(UpdateUrl + ver);
+                var webres = webreq.GetResponse();
 
-                    WebResponse webres = webreq.GetResponse();
+                // 文字コード(EUC)を指定する
+                // FIXME: EUC?
+                var enc = Encoding.UTF8;
 
-                    //文字コード(EUC)を指定する
-                    Encoding enc = Encoding.UTF8;
-                    //応答データを受信するためのStreamを取得
-                    Stream st = webres.GetResponseStream();
-                    sr = new StreamReader(st, enc);
-                    //受信して表示
-                    string html = sr.ReadToEnd();
-                    result = html;
+                using (var st = webres.GetResponseStream())
+                using (var sr = new StreamReader(st, enc))
+                    // 受信して表示
+                    result = sr.ReadToEnd();
 
-                }
-                catch (Exception)
-                {
-                }
-                finally
-                {
-                    if (sr != null)
-                        sr.Close();
-                }
-
-                if (result != null)
+                if (!string.IsNullOrWhiteSpace(result))
                 {
                     var res = DynamicJson.Parse(result);
                     var patch = new PatchInfo(res.download_url, res.md5, res.modify);
+
                     if (!res.isModify)
                     {
-                        //  アプデなし
+                        // アプデなし
                         Setting.Update.isIgnoreUpdate = false;
                     }
                     else
