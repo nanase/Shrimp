@@ -753,7 +753,7 @@ namespace Shrimp.ControlParts.Timeline
                 if (selTweet != null)
                 {
                     AccountManager account = OnRequiredAccountInfo.Invoke();
-                    selTweetContextMenu.isEnableDelTweet = account.accounts.Any((t) => t.user_id == selTweet.user.id);
+                    selTweetContextMenu.isEnableDelTweet = account.accounts.Any((t) => t.UserId == selTweet.user.id);
                 }
             }
         }

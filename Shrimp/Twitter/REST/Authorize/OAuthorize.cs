@@ -59,8 +59,8 @@ namespace Shrimp.Twitter.REST.Authorize
         {
             List<OAuth.OAuthBase.QueryParameter> q = new List<OAuth.OAuthBase.QueryParameter>();
             q.Add(new OAuth.OAuthBase.QueryParameter("oauth_verifier", pincode));
-            q.Add(new OAuth.OAuthBase.QueryParameter("request_token", srv.request_token_key));
-            q.Add(new OAuth.OAuthBase.QueryParameter("request_token_secret", srv.request_token_secret));
+            q.Add(new OAuth.OAuthBase.QueryParameter("request_token", srv.RequestTokenKey));
+            q.Add(new OAuth.OAuthBase.QueryParameter("request_token_secret", srv.RequestTokenSecret));
             this.AccessTokenResult = base.loadAsync(srv, "POST", workerResult, null, null, "oauth/access_token", q);
         }
 

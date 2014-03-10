@@ -51,19 +51,19 @@ namespace Shrimp.Twitter
                 uri = new Uri("https://api.twitter.com/" + url + "");
                 if (param != null && param[0].Name == "oauth_verifier")
                 {
-                    sig = oAuth.GenerateSignature(uri, null, "oob", srv.consumer_key, srv.consumer_secret, param[1].Value, param[2].Value,
+                    sig = oAuth.GenerateSignature(uri, null, "oob", srv.ConsumerKey, srv.ConsumerSecret, param[1].Value, param[2].Value,
                         method, timestamp, param[0].Value, nonce, out normalizedUrl, out normalizedRequestParameters);
                 }
                 else
                 {
-                    sig = oAuth.GenerateSignature(uri, param, "oob", srv.consumer_key, srv.consumer_secret, null, null,
+                    sig = oAuth.GenerateSignature(uri, param, "oob", srv.ConsumerKey, srv.ConsumerSecret, null, null,
                         method, timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters);
                 }
             }
             else
             {
                 uri = new Uri(twitterAPIBase + url);
-                sig = oAuth.GenerateSignature(uri, param, "oob", srv.consumer_key, srv.consumer_secret, srv.access_token_key, srv.access_token_secret,
+                sig = oAuth.GenerateSignature(uri, param, "oob", srv.ConsumerKey, srv.ConsumerSecret, srv.AccessTokenKey, srv.AccessTokenSecret,
                                                         method, timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters);
             }
             sig = OAuthBase.UrlEncode(sig);

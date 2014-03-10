@@ -13,7 +13,7 @@ namespace Shrimp.Twitter.Status.StatusChecker
         {
             if (tweet.retweeted_status != null)
             {
-                if (accounts.Find((info) => info.user_id == tweet.retweeted_status.user.id) != null)
+                if (accounts.Find((info) => info.UserId == tweet.retweeted_status.user.id) != null)
                 {
                     //  リツイートされた
                     var newTweet = (TwitterStatus)tweet.Clone();
@@ -40,9 +40,9 @@ namespace Shrimp.Twitter.Status.StatusChecker
             //  リプライかどうか
             var text = tweet.DynamicTweet.text.ToLower();
             TwitterInfo t;
-            if ((t = accounts.Find((info) => (text.IndexOf("@" + info.screen_name.ToLower() + "") >= 0))) != null)
+            if ((t = accounts.Find((info) => (text.IndexOf("@" + info.ScreenName.ToLower() + "") >= 0))) != null)
             {
-                tweet.DynamicTweet.SetReply(t.user_id);
+                tweet.DynamicTweet.SetReply(t.UserId);
             }
         }
 
@@ -58,8 +58,8 @@ namespace Shrimp.Twitter.Status.StatusChecker
             {
                 var sourceUser = tweet.source;
                 var targetUser = tweet.target;
-                tweet.isFaved = (accounts.FindIndex((t) => t.user_id == targetUser.id) >= 0);
-                tweet.isOwnFav = (accounts.FindIndex((t) => t.user_id == sourceUser.id) >= 0);
+                tweet.isFaved = (accounts.FindIndex((t) => t.UserId == targetUser.id) >= 0);
+                tweet.isOwnFav = (accounts.FindIndex((t) => t.UserId == sourceUser.id) >= 0);
                 tweet.isFav = !(tweet.isFaved | tweet.isOwnFav);
             }
 
@@ -67,8 +67,8 @@ namespace Shrimp.Twitter.Status.StatusChecker
             {
                 var targetUser = tweet.target;
                 var sourceUser = tweet.source;
-                tweet.isUnFaved = (accounts.FindIndex((t) => t.user_id == targetUser.id) >= 0);
-                tweet.isOwnUnFav = (sourceUser.id == targetUser.id) || (accounts.FindIndex((t) => t.user_id == sourceUser.id) >= 0);
+                tweet.isUnFaved = (accounts.FindIndex((t) => t.UserId == targetUser.id) >= 0);
+                tweet.isOwnUnFav = (sourceUser.id == targetUser.id) || (accounts.FindIndex((t) => t.UserId == sourceUser.id) >= 0);
                 tweet.isUnFav = !(tweet.isUnFaved | tweet.isOwnUnFav);
             }
         }

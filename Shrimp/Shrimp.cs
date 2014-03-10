@@ -581,12 +581,12 @@ namespace Shrimp
             {
                 if (tmp != null)
                 {
-                    if (tmp.icon_url != null)
+                    if (tmp.IconUrl != null)
                     {
-                        tmp.icon_data = ImageCache.AutoCache(tmp.icon_url, true);
-                        if (tmp.icon_data != null && accountManager.SelectedAccount == tmp)
+                        tmp.IconData = ImageCache.AutoCache(tmp.IconUrl, true);
+                        if (tmp.IconData != null && accountManager.SelectedAccount == tmp)
                         {
-                            this.tweetBox.SelectedIcon = tmp.icon_data;
+                            this.tweetBox.SelectedIcon = tmp.IconData;
                         }
                     }
                 }
@@ -685,8 +685,8 @@ namespace Shrimp
                     {
                         TwitterUserStatus user = (TwitterUserStatus)data;
                         ImageCache.AutoCache(user.profile_image_url, true);
-                        twIn.icon_url = user.profile_image_url;
-                    }, null, null, t.user_id);
+                        twIn.IconUrl = user.profile_image_url;
+                    }, null, null, t.UserId);
                     //  リスト取得
                     listAPI.list(twIn, (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
                     {
@@ -694,7 +694,7 @@ namespace Shrimp
                         if (res_data.Count == 0)
                             return;
                         this.tmplistDatas.AddlistRange(res_data);
-                    }, null, null, t.user_id);
+                    }, null, null, t.UserId);
                 }
             });
 
@@ -883,7 +883,7 @@ namespace Shrimp
             int i = 0;
             foreach (TwitterInfo t in this.accountManager.accounts)
             {
-                if (e.ClickedItem.Name == "" + t.user_id + "")
+                if (e.ClickedItem.Name == "" + t.UserId + "")
                 {
                     this.accountManager.selNum = i;
                 }
@@ -943,11 +943,11 @@ namespace Shrimp
 
                 db.InsertTweetRange(data);
                 db.InsertUserRange(users);
-                this.ShrimpSpringLabelText = "@" + e.account_source.screen_name + "の" + apiI + "しました(" + data.Count + "件)";
+                this.ShrimpSpringLabelText = "@" + e.account_source.ScreenName + "の" + apiI + "しました(" + data.Count + "件)";
             }
             else
             {
-                this.ShrimpSpringLabelText = "@" + e.account_source.screen_name + "の" + apiI + "に失敗しました";
+                this.ShrimpSpringLabelText = "@" + e.account_source.ScreenName + "の" + apiI + "に失敗しました";
             }
         }
 
@@ -1047,7 +1047,7 @@ namespace Shrimp
                     this.us.CheckStopped();
                     if (this.us.isStartedStreaming)
                     {
-                        this.ShrimpSpringLabelText = "@" + e.account_source.screen_name + "のUserStreamが停止されました";
+                        this.ShrimpSpringLabelText = "@" + e.account_source.ScreenName + "のUserStreamが停止されました";
                     }
                     else
                     {
@@ -1224,7 +1224,7 @@ namespace Shrimp
                 else
                 {
                     var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.Uri.AbsoluteUri);
-                    this.ShrimpSpringLabelText = "@" + e.account_source.screen_name + "で" + apiI + "しました";
+                    this.ShrimpSpringLabelText = "@" + e.account_source.ScreenName + "で" + apiI + "しました";
                 }
             }
             else
@@ -1237,7 +1237,7 @@ namespace Shrimp
                 else
                 {
                     var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.Uri.AbsoluteUri);
-                    this.ShrimpSpringLabelText = "@" + e.account_source.screen_name + "で" + apiI + "に失敗しました";
+                    this.ShrimpSpringLabelText = "@" + e.account_source.ScreenName + "で" + apiI + "に失敗しました";
                 }
             }
         }
@@ -1252,12 +1252,12 @@ namespace Shrimp
             if (e.error_code == HttpStatusCode.OK)
             {
                 var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.Uri.AbsoluteUri);
-                this.ShrimpSpringLabelText = "@" + e.account_source.screen_name + "で" + apiI + "しました";
+                this.ShrimpSpringLabelText = "@" + e.account_source.ScreenName + "で" + apiI + "しました";
             }
             else
             {
                 var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.Uri.AbsoluteUri);
-                this.ShrimpSpringLabelText = "@" + e.account_source.screen_name + "で" + apiI + "に失敗しました";
+                this.ShrimpSpringLabelText = "@" + e.account_source.ScreenName + "で" + apiI + "に失敗しました";
             }
         }
 
@@ -1375,7 +1375,7 @@ namespace Shrimp
                 TwitterStatus t = arg[1] as TwitterStatus;
                 if (t.user != null)
                 {
-                    var info = accountManager.accounts.Find((u) => u.user_id == t.user.id);
+                    var info = accountManager.accounts.Find((u) => u.UserId == t.user.id);
                     if (t.isDirectMessage)
                         directMessage.DestroyDirectMessage(info, null, null, t.id);
                     else

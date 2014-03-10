@@ -51,12 +51,12 @@ namespace Shrimp.Twitter.Streaming
         /// </summary>
         public void loadAsync(TwitterInfo srv, List<OAuthBase.QueryParameter> param)
         {
-            if (this.workerThreads.ContainsKey(srv.user_id))
+            if (this.workerThreads.ContainsKey(srv.UserId))
                 this.stopStreaming(srv);
 
             var thread = new Thread(new ParameterizedThreadStart(this.StartStreaming));
-            this.workerThreads[srv.user_id] = new UserStreamThreadData(thread, false);
-            thread.Start(new object[6] { srv, param, completedHandler, notifyHandler, disconnectHandler, this.workerThreads[srv.user_id] });
+            this.workerThreads[srv.UserId] = new UserStreamThreadData(thread, false);
+            thread.Start(new object[6] { srv, param, completedHandler, notifyHandler, disconnectHandler, this.workerThreads[srv.UserId] });
 
             this.isStartedStreaming = true;
         }
@@ -68,17 +68,17 @@ namespace Shrimp.Twitter.Streaming
         /// <param name="isJoin"></param>
         public void stopStreaming(TwitterInfo srv, bool isJoin = false)
         {
-            if (!this.workerThreads.ContainsKey(srv.user_id))
+            if (!this.workerThreads.ContainsKey(srv.UserId))
                 return;
 
 
-            if (this.workerThreads[srv.user_id] != null && this.workerThreads[srv.user_id].Thread.ThreadState == ThreadState.Running)
+            if (this.workerThreads[srv.UserId] != null && this.workerThreads[srv.UserId].Thread.ThreadState == ThreadState.Running)
             {
                 //
                 //Thread.Sleep ( 1 );
-                this.workerThreads[srv.user_id].isStopFlag = true;
+                this.workerThreads[srv.UserId].isStopFlag = true;
                 Thread.Sleep(0);
-                this.workerThreads[srv.user_id].Thread.Join();
+                this.workerThreads[srv.UserId].Thread.Join();
                 // this.workerThreads[srv.user_id] = null;
                 // this.workerThreads.Remove ( srv.user_id );
             }
@@ -160,7 +160,7 @@ namespace Shrimp.Twitter.Streaming
             int ReconnectCount = 0;
 
             Uri uri;
-            uri = new Uri(TwitterInfo.twitterStreamingAPI);
+            uri = new Uri(TwitterInfo.TwitterStreamingAPI);
 
             //  再接続処理も含めて。
             while (!sender.isStopFlag)
@@ -171,7 +171,7 @@ namespace Shrimp.Twitter.Streaming
 
                 //OAuthBace.csを用いてsignature生成
                 string normalizedUrl, normalizedRequestParameters;
-                string sig = oAuth.GenerateSignature(uri, param, "oob", srv.consumer_key, srv.consumer_secret, srv.access_token_key, srv.access_token_secret,
+                string sig = oAuth.GenerateSignature(uri, param, "oob", srv.ConsumerKey, srv.ConsumerSecret, srv.AccessTokenKey, srv.AccessTokenSecret,
                                                         "GET", timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters);
                 sig = OAuthBase.UrlEncode(sig);
 

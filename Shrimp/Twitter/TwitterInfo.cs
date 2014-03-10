@@ -16,32 +16,148 @@ namespace Shrimp.Twitter
     {
         #region 定義
         //private OAuthBase oauth = new OAuthBase ();
-        public delegate void newTweetEventHandler(object sender, UserStreamingEventArgs e);
         //public  event newTweetEventHandler newTweetEvent;
-        public volatile bool stopStreamingFlag = false;
+        private volatile bool stopStreamingFlag = false;
+
+        public delegate void NewTweetEventHandler(object sender, UserStreamingEventArgs e);
         #endregion
 
+        /// <summary>
+        /// コンシューマーキー
+        /// </summary>
+        [XmlAttribute("consumer_key")]
+        public string ConsumerKey { get; set; }
+
+        /// <summary>
+        /// コンシューマーシークレット
+        /// </summary>
+        [XmlAttribute("consumer_secret")]
+        public string ConsumerSecret { get; set; }
+
+        /// <summary>
+        /// アクセストークンキー
+        /// </summary>
+        [XmlAttribute("access_token_key")]
+        public string AccessTokenKey { get; set; }
+
+        /// <summary>
+        /// アクセストークンシークレット
+        /// </summary>
+        [XmlAttribute("access_token_secret")]
+        public string AccessTokenSecret { get; set; }
+
+        /// <summary>
+        /// トークンキー
+        /// </summary>
+        [XmlIgnore]
+        public string RequestTokenKey { get; set; }
+
+        /// <summary>
+        /// トークンシークレット
+        /// </summary>
+        [XmlIgnore]
+        public string RequestTokenSecret { get; set; }
+
+        /// <summary>
+        /// アイコンのURL
+        /// </summary>
+        [XmlIgnore]
+        public string IconUrl { get; set; }
+
+        /// <summary>
+        /// アイコンのデータ
+        /// </summary>
+        [XmlIgnore]
+        public Bitmap IconData { get; set; }
+
+        /// <summary>
+        /// TwitterAPIのURLの根幹を取得
+        /// </summary>
+        [XmlIgnore]
+        private string twitterAPIBase
+        {
+            get { return "https://api.twitter.com/1.1/"; }
+        }
+
+        /// <summary>
+        /// Streaming API URLを取得
+        /// </summary>
+        [XmlIgnore]
+        public static string TwitterStreamingAPI
+        {
+            get { return "https://userstream.twitter.com/1.1/user.json"; }
+        }
+
+
+        /// <summary>
+        /// 自分のユーザータイムラインの内容
+        /// </summary>
+        [XmlIgnore]
+        private List<TwitterStatus> OwnUserTimeline { get; set; }
+
+        /// <summary>
+        /// あと何ツイートできるか計算する
+        /// </summary>
+        [XmlIgnore]
+        public int TweetLimit { get { return 0; } }
+
+        /// <summary>
+        /// ユーザーID
+        /// </summary>
+        [XmlAttribute("user_id")]
+        public decimal UserId { get; set; }
+
+        /// <summary>
+        /// スクリーンネーム
+        /// </summary>
+        [XmlAttribute("screen_name")]
+        public string ScreenName { get; set; }
+
+        /// <summary>
+        /// ホームタイムラインの直前のID
+        /// </summary>
+        [XmlIgnore]
+        public decimal HomeTimelineSinceID { get; set; }
+
+        /// <summary>
+        /// 返信の直前のID
+        /// </summary>
+        [XmlIgnore]
+        public decimal MentionTimelineSinceID { get; set; }
+
+        /// <summary>
+        /// ダイレクトメッセージタイムラインの直前のID
+        /// </summary>
+        [XmlIgnore]
+        public decimal DirectMessageReceivedSinceID { get; set; }
+
+        /// <summary>
+        /// ダイレクトメッセージタイムラインの直前のID
+        /// </summary>
+        [XmlIgnore]
+        public decimal DirectMessageSendSinceID { get; set; }
+
         #region コンストラクタ
-        public TwitterInfo()
+        public TwitterInfo(string consumerKey = null,
+                           string consumerSecret = null,
+                           string accessTokenKey = null,
+                           string accessTokenSecret = null)
         {
-            initialize();
+            this.ConsumerKey = consumerKey;
+            this.ConsumerSecret = consumerSecret;
+            this.AccessTokenKey = accessTokenKey;
+            this.AccessTokenSecret = accessTokenSecret;
+
+            Initialize();
         }
+        #endregion
 
-        public TwitterInfo(string consumer_key, string consumer_secret)
+        /// <summary>
+        /// 初期化
+        /// </summary>
+        private void Initialize()
         {
-            this.consumer_key = consumer_key;
-            this.consumer_secret = consumer_secret;
-            initialize();
-        }
-
-
-        public TwitterInfo(string consumer_key, string consumer_secret, string access_token_key, string access_token_secret)
-        {
-            this.consumer_key = consumer_key;
-            this.consumer_secret = consumer_secret;
-            this.access_token_key = access_token_key;
-            this.access_token_secret = access_token_secret;
-            initialize();
+            ServicePointManager.Expect100Continue = false;
         }
 
         /// <summary>
@@ -51,205 +167,22 @@ namespace Shrimp.Twitter
         /// <returns></returns>
         public bool Equals(TwitterInfo other)
         {
-            if (other == null) return false;
+            if (other == null)
+                throw new ArgumentNullException("other");
 
-            return this.user_id == other.user_id;
-        }
-        #endregion
-
-        /// <summary>
-        /// 初期化
-        /// </summary>
-        private void initialize()
-        {
-            ServicePointManager.Expect100Continue = false;
-        }
-
-        /// <summary>
-        /// コンシューマーキー
-        /// </summary>
-        public string consumer_key
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// コンシューマーシークレット
-        /// </summary>
-        public string consumer_secret
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// アクセストークンキー
-        /// </summary>
-        public string access_token_key
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// アクセストークンシークレット
-        /// </summary>
-        public string access_token_secret
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// トークンキー
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute]
-        public string request_token_key
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// トークンシークレット
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute]
-        public string request_token_secret
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// アイコンのURL
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute]
-        public string icon_url
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// アイコンのデータ
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute]
-        public Bitmap icon_data
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// TwitterAPIのURLの根幹を取得
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute]
-        private string twitterAPIBase
-        {
-            get { return "https://api.twitter.com/1.1/"; }
-        }
-
-        /// <summary>
-        /// Streaming API URLを取得
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute]
-        public static string twitterStreamingAPI
-        {
-            get { return "https://userstream.twitter.com/1.1/user.json"; }
-        }
-
-
-        /// <summary>
-        /// 自分のユーザータイムラインの内容
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute]
-        private List<TwitterStatus> OwnUserTimeline
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// あと何ツイートできるか計算する
-        /// </summary>
-        [System.Xml.Serialization.XmlIgnoreAttribute]
-        public int Tweetlimit
-        {
-            get
-            {
-                return 0;
-            }
-        }
-
-        /// <summary>
-        /// ユーザーID
-        /// </summary>
-        public decimal user_id
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// スクリーンネーム
-        /// </summary>
-        public string screen_name
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// ホームタイムラインの直前のID
-        /// </summary>
-        [XmlIgnoreAttribute]
-        public decimal HomeTimelineSinceID
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// 返信の直前のID
-        /// </summary>
-        [XmlIgnoreAttribute]
-        public decimal MentionTimelineSinceID
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// ダイレクトメッセージタイムラインの直前のID
-        /// </summary>
-        [XmlIgnoreAttribute]
-        public decimal DirectMessageReceivedSinceID
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// ダイレクトメッセージタイムラインの直前のID
-        /// </summary>
-        [XmlIgnoreAttribute]
-        public decimal DirectMessageSendSinceID
-        {
-            get;
-            set;
+            return this.UserId == other.UserId;
         }
 
         // コピーを作成するメソッド
         public virtual object Clone()
         {
             TwitterInfo instance = (TwitterInfo)Activator.CreateInstance(GetType());
-            instance.consumer_key = this.consumer_key;
-            instance.consumer_secret = this.consumer_secret;
-            instance.access_token_key = this.access_token_key;
-            instance.access_token_secret = this.access_token_secret;
-            instance.screen_name = this.screen_name;
-            instance.user_id = this.user_id;
+            instance.ConsumerKey = this.ConsumerKey;
+            instance.ConsumerSecret = this.ConsumerSecret;
+            instance.AccessTokenKey = this.AccessTokenKey;
+            instance.AccessTokenSecret = this.AccessTokenSecret;
+            instance.ScreenName = this.ScreenName;
+            instance.UserId = this.UserId;
             return instance;
         }
 
@@ -263,48 +196,71 @@ namespace Shrimp.Twitter
         }
 
         /// <summary>
+        /// 同期的に行うので、どっかでやって
+        /// </summary>
+        /// <param name="uri"></param>
+        public TwitterSocket Get(string url, List<OAuthBase.QueryParameter> param)
+        {
+            return this.Socket(url, "GET", param);
+        }
+
+        /// <summary>
+        /// 同期的に行うので、どっかでやって
+        /// </summary>
+        /// <param name="uri"></param>
+        public TwitterSocket Post(string url, List<OAuthBase.QueryParameter> param, TwitterUpdateImage image)
+        {
+            return this.Socket(url, "POST", param, image);
+        }
+
+        /// <summary>
         /// WebSocket
         /// </summary>
         /// <param name="url">URL</param>
         /// <param name="method">GET or POST</param>
         /// <param name="param">パラメータ</param>
         /// <returns></returns>
-        private TwitterSocket socket(string url, string method, List<OAuthBase.QueryParameter> param, TwitterUpdateImage image = null)
+        // FIXME: 適切な名前をつけてね
+        private TwitterSocket Socket(string url, string method, List<OAuthBase.QueryParameter> param, TwitterUpdateImage image = null)
         {
             OAuthBase oAuth = new OAuthBase();
             string nonce = oAuth.GenerateNonce();
             string timestamp = oAuth.GenerateTimeStamp();
 
             Uri uri;
+
             //OAuthBace.csを用いてsignature生成
             string normalizedUrl, normalizedRequestParameters, sig = "";
 
             if (url == "oauth/request_token" || url == "oauth/access_token")
             {
                 uri = new Uri("https://api.twitter.com/" + url + "");
+
                 if (param != null && param[0].Name == "oauth_verifier")
                 {
-                    sig = oAuth.GenerateSignature(uri, null, "oob", consumer_key, consumer_secret, param[1].Value, param[2].Value,
+                    sig = oAuth.GenerateSignature(uri, null, "oob", ConsumerKey, ConsumerSecret, param[1].Value, param[2].Value,
                         method, timestamp, param[0].Value, nonce, out normalizedUrl, out normalizedRequestParameters);
                 }
                 else
                 {
-                    sig = oAuth.GenerateSignature(uri, param, "oob", consumer_key, consumer_secret, null, null,
+                    sig = oAuth.GenerateSignature(uri, param, "oob", ConsumerKey, ConsumerSecret, null, null,
                         method, timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters);
                 }
             }
             else
             {
                 uri = new Uri(twitterAPIBase + url);
-                sig = oAuth.GenerateSignature(uri, param, "oob", consumer_key, consumer_secret, access_token_key, access_token_secret,
+                sig = oAuth.GenerateSignature(uri, param, "oob", ConsumerKey, ConsumerSecret, AccessTokenKey, AccessTokenSecret,
                                                         method, timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters);
             }
+
             sig = OAuthBase.UrlEncode(sig);
             string raw_data = null;
             Stream st = null;
             StreamReader sr = null;
             HttpStatusCode code = HttpStatusCode.RequestTimeout;
             HttpWebRequest webreq = null;
+
             try
             {
                 webreq = (HttpWebRequest)WebRequest.Create(string.Format("{0}?{1}&oauth_signature={2}", normalizedUrl, normalizedRequestParameters, sig));
@@ -322,6 +278,7 @@ namespace Shrimp.Twitter
                     //区切り文字列
                     if (image == null)
                         throw new WebException("imageがありません");
+
                     var media = image.Data;
                     var filename = image.FileName;
                     var status = image.Status;
@@ -339,6 +296,7 @@ namespace Shrimp.Twitter
                             filename + "\"\r\n" +
                         "Content-Type: application/octet-stream\r\n" +
                         "Content-Transfer-Encoding: binary\r\n\r\n";
+
                     //バイト型配列に変換
                     byte[] startData = enc.GetBytes(postData);
                     postData = "\r\n--" + boundary + "--\r\n";
@@ -358,12 +316,14 @@ namespace Shrimp.Twitter
                     reqStream.Write(endData, 0, endData.Length);
                     reqStream.Close();
                 }
+
                 HttpWebResponse webres = (HttpWebResponse)webreq.GetResponse();
 
                 //  コードチェック
                 if ((code = webres.StatusCode) == HttpStatusCode.OK)
                 {
                     st = webres.GetResponseStream();
+
                     if (webres != null && webres.ContentEncoding.ToLower() == "gzip")
                     {
                         //gzip。
@@ -375,7 +335,9 @@ namespace Shrimp.Twitter
                     {
                         sr = new StreamReader(st, Encoding.GetEncoding(932));
                     }
+
                     raw_data = sr.ReadToEnd();
+
                     if (raw_data == null)
                         raw_data = "";
                 }
@@ -385,6 +347,7 @@ namespace Shrimp.Twitter
                 if (e is WebException)
                 {
                     var exp = e as WebException;
+
                     if (exp.Status == WebExceptionStatus.ProtocolError)
                     {
                         HttpWebResponse err = (HttpWebResponse)exp.Response;
@@ -396,28 +359,11 @@ namespace Shrimp.Twitter
             {
                 if (sr != null)
                     sr.Close();
+
                 if (st != null)
                     st.Close();
             }
             return new TwitterSocket((webreq != null ? webreq.RequestUri : null), code, raw_data);
-        }
-
-        /// <summary>
-        /// 同期的に行うので、どっかでやって
-        /// </summary>
-        /// <param name="uri"></param>
-        public TwitterSocket get(string url, List<OAuthBase.QueryParameter> param)
-        {
-            return this.socket(url, "GET", param);
-        }
-
-        /// <summary>
-        /// 同期的に行うので、どっかでやって
-        /// </summary>
-        /// <param name="uri"></param>
-        public TwitterSocket post(string url, List<OAuthBase.QueryParameter> param, TwitterUpdateImage image)
-        {
-            return this.socket(url, "POST", param, image);
         }
 
         /*

@@ -85,8 +85,8 @@ namespace Shrimp.ControlParts.AuthPanel
                     string[] tmp = (string[])e.data;
                     this.URLLabel = "https://api.twitter.com/oauth/authorize?oauth_token=" + tmp[0] + "";
                     this.URLLabelEnable = true;
-                    this.destTwitter.request_token_key = tmp[0];
-                    this.destTwitter.request_token_secret = tmp[1];
+                    this.destTwitter.RequestTokenKey = tmp[0];
+                    this.destTwitter.RequestTokenSecret = tmp[1];
                 }
                 else
                 {
@@ -99,10 +99,10 @@ namespace Shrimp.ControlParts.AuthPanel
                 {
                     //
                     string[] tmp = (string[])e.data;
-                    this.destTwitter.access_token_key = tmp[0];
-                    this.destTwitter.access_token_secret = tmp[1];
-                    this.destTwitter.user_id = Decimal.Parse(tmp[2]);
-                    this.destTwitter.screen_name = tmp[3];
+                    this.destTwitter.AccessTokenKey = tmp[0];
+                    this.destTwitter.AccessTokenSecret = tmp[1];
+                    this.destTwitter.UserId = Decimal.Parse(tmp[2]);
+                    this.destTwitter.ScreenName = tmp[3];
                     this.Tag = this.destTwitter;
                     if (CompletedAuthorizeTwitter != null)
                         CompletedAuthorizeTwitter.Invoke(this, (TwitterInfo)this.destTwitter.Clone());
@@ -123,7 +123,7 @@ namespace Shrimp.ControlParts.AuthPanel
                     MessageBox.Show("アクセストークンの取得に失敗しました。再度1からトークンを取得し直してください", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     this.URLLabelEnable = false;
                     this.PinBoxInitialize();
-                    this.destTwitter = new TwitterInfo(this.destTwitter.consumer_key, this.destTwitter.consumer_secret);
+                    this.destTwitter = new TwitterInfo(this.destTwitter.ConsumerKey, this.destTwitter.ConsumerSecret);
                     oauth.RequestToken(this.destTwitter);
                 }
             }

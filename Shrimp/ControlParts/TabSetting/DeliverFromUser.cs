@@ -23,18 +23,18 @@ namespace Shrimp.ControlParts.TabSetting
             List<string> ii = new List<string>();
             foreach (decimal num in this._users.DeliveryFromUsers)
             {
-                TwitterInfo sn = this._manager.accounts.Find((t) => t.user_id == num);
+                TwitterInfo sn = this._manager.accounts.Find((t) => t.UserId == num);
                 if (sn != null)
                 {
-                    this.deliveryUsers.Items.Add(sn.screen_name);
-                    ii.Add(sn.screen_name);
+                    this.deliveryUsers.Items.Add(sn.ScreenName);
+                    ii.Add(sn.ScreenName);
                 }
             }
             foreach (TwitterInfo num in this._manager.accounts)
             {
-                if (ii.FindIndex((s) => s == num.screen_name) >= 0)
+                if (ii.FindIndex((s) => s == num.ScreenName) >= 0)
                     continue;
-                this.registUsers.Items.Add(num.screen_name);
+                this.registUsers.Items.Add(num.ScreenName);
             }
 
             setAllCheckBox();
@@ -86,14 +86,14 @@ namespace Shrimp.ControlParts.TabSetting
 
         private void AddUser(List<decimal> list, string screen_name)
         {
-            var t = this._manager.accounts.Find((s) => s.screen_name == screen_name);
-            list.Add(t.user_id);
+            var t = this._manager.accounts.Find((s) => s.ScreenName == screen_name);
+            list.Add(t.UserId);
         }
 
         private void TrimUser(List<decimal> list, string screen_name)
         {
-            var t = this._manager.accounts.Find((s) => s.screen_name == screen_name);
-            list.Remove(t.user_id);
+            var t = this._manager.accounts.Find((s) => s.ScreenName == screen_name);
+            list.Remove(t.UserId);
         }
 
         private void allUserCheckBox_CheckedChanged(object sender, EventArgs e)

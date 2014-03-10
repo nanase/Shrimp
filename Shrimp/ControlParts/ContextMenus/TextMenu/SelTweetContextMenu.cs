@@ -117,8 +117,8 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
         /// <returns></returns>
         private ToolStripMenuItem getSelectingAccount(TwitterInfo SelectAccount)
         {
-            var iconImageSel = SelectAccount.icon_data;
-            var dropItemFirst = new ToolStripMenuItem("選択中のアカウント(@" + SelectAccount.screen_name + ")", iconImageSel)
+            var iconImageSel = SelectAccount.IconData;
+            var dropItemFirst = new ToolStripMenuItem("選択中のアカウント(@" + SelectAccount.ScreenName + ")", iconImageSel)
             {
                 Name = "AccountSelected",
                 Tag = SelectAccount
@@ -137,8 +137,8 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
             List<ToolStripItem> items = new List<ToolStripItem>();
             foreach (TwitterInfo t in accounts)
             {
-                var iconImage = t.icon_data;
-                var dropItem = new ToolStripMenuItem("@" + t.screen_name + "", iconImage) { Name = "AccountSelected", Tag = t };
+                var iconImage = t.IconData;
+                var dropItem = new ToolStripMenuItem("@" + t.ScreenName + "", iconImage) { Name = "AccountSelected", Tag = t };
                 accountItems.Add(dropItem);
                 items.Add(dropItem);
             }

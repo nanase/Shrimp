@@ -103,9 +103,9 @@ namespace Shrimp.Twitter.REST
             */
             TwitterSocket res;
             if (Method == "GET")
-                res = srv.get(url, q);
+                res = srv.Get(url, q);
             else
-                res = srv.post(url, q, objects);
+                res = srv.Post(url, q, objects);
 
             dynamic data = null;
             if (res.RawData != null && url != "oauth/request_token" && url != "oauth/access_token")

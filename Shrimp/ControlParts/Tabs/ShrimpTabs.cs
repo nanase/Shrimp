@@ -436,34 +436,34 @@ namespace Shrimp.ControlParts.Tabs
                 return;
             foreach (TwitterInfo t in account.accounts)
             {
-                ToolStripMenuItem item = new ToolStripMenuItem("@" + t.screen_name + "のホームタイムライン(通知あり)", t.icon_data);
+                ToolStripMenuItem item = new ToolStripMenuItem("@" + t.ScreenName + "のホームタイムライン(通知あり)", t.IconData);
                 item.Name = "AddHomeTimelineWithNotify";
-                item.Tag = t.user_id;
+                item.Tag = t.UserId;
                 ctl.CustomControlMenu.Items.Add(item);
 
-                item = new ToolStripMenuItem("@" + t.screen_name + "のホームタイムライン(通知なし)");
+                item = new ToolStripMenuItem("@" + t.ScreenName + "のホームタイムライン(通知なし)");
                 item.Name = "AddHomeTimelineWithoutNotify";
-                item.Tag = t.user_id;
+                item.Tag = t.UserId;
                 ctl.CustomControlMenu.Items.Add(item);
 
-                item = new ToolStripMenuItem("@" + t.screen_name + "の返信(通知あり)");
+                item = new ToolStripMenuItem("@" + t.ScreenName + "の返信(通知あり)");
                 item.Name = "AddReplyWithNotify";
-                item.Tag = t.user_id;
+                item.Tag = t.UserId;
                 ctl.CustomControlMenu.Items.Add(item);
 
-                item = new ToolStripMenuItem("@" + t.screen_name + "の返信(通知なし)");
+                item = new ToolStripMenuItem("@" + t.ScreenName + "の返信(通知なし)");
                 item.Name = "AddReplyWithoutNotify";
-                item.Tag = t.user_id;
+                item.Tag = t.UserId;
                 ctl.CustomControlMenu.Items.Add(item);
 
-                item = new ToolStripMenuItem("@" + t.screen_name + "の通知");
+                item = new ToolStripMenuItem("@" + t.ScreenName + "の通知");
                 item.Name = "AddNotify";
-                item.Tag = t.user_id;
+                item.Tag = t.UserId;
                 ctl.CustomControlMenu.Items.Add(item);
 
-                item = new ToolStripMenuItem("@" + t.screen_name + "のダイレクトメッセージ");
+                item = new ToolStripMenuItem("@" + t.ScreenName + "のダイレクトメッセージ");
                 item.Name = "AddDirectMessage";
-                item.Tag = t.user_id;
+                item.Tag = t.UserId;
                 ctl.CustomControlMenu.Items.Add(item);
 
                 ctl.CustomControlMenu.Items.Add(new ToolStripSeparator());
@@ -709,7 +709,7 @@ namespace Shrimp.ControlParts.Tabs
 
             if (destCategories == TimelineCategories.NotifyTimeline)
                 obj = tweet.NotifyStatus;
-            decimal id = (sourceUser != null ? sourceUser.user_id : 0);
+            decimal id = (sourceUser != null ? sourceUser.UserId : 0);
             this.tabs.InsertTweet(this.shrimpQueryParser, tweet, id, destCategories, obj);
         }
 
@@ -778,7 +778,7 @@ namespace Shrimp.ControlParts.Tabs
                          t.MentionTimelineSinceID = tmp[0].id;
                          this.Invoke((MethodInvoker)delegate()
                         {
-                            this.InsertTweetRange(t.user_id, tmp, TimelineCategories.MentionTimeline, null);
+                            this.InsertTweetRange(t.UserId, tmp, TimelineCategories.MentionTimeline, null);
                         });
                      }
                  }, null, t.MentionTimelineSinceID);
@@ -799,7 +799,7 @@ namespace Shrimp.ControlParts.Tabs
                             var lis = tmp.ConvertAll((tweet) => (TwitterStatus)tweet);
                             this.Invoke((MethodInvoker)delegate()
                             {
-                                this.InsertTweetRange(t.user_id, lis, TimelineCategories.DirectMessageTimeline, null);
+                                this.InsertTweetRange(t.UserId, lis, TimelineCategories.DirectMessageTimeline, null);
                             });
                         }
                     }, null, t.DirectMessageReceivedSinceID, 0);
@@ -815,7 +815,7 @@ namespace Shrimp.ControlParts.Tabs
                             var lis = tmp.ConvertAll((tweet) => (TwitterStatus)tweet);
                             this.Invoke((MethodInvoker)delegate()
                             {
-                                this.InsertTweetRange(t.user_id, lis, TimelineCategories.DirectMessageTimeline, null);
+                                this.InsertTweetRange(t.UserId, lis, TimelineCategories.DirectMessageTimeline, null);
                             });
                         }
                     }, null, t.DirectMessageSendSinceID, 0);
@@ -833,7 +833,7 @@ namespace Shrimp.ControlParts.Tabs
                          t.HomeTimelineSinceID = tmp[0].id;
                          this.Invoke((MethodInvoker)delegate()
                         {
-                            this.InsertTweetRange(t.user_id, tmp, TimelineCategories.HomeTimeline, null);
+                            this.InsertTweetRange(t.UserId, tmp, TimelineCategories.HomeTimeline, null);
                         });
                          //delay.Invoke ( per );
                      }
@@ -842,7 +842,7 @@ namespace Shrimp.ControlParts.Tabs
                 listDataCollection destC = new listDataCollection();
                 foreach (TabControls tabctl in this.tabs)
                 {
-                    var dest1 = tabctl.tabDelivery.FindListData(t.user_id);
+                    var dest1 = tabctl.tabDelivery.FindListData(t.UserId);
                     if (dest1 != null)
                         destC.AddlistRange(dest1);
                 }

@@ -60,7 +60,7 @@ namespace Shrimp.Setting.Forms
                     this.accountView.Items.Clear();
                     foreach (TwitterInfo t in this.accountManager.accounts)
                     {
-                        this.accountView.Items.Add(new ListViewItem(new string[] { t.screen_name, "" + t.user_id + "" }));
+                        this.accountView.Items.Add(new ListViewItem(new string[] { t.ScreenName, "" + t.UserId + "" }));
                     }
                 });
             }
@@ -69,7 +69,7 @@ namespace Shrimp.Setting.Forms
                 this.accountView.Items.Clear();
                 foreach (TwitterInfo t in this.accountManager.accounts)
                 {
-                    this.accountView.Items.Add(new ListViewItem(new string[] { t.screen_name, "" + t.user_id + "" }));
+                    this.accountView.Items.Add(new ListViewItem(new string[] { t.ScreenName, "" + t.UserId + "" }));
                 }
             }
         }

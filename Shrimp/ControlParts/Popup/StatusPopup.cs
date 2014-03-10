@@ -24,11 +24,11 @@ namespace Shrimp.ControlParts.Popup
         /// <param name="account"></param>
         public void InsertAccountName(TwitterInfo t, bool isSelected = false)
         {
-            var item = new ToolStripMenuItem(t.screen_name + "", (t.icon_data)) { Name = "" + t.user_id + "" };
+            var item = new ToolStripMenuItem(t.ScreenName + "", (t.IconData)) { Name = "" + t.UserId + "" };
             this.Menu.Items.Insert(0, item);
-            accountNames[t.user_id] = item;
+            accountNames[t.UserId] = item;
 
-            accountNames[t.user_id].Checked = isSelected;
+            accountNames[t.UserId].Checked = isSelected;
         }
 
         public void Show(Point p)
