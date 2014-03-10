@@ -1478,7 +1478,7 @@ namespace Shrimp
             {
                 if (Form.ActiveForm != this && this.WindowState == FormWindowState.Minimized)
                 {
-                    User32.FlashWindow(this.Handle);
+                    User32.FlashWindow(this);
                     this.isNowFlashing = true;
                 }
             });
@@ -1488,7 +1488,7 @@ namespace Shrimp
         {
             if (isNowFlashing)
             {
-                User32.FlashWindow(this.Handle, true);
+                User32.FlashWindow(this, true);
                 isNowFlashing = false;
             }
         }

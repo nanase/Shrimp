@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace Shrimp.Win32API
 {
@@ -22,12 +23,12 @@ namespace Shrimp.Win32API
             public UInt32 dwTimeout; // 点滅する間隔（ミリ秒単位）
         }
         
-        public static void FlashWindow(IntPtr hWnd, bool isStop = false)
+        public static void FlashWindow(Form form, bool isStop = false)
         {
             FLASHWINFO fInfo = new FLASHWINFO()
             {
                 cbSize = (uint)Marshal.SizeOf(typeof(FLASHWINFO)),
-                hwnd = hWnd,
+                hwnd = form.Handle,
                 dwFlags = (isStop ? FLASHW_STOP : FLASHW_ALL),
                 uCount = 5, // 点滅回数
                 dwTimeout = 0,
