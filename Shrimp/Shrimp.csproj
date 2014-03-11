@@ -335,6 +335,12 @@
     <Compile Include="Setting\Forms\AccountManagement.designer.cs">
       <DependentUpon>AccountManagement.cs</DependentUpon>
     </Compile>
+    <Compile Include="Setting\Forms\FontForm.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Setting\Forms\FontForm.Designer.cs">
+      <DependentUpon>FontForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Setting\Forms\ISettingForm.cs" />
     <Compile Include="Setting\Forms\NewColor.cs">
       <SubType>Form</SubType>
@@ -562,6 +568,9 @@
     </Compile>
     <EmbeddedResource Include="Setting\Forms\AccountManagement.resx">
       <DependentUpon>AccountManagement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setting\Forms\FontForm.resx">
+      <DependentUpon>FontForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Setting\Forms\NewColor.resx">
       <DependentUpon>NewColor.cs</DependentUpon>

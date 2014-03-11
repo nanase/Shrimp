@@ -33,18 +33,20 @@
             System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("タブの設定", new System.Windows.Forms.TreeNode[] {
             treeNode2});
             System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("ツイート色");
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("タイムライン", new System.Windows.Forms.TreeNode[] {
-            treeNode4});
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("ユーザーストリーム");
-            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("一般設定", new System.Windows.Forms.TreeNode[] {
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("フォント");
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("タイムライン", new System.Windows.Forms.TreeNode[] {
+            treeNode4,
+            treeNode5});
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("ユーザーストリーム");
+            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("一般設定", new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode3,
-            treeNode5,
-            treeNode6});
-            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("グローバルミュート");
-            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("ショートカットキーの設定");
-            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("プラグイン");
-            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("Shrimpの情報");
+            treeNode6,
+            treeNode7});
+            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("グローバルミュート");
+            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("ショートカットキーの設定");
+            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("プラグイン");
+            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("Shrimpの情報");
             this.MainSplit = new System.Windows.Forms.SplitContainer();
             this.SettingListView = new System.Windows.Forms.TreeView();
             ((System.ComponentModel.ISupportInitialize)(this.MainSplit)).BeginInit();
@@ -78,26 +80,28 @@
             treeNode3.Text = "タブの設定";
             treeNode4.Name = "TimelineColorSetting";
             treeNode4.Text = "ツイート色";
-            treeNode5.Name = "TimelineSetting";
-            treeNode5.Text = "タイムライン";
-            treeNode6.Name = "UserStreamMenuSetting";
-            treeNode6.Text = "ユーザーストリーム";
-            treeNode7.Name = "ShrimpSetting";
-            treeNode7.Text = "一般設定";
-            treeNode8.Name = "GlobalMuteMenu";
-            treeNode8.Text = "グローバルミュート";
-            treeNode9.Name = "ShortcutKeySetting";
-            treeNode9.Text = "ショートカットキーの設定";
-            treeNode10.Name = "PluginNode";
-            treeNode10.Text = "プラグイン";
-            treeNode11.Name = "ShrimpInfo";
-            treeNode11.Text = "Shrimpの情報";
+            treeNode5.Name = "FontNode";
+            treeNode5.Text = "フォント";
+            treeNode6.Name = "TimelineSetting";
+            treeNode6.Text = "タイムライン";
+            treeNode7.Name = "UserStreamMenuSetting";
+            treeNode7.Text = "ユーザーストリーム";
+            treeNode8.Name = "ShrimpSetting";
+            treeNode8.Text = "一般設定";
+            treeNode9.Name = "GlobalMuteMenu";
+            treeNode9.Text = "グローバルミュート";
+            treeNode10.Name = "ShortcutKeySetting";
+            treeNode10.Text = "ショートカットキーの設定";
+            treeNode11.Name = "PluginNode";
+            treeNode11.Text = "プラグイン";
+            treeNode12.Name = "ShrimpInfo";
+            treeNode12.Text = "Shrimpの情報";
             this.SettingListView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode7,
             treeNode8,
             treeNode9,
             treeNode10,
-            treeNode11});
+            treeNode11,
+            treeNode12});
             this.SettingListView.Size = new System.Drawing.Size(145, 441);
             this.SettingListView.TabIndex = 0;
             this.SettingListView.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.SettingListView_NodeMouseClick);
