@@ -33,10 +33,12 @@
             System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("タブの設定", new System.Windows.Forms.TreeNode[] {
             treeNode2});
             System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("ツイート色");
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("タイムライン", new System.Windows.Forms.TreeNode[] {
-            treeNode4});
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("ユーザーストリーム");
-            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("一般設定", new System.Windows.Forms.TreeNode[] {
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("フォント");
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("タイムライン", new System.Windows.Forms.TreeNode[] {
+            treeNode4,
+            treeNode5});
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("ユーザーストリーム");
+            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("一般設定", new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode3,
             treeNode6,
@@ -95,7 +97,6 @@
             treeNode12.Name = "ShrimpInfo";
             treeNode12.Text = "Shrimpの情報";
             this.SettingListView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode7,
             treeNode8,
             treeNode9,
             treeNode10,
