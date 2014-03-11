@@ -19,7 +19,7 @@ namespace Shrimp.Twitter
         //public  event newTweetEventHandler newTweetEvent;
         private volatile bool stopStreamingFlag = false;
 
-        public delegate void NewTweetEventHandler(object sender, UserStreamingEventArgs e);
+        public delegate void NewTweetEventHandler ( object sender, UserStreamingEventArgs e );
         #endregion
 
         /// <summary>
@@ -154,24 +154,24 @@ namespace Shrimp.Twitter
         {
         }
 
-        public TwitterInfo(string consumerKey = null,
+        public TwitterInfo ( string consumerKey = null,
                            string consumerSecret = null,
                            string accessTokenKey = null,
-                           string accessTokenSecret = null)
+                           string accessTokenSecret = null )
         {
             this.ConsumerKey = consumerKey;
             this.ConsumerSecret = consumerSecret;
             this.AccessTokenKey = accessTokenKey;
             this.AccessTokenSecret = accessTokenSecret;
 
-            Initialize();
+            Initialize ();
         }
         #endregion
 
         /// <summary>
         /// 初期化
         /// </summary>
-        private void Initialize()
+        private void Initialize ()
         {
             ServicePointManager.Expect100Continue = false;
         }
@@ -181,18 +181,18 @@ namespace Shrimp.Twitter
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Equals(TwitterInfo other)
+        public bool Equals ( TwitterInfo other )
         {
-            if (other == null)
-                throw new ArgumentNullException("other");
+            if ( other == null )
+                throw new ArgumentNullException ( "other" );
 
             return this.UserId == other.UserId;
         }
 
         // コピーを作成するメソッド
-        public virtual object Clone()
+        public virtual object Clone ()
         {
-            TwitterInfo instance = (TwitterInfo)Activator.CreateInstance(GetType());
+            TwitterInfo instance = (TwitterInfo)Activator.CreateInstance ( GetType () );
             instance.ConsumerKey = this.ConsumerKey;
             instance.ConsumerSecret = this.ConsumerSecret;
             instance.AccessTokenKey = this.AccessTokenKey;
@@ -206,7 +206,7 @@ namespace Shrimp.Twitter
         /// 自分のユーザータイムラインをセットする
         /// </summary>
         /// <param name="status"></param>
-        public void SetUserTimeline(List<TwitterStatus> status)
+        public void SetUserTimeline ( List<TwitterStatus> status )
         {
             this.OwnUserTimeline = status;
         }
@@ -215,18 +215,18 @@ namespace Shrimp.Twitter
         /// 同期的に行うので、どっかでやって
         /// </summary>
         /// <param name="uri"></param>
-        public TwitterSocket Get(string url, List<OAuthBase.QueryParameter> param)
+        public TwitterSocket Get ( string url, List<OAuthBase.QueryParameter> param )
         {
-            return this.Socket(url, "GET", param);
+            return this.Socket ( url, "GET", param );
         }
 
         /// <summary>
         /// 同期的に行うので、どっかでやって
         /// </summary>
         /// <param name="uri"></param>
-        public TwitterSocket Post(string url, List<OAuthBase.QueryParameter> param, TwitterUpdateImage image)
+        public TwitterSocket Post ( string url, List<OAuthBase.QueryParameter> param, TwitterUpdateImage image )
         {
-            return this.Socket(url, "POST", param, image);
+            return this.Socket ( url, "POST", param, image );
         }
 
         /// <summary>
@@ -237,49 +237,47 @@ namespace Shrimp.Twitter
         /// <param name="param">パラメータ</param>
         /// <returns></returns>
         // FIXME: 適切な名前をつけてね
-        private TwitterSocket Socket(string url, string method, List<OAuthBase.QueryParameter> param, TwitterUpdateImage image = null)
+        private TwitterSocket Socket ( string url, string method, List<OAuthBase.QueryParameter> param, TwitterUpdateImage image = null )
         {
-            OAuthBase oAuth = new OAuthBase();
-            string nonce = oAuth.GenerateNonce();
-            string timestamp = oAuth.GenerateTimeStamp();
+            OAuthBase oAuth = new OAuthBase ();
+            string nonce = oAuth.GenerateNonce ();
+            string timestamp = oAuth.GenerateTimeStamp ();
 
             Uri uri;
 
             //OAuthBace.csを用いてsignature生成
             string normalizedUrl, normalizedRequestParameters, sig = "";
 
-            if (url == "oauth/request_token" || url == "oauth/access_token")
+            if ( url == "oauth/request_token" || url == "oauth/access_token" )
             {
-                uri = new Uri("https://api.twitter.com/" + url + "");
+                uri = new Uri ( "https://api.twitter.com/" + url + "" );
 
-                if (param != null && param[0].Name == "oauth_verifier")
+                if ( param != null && param[0].Name == "oauth_verifier" )
                 {
-                    sig = oAuth.GenerateSignature(uri, null, "oob", ConsumerKey, ConsumerSecret, param[1].Value, param[2].Value,
-                        method, timestamp, param[0].Value, nonce, out normalizedUrl, out normalizedRequestParameters);
+                    sig = oAuth.GenerateSignature ( uri, null, "oob", ConsumerKey, ConsumerSecret, param[1].Value, param[2].Value,
+                        method, timestamp, param[0].Value, nonce, out normalizedUrl, out normalizedRequestParameters );
                 }
                 else
                 {
-                    sig = oAuth.GenerateSignature(uri, param, "oob", ConsumerKey, ConsumerSecret, null, null,
-                        method, timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters);
+                    sig = oAuth.GenerateSignature ( uri, param, "oob", ConsumerKey, ConsumerSecret, null, null,
+                        method, timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters );
                 }
             }
             else
             {
-                uri = new Uri(twitterAPIBase + url);
-                sig = oAuth.GenerateSignature(uri, param, "oob", ConsumerKey, ConsumerSecret, AccessTokenKey, AccessTokenSecret,
-                                                        method, timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters);
+                uri = new Uri ( twitterAPIBase + url );
+                sig = oAuth.GenerateSignature ( uri, param, "oob", ConsumerKey, ConsumerSecret, AccessTokenKey, AccessTokenSecret,
+                                                        method, timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters );
             }
 
-            sig = OAuthBase.UrlEncode(sig);
+            sig = OAuthBase.UrlEncode ( sig );
             string raw_data = null;
-            Stream st = null;
-            StreamReader sr = null;
             HttpStatusCode code = HttpStatusCode.RequestTimeout;
             HttpWebRequest webreq = null;
 
             try
             {
-                webreq = (HttpWebRequest)WebRequest.Create(string.Format("{0}?{1}&oauth_signature={2}", normalizedUrl, normalizedRequestParameters, sig));
+                webreq = (HttpWebRequest)WebRequest.Create ( string.Format ( "{0}?{1}&oauth_signature={2}", normalizedUrl, normalizedRequestParameters, sig ) );
                 webreq.Method = method;
                 webreq.Timeout = 60 * 1000;
                 webreq.UserAgent = "Shrimp";
@@ -288,18 +286,18 @@ namespace Shrimp.Twitter
                 webreq.ServicePoint.ConnectionLimit = 1000;
                 webreq.ContentType = "application/x-www-form-urlencoded";
 
-                if (url.IndexOf("statuses/update_with_media") >= 0)
+                if ( url.IndexOf ( "statuses/update_with_media" ) >= 0 )
                 {
                     //  メディアアップロードらしい。
                     //区切り文字列
-                    if (image == null)
-                        throw new WebException("imageがありません");
+                    if ( image == null )
+                        throw new WebException ( "imageがありません" );
 
                     var media = image.Data;
                     var filename = image.FileName;
                     var status = image.Status;
-                    Encoding enc = Encoding.GetEncoding("utf-8");
-                    string boundary = Environment.TickCount.ToString();
+                    Encoding enc = Encoding.GetEncoding ( "utf-8" );
+                    string boundary = Environment.TickCount.ToString ();
                     webreq.ContentType = "multipart/form-data; boundary=" + boundary;
 
                     //POST送信するデータを作成
@@ -314,72 +312,66 @@ namespace Shrimp.Twitter
                         "Content-Transfer-Encoding: binary\r\n\r\n";
 
                     //バイト型配列に変換
-                    byte[] startData = enc.GetBytes(postData);
+                    byte[] startData = enc.GetBytes ( postData );
                     postData = "\r\n--" + boundary + "--\r\n";
-                    byte[] endData = enc.GetBytes(postData);
+                    byte[] endData = enc.GetBytes ( postData );
 
                     //POST送信するデータの長さを指定
                     webreq.ContentLength = startData.Length + endData.Length + media.Length;
 
                     //データをPOST送信するためのStreamを取得
-                    Stream reqStream = webreq.GetRequestStream();
+                    Stream reqStream = webreq.GetRequestStream ();
 
                     //送信するデータを書き込む
-                    reqStream.Write(startData, 0, startData.Length);
+                    reqStream.Write ( startData, 0, startData.Length );
                     //ファイルの内容を送信
-                    reqStream.Write(media, 0, media.Length);
+                    reqStream.Write ( media, 0, media.Length );
 
-                    reqStream.Write(endData, 0, endData.Length);
-                    reqStream.Close();
+                    reqStream.Write ( endData, 0, endData.Length );
+                    reqStream.Close ();
                 }
 
-                HttpWebResponse webres = (HttpWebResponse)webreq.GetResponse();
+                HttpWebResponse webres = (HttpWebResponse)webreq.GetResponse ();
 
                 //  コードチェック
-                if ((code = webres.StatusCode) == HttpStatusCode.OK)
+                if ( (code = webres.StatusCode) == HttpStatusCode.OK )
                 {
-                    st = webres.GetResponseStream();
+                    using ( var st = webres.GetResponseStream () )
+                    using ( StreamReader sr = OpenStreamReader ( st, (webres != null && webres.ContentEncoding.ToLower () == "gzip") ) )
+                        raw_data = sr.ReadToEnd ();
 
-                    if (webres != null && webres.ContentEncoding.ToLower() == "gzip")
-                    {
-                        //gzip。
-                        GZipStream gzip = new GZipStream(st, CompressionMode.Decompress);
-                        sr = new StreamReader(gzip, Encoding.GetEncoding(932));
-                        gzip.Close();
-                    }
-                    else
-                    {
-                        sr = new StreamReader(st, Encoding.GetEncoding(932));
-                    }
-
-                    raw_data = sr.ReadToEnd();
-
-                    if (raw_data == null)
+                    if ( raw_data == null )
                         raw_data = "";
                 }
             }
-            catch (Exception e)
+            catch ( Exception e )
             {
-                if (e is WebException)
+                if ( e is WebException )
                 {
                     var exp = e as WebException;
 
-                    if (exp.Status == WebExceptionStatus.ProtocolError)
+                    if ( exp.Status == WebExceptionStatus.ProtocolError )
                     {
                         HttpWebResponse err = (HttpWebResponse)exp.Response;
                         code = err.StatusCode;
                     }
                 }
             }
-            finally
-            {
-                if (sr != null)
-                    sr.Close();
 
-                if (st != null)
-                    st.Close();
+            return new TwitterSocket ( (webreq != null ? webreq.RequestUri : null), code, raw_data );
+        }
+
+        private static StreamReader OpenStreamReader ( Stream baseStream, bool decompress )
+        {
+            Encoding shift_jis = Encoding.GetEncoding ( 932 );
+
+            if ( decompress )
+            {
+                GZipStream gzip = new GZipStream ( baseStream, CompressionMode.Decompress );
+                return new StreamReader ( gzip, shift_jis );
             }
-            return new TwitterSocket((webreq != null ? webreq.RequestUri : null), code, raw_data);
+            else
+                return new StreamReader ( baseStream, shift_jis );
         }
 
         /*
