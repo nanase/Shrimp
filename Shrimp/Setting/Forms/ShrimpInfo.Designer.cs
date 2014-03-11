@@ -34,8 +34,8 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.UpdateCheckBox = new System.Windows.Forms.CheckBox();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -64,7 +64,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.UpdateCheckBox);
             this.splitContainer1.Panel2.Controls.Add(this.richTextBox1);
-            this.splitContainer1.Size = new System.Drawing.Size(316, 260);
+            this.splitContainer1.Size = new System.Drawing.Size(406, 260);
             this.splitContainer1.SplitterDistance = 71;
             this.splitContainer1.TabIndex = 0;
             // 
@@ -84,7 +84,7 @@
             // 
             this.splitContainer2.Panel2.Controls.Add(this.label2);
             this.splitContainer2.Panel2.Controls.Add(this.label1);
-            this.splitContainer2.Size = new System.Drawing.Size(316, 71);
+            this.splitContainer2.Size = new System.Drawing.Size(406, 71);
             this.splitContainer2.SplitterDistance = 71;
             this.splitContainer2.TabIndex = 0;
             // 
@@ -107,10 +107,10 @@
             this.label2.Font = new System.Drawing.Font("Georgia", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(3, 43);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(235, 30);
+            this.label2.Size = new System.Drawing.Size(325, 30);
             this.label2.TabIndex = 1;
-            this.label2.Text = "Version 1.1(Fairy)";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.label2.Text = "Version 1.11(PreFairy)";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // label1
             // 
@@ -119,24 +119,10 @@
             this.label1.Font = new System.Drawing.Font("Georgia", 27.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(2, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(239, 43);
+            this.label1.Size = new System.Drawing.Size(329, 43);
             this.label1.TabIndex = 0;
             this.label1.Text = "Shrimp";
             this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // richTextBox1
-            // 
-            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox1.Location = new System.Drawing.Point(3, 2);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(310, 158);
-            this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Text = "Shrimpは、軽快な動作を目標としたTwitterクライアントです。\n最新情報については、@shrimpclientか、http://shrimp.gaへアクセ" +
-    "スしてください。\n\n開発者: @ulicknormanowen\nアイコン提供: @jaga_nyan";
             // 
             // UpdateCheckBox
             // 
@@ -149,13 +135,27 @@
             this.UpdateCheckBox.UseVisualStyleBackColor = true;
             this.UpdateCheckBox.CheckedChanged += new System.EventHandler(this.UpdateCheckBox_CheckedChanged);
             // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.richTextBox1.Location = new System.Drawing.Point(3, 2);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.ReadOnly = true;
+            this.richTextBox1.Size = new System.Drawing.Size(400, 158);
+            this.richTextBox1.TabIndex = 0;
+            this.richTextBox1.Text = "Shrimpは、軽快な動作を目標としたTwitterクライアントです。\n最新情報については、@shrimpclientか、http://shrimp.gaへアクセ" +
+    "スしてください。\n\n開発者: @ulicknormanowen, @nanasetomona (Thanks!)\nアイコン提供: @jaga_nyan";
+            // 
             // ShrimpInfo
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.splitContainer1);
             this.Name = "ShrimpInfo";
-            this.Size = new System.Drawing.Size(316, 260);
+            this.Size = new System.Drawing.Size(406, 260);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
