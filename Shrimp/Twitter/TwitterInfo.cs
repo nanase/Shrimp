@@ -152,6 +152,7 @@ namespace Shrimp.Twitter
         #region コンストラクタ
         public TwitterInfo ()
         {
+            // XMLシリアライズのため、このデフォルトコンストラクタは必要
         }
 
         public TwitterInfo ( string consumerKey = null,
