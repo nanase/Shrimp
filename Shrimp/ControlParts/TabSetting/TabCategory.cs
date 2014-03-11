@@ -48,6 +48,8 @@ namespace Shrimp.ControlParts.TabSetting
 
         private void notifyOnChangedDetail(object sender, EventArgs e)
         {
+            if ( this.notifyControl.getNotifyFilter != null )
+                this._category.notifyFilter = (NotifyFilter)this.notifyControl.getNotifyFilter.Clone ();
             this.Tag = true;
         }
 

@@ -423,6 +423,8 @@ namespace Shrimp.ControlParts.Tabs
                             t.Visible = value;
                         }
                     }
+                    if ( value )
+                        SetTextReset ();
                 }
             }
         }

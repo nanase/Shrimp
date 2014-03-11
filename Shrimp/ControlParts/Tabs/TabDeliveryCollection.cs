@@ -155,7 +155,8 @@ namespace Shrimp.ControlParts.Tabs
                 foreach (TabDelivery tmp in this.deliveries)
                 {
                     TimelineCategory cat = tmp.Category;
-                    if (cat.notifyFilter != null && cat.notifyFilter.isHit((TwitterNotifyStatus)checkObject))
+
+                    if (cat.notifyFilter != null && cat.category == TimelineCategories.NotifyTimeline &&cat.notifyFilter.isHit((TwitterNotifyStatus)checkObject))
                     {
                         return true;
                     }
