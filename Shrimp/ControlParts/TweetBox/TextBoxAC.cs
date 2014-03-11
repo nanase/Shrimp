@@ -14,6 +14,7 @@ namespace Shrimp.ControlParts.TweetBox
         bool _listShow = false;
         bool isScreenName = false;
         int offset = 0;
+        bool EnableAutoComplete = false;
 
         public TextBoxAC()
         {
@@ -21,6 +22,7 @@ namespace Shrimp.ControlParts.TweetBox
             this.acf.Visible = false;
             this.acf.OnDoubleClickedItem += new EventHandler(itemDoubleClicked);
             //this.Controls.Add ( this.acf );
+            /*
             this.acf.AddWord("@jaga_nyan", true);
             this.acf.AddWord("@ulicknormanowen", true);
             this.acf.AddWord("@jaga_nyan", true);
@@ -29,6 +31,7 @@ namespace Shrimp.ControlParts.TweetBox
             this.acf.AddWord("#hoge", false);
             this.acf.AddWord("#hage", false);
             this.acf.AddWord("#hoge", false);
+            */
         }
 
         public bool listShow
@@ -57,6 +60,10 @@ namespace Shrimp.ControlParts.TweetBox
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
             base.OnKeyPress(e);
+
+            if ( !EnableAutoComplete )
+                return;
+
             if (this.listShow)
             {
                 string repSourceText = this.Text.Substring(this.offset);
@@ -91,6 +98,9 @@ namespace Shrimp.ControlParts.TweetBox
 
         public void ShowAutoComplete(bool isScreenName)
         {
+            if ( !EnableAutoComplete )
+                return;
+
             if (this.listShow)
                 return;
 
@@ -111,6 +121,9 @@ namespace Shrimp.ControlParts.TweetBox
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
+
+            if ( !EnableAutoComplete )
+                return;
 
             if (e.Control || e.Shift || e.Alt)
                 return;

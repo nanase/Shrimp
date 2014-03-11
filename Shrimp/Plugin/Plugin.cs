@@ -115,7 +115,7 @@ namespace Shrimp.Plugin
         /// デバッグ用。Luaでprintを呼び出すと呼ばれます。
         /// </summary>
         /// <param name="str"></param>
-        public void lua_tweet(string str)
+        public void lua_print(string str)
         {
             LogControl.AddLogs(str);
         }
@@ -127,6 +127,7 @@ namespace Shrimp.Plugin
         public void lua_tweet ( string str, decimal in_reply_to_status_id )
         {
             //  ツイート処理
+
         }
 
 

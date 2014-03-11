@@ -78,7 +78,7 @@ namespace Shrimp.Twitter.Streaming
                 //Thread.Sleep ( 1 );
                 this.workerThreads[srv.UserId].isStopFlag = true;
                 Thread.Sleep(0);
-                this.workerThreads[srv.UserId].Thread.Join();
+                this.workerThreads[srv.UserId].Thread.Abort();
                 // this.workerThreads[srv.user_id] = null;
                 // this.workerThreads.Remove ( srv.user_id );
             }

@@ -48,6 +48,16 @@ namespace Shrimp.Setting
             return dest;
         }
 
+        public static string FontConverter ( Font f )
+        {
+            return TypeDescriptor.GetConverter ( typeof ( Font ) ).ConvertToString ( f );
+        }
+
+        public static Font FontConverter ( string f )
+        {
+            return (Font)TypeDescriptor.GetConverter ( typeof ( Font ) ).ConvertFromString ( f );
+        }
+
         public static string NameFontConverted
         {
             get

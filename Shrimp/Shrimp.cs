@@ -668,7 +668,19 @@ namespace Shrimp
         /// <param name="e"></param>
         void tweetBox_ShrimpBeamClicked(object sender, EventArgs e)
         {
-            statuses.Update(accountManager.SelectedAccount, null, null, "エビビーム！ﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞｗｗｗｗｗ (1回目)", 0);
+            var selected = accountManager.SelectedAccount;
+            var time = DateTime.Now - selected.ShrimpBeamLatestDate;
+            if ( time.TotalHours < 1.0 )
+            {
+                MessageBoxEX.ShowErrorMessageBox ( "大変申し訳ありませんが、エビビームは清楚故1時間に1回のみのご利用となります。ご了承ください。" );
+                return;
+            }
+            else
+            {
+                selected.ShrimpBeam ++;
+                statuses.Update ( selected, null, null, "エビビーム！ﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞｗｗｗｗｗ ("+ selected.ShrimpBeam +"回目)", 0 );
+            }
+            selected.ShrimpBeamLatestDate = DateTime.Now;
         }
 
         /// <summary>
@@ -915,7 +927,7 @@ namespace Shrimp
                     q.Add(new OAuthBase.QueryParameter("replies", "all"));
                 if (Setting.UserStream.isIncludeFollowingsActivity)
                     q.Add(new OAuthBase.QueryParameter("include_followings_activity", "true"));
-                q.Add(new OAuthBase.QueryParameter("track", "@"));
+                //q.Add(new OAuthBase.QueryParameter("track", "@"));
                 foreach (TwitterInfo t in accountManager.accounts)
                 {
                     us.loadAsync(t, q);
@@ -1452,6 +1464,7 @@ namespace Shrimp
                         Process.Start("ShrimpAutoUpdater.exe");
                     }
                 }
+                System.Environment.Exit ( 0 );
             }
         }
 

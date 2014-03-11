@@ -53,8 +53,11 @@
             this.notifyBox.Items.AddRange(new object[] {
             "お気に入りに追加されたとき",
             "お気に入りから削除されたとき",
+            "(自分のツイートが)お気に入りに追加されたとき",
+            "(自分のツイートが)お気に入りから削除されたとき",
             "フォローされたとき",
-            "アンフォローしたとき"});
+            "アンフォローしたとき",
+            "リツイートされたとき"});
             this.notifyBox.Location = new System.Drawing.Point(3, 15);
             this.notifyBox.Name = "notifyBox";
             this.notifyBox.Size = new System.Drawing.Size(348, 194);

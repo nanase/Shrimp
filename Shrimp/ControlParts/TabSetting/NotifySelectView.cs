@@ -14,8 +14,11 @@ namespace Shrimp.ControlParts.TabSetting
             InitializeComponent();
             notifyBox.SetItemChecked(0, notifyFilter.Favorited);
             notifyBox.SetItemChecked(1, notifyFilter.UnFavorited);
-            notifyBox.SetItemChecked(2, notifyFilter.Followed);
-            notifyBox.SetItemChecked(3, notifyFilter.Unfollowed);
+            notifyBox.SetItemChecked ( 2, notifyFilter.OwnFavorited );
+            notifyBox.SetItemChecked ( 3, notifyFilter.OwnUnFavorited );
+            notifyBox.SetItemChecked(4, notifyFilter.Followed);
+            notifyBox.SetItemChecked(5, notifyFilter.Unfollowed);
+            notifyBox.SetItemChecked ( 6, notifyFilter.Retweeted );
             tmpFilter = notifyFilter;
             this.isInitialized = true;
         }
@@ -33,6 +36,13 @@ namespace Shrimp.ControlParts.TabSetting
                     tmpFilter.Followed = !tmpFilter.Followed;
                 if (item == "アンフォローしたとき")
                     tmpFilter.Unfollowed = !tmpFilter.Unfollowed;
+                if ( item == "リツイートされたとき" )
+                    tmpFilter.Retweeted = !tmpFilter.Retweeted;
+                if ( item == "(自分のツイートが)お気に入りに追加されたとき" )
+                    tmpFilter.OwnFavorited = !tmpFilter.OwnFavorited;
+                if ( item == "(自分のツイートが)お気に入りから削除されたとき" )
+                    tmpFilter.OwnUnFavorited = !tmpFilter.OwnUnFavorited;
+
             }
             //return notify;
         }
@@ -44,6 +54,11 @@ namespace Shrimp.ControlParts.TabSetting
             this.setNotifyFilter();
             if (OnChangedDetail != null)
                 OnChangedDetail.Invoke(sender, e);
+        }
+
+        public NotifyFilter getNotifyFilter
+        {
+            get { return this.tmpFilter; }
         }
     }
 }

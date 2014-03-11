@@ -166,6 +166,7 @@ namespace Shrimp.ControlParts.Tabs
                             var res = tb.TimelineObject as UserStatusControl;
                             res.Suspend();
                         }
+                        tb.isVisible = false;
                         //invisibleControls.Add ( tb );
                     }
                     i++;

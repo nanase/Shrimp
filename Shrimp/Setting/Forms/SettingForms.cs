@@ -97,6 +97,11 @@ namespace Shrimp.Setting.Forms
                 BeforeSelectControl = new PluginForm ();
             }
 
+            if ( node.Name == "FontNode" )
+            {
+                BeforeSelectControl = new FontForm ();
+            }
+
             if (BeforeSelectControl != null)
             {
                 BeforeSelectControl.Dock = DockStyle.Fill;

@@ -137,6 +137,18 @@ namespace Shrimp.Twitter
         [XmlIgnore]
         public decimal DirectMessageSendSinceID { get; set; }
 
+        /// <summary>
+        /// エビビーム！ビビビビ！
+        /// </summary>
+        [XmlElement ( "shrimpBeamCount" )]
+        public decimal ShrimpBeam { get; set; }
+
+        /// <summary>
+        /// エビビームを最後に撃った時間
+        /// </summary>
+        [XmlElement ( "executeShrimpBeamlatestDate" )]
+        public DateTime ShrimpBeamLatestDate { get; set; }
+
         #region コンストラクタ
         public TwitterInfo ()
         {
