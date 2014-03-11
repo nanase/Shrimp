@@ -4,36 +4,32 @@ namespace Shrimp.Twitter.Streaming
 {
     class UserStreamThreadData
     {
-        private Thread thread;
         private bool isFinished = false;
 
-        public UserStreamThreadData()
-        {
+        public Thread Thread { get; private set; }
 
-        }
-
-        public UserStreamThreadData(Thread thread, bool isFinished)
-        {
-            this.thread = thread;
-            this.isFinished = isFinished;
-        }
-
-        public Thread Thread
-        {
-            get { return this.thread; }
-            set { this.thread = value; }
-        }
-
-        public bool isStopFlag
+        // FIXME: このプロパティ名を IsFinished に統一したほうがいいかと
+        public bool IsStopFlag
         {
             get { return this.isFinished; }
             set { this.isFinished = value; }
         }
 
-        public bool isFinishedThread
+        public bool IsFinishedThread
         {
             get;
             set;
+        }
+
+        public UserStreamThreadData ()
+        {
+
+        }
+
+        public UserStreamThreadData ( Thread thread, bool isFinished )
+        {
+            this.Thread = thread;
+            this.isFinished = isFinished;
         }
     }
 }
