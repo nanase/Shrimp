@@ -34,7 +34,8 @@ namespace Shrimp.Twitter
 
             this.Uri = uri;
             this.StatusCode = statusCode;
-            this.RawData = (string)rawdata.Clone();
+            if ( rawdata != null )
+                this.RawData = (string)rawdata.Clone();
         }        
 
         public object Clone()
