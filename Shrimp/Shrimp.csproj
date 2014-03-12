@@ -487,6 +487,7 @@
       <DependentUpon>UpdateForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Utils\AdditionalEncoding.cs" />
+    <Compile Include="Utils\StreamExtension.cs" />
     <Compile Include="Win32API\User32.cs" />
     <EmbeddedResource Include="ControlParts\AuthPanel\AccountRegister.resx">
       <DependentUpon>AccountRegister.cs</DependentUpon>
