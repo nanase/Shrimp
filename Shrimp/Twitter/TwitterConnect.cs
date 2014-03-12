@@ -134,16 +134,10 @@ namespace Shrimp.Twitter
                     //POST送信するデータの長さを指定
                     webreq.ContentLength = startData.Length + endData.Length + media.Length;
 
-                    //データをPOST送信するためのStreamを取得
-                    Stream reqStream = webreq.GetRequestStream ();
-
-                    //送信するデータを書き込む
-                    reqStream.Write ( startData, 0, startData.Length );
-                    //ファイルの内容を送信
-                    reqStream.Write ( media, 0, media.Length );
-
-                    reqStream.Write ( endData, 0, endData.Length );
-                    reqStream.Close ();
+                    // データをPOST送信するためのStreamを取得
+                    // 順にヘッダ、コンテント、フッタで書き込む
+                    using ( Stream reqStream = webreq.GetRequestStream () )
+                        reqStream.WriteArrays ( startData, media, endData );
                 }
 
                 HttpWebResponse webres = (HttpWebResponse)webreq.GetResponse ();
@@ -151,8 +145,10 @@ namespace Shrimp.Twitter
                 //  コードチェック
                 if ( (code = webres.StatusCode) == HttpStatusCode.OK )
                 {
+                    bool decompress = (webres != null && webres.ContentEncoding.ToLower () == "gzip");
+
                     using ( var st = webres.GetResponseStream () )
-                    using ( StreamReader sr = OpenStreamReader ( st, (webres != null && webres.ContentEncoding.ToLower () == "gzip") ) )
+                    using ( StreamReader sr = st.OpenStreamReader ( decompress, AdditionalEncoding.ShiftJIS ) )
                         raw_data = sr.ReadToEnd ();
 
                     if ( raw_data == null )
@@ -174,19 +170,6 @@ namespace Shrimp.Twitter
             }
 
             return new TwitterSocket ( (webreq != null ? webreq.RequestUri : null), code, raw_data );
-        }
-
-        private static StreamReader OpenStreamReader ( Stream baseStream, bool decompress )
-        {
-            Encoding shift_jis = Encoding.GetEncoding ( 932 );
-
-            if ( decompress )
-            {
-                GZipStream gzip = new GZipStream ( baseStream, CompressionMode.Decompress );
-                return new StreamReader ( gzip, shift_jis );
-            }
-            else
-                return new StreamReader ( baseStream, shift_jis );
         }
     }
 }
