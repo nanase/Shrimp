@@ -320,97 +320,97 @@ namespace Shrimp.ControlParts.Tabs
                     tabText = "";
                 }
 
-                // タブの画像を作成する
-                Bitmap bmp = new Bitmap ( imgSize.Width, imgSize.Height );
-                Graphics g = Graphics.FromImage ( bmp );
-
-                // 高さに1足しているのは、下にできる空白部分を消すため
-                Image img = new Bitmap ( imgSize.Width, imgSize.Height );
-                Graphics gg = Graphics.FromImage ( img );
-                /*
-                LinearGradientBrush gb = new LinearGradientBrush (
-                    g.VisibleClipBounds,
-                    Color.Red,
-                    Color.Gray,
-                    LinearGradientMode.Vertical );
-                */
                 Brush BackBrush =
-                    (state == TabItemState.Selected ? Setting.TabColors.SelectedTabBackground :
-                    page.isContainUnRead ? Setting.TabColors.ExistUnReadBackgroundColor : Setting.TabColors.NormalTabBackground);
+                       (state == TabItemState.Selected ? Setting.TabColors.SelectedTabBackground :
+                       page.isContainUnRead ? Setting.TabColors.ExistUnReadBackgroundColor : Setting.TabColors.NormalTabBackground);
                 Brush StringBrush =
                     (state == TabItemState.Selected ? Setting.TabColors.SelectedTabString :
                     page.isContainUnRead ? Setting.TabColors.ExistUnReadStringColor : Setting.TabColors.NormalTabString);
                 bool isBold =
                     (state == TabItemState.Selected ? Setting.TabColors.isBoldSelectedTab :
                     page.isContainUnRead ? Setting.TabColors.isBoldUnRead : Setting.TabColors.isBoldNormalTab);
-                gg.FillRectangle ( BackBrush, new Rectangle ( 2, 2, imgSize.Width - 4, imgSize.Height - 2 ) );
-                gg.Dispose ();
 
-                TabRenderer.DrawTabItem ( g,
-                            new Rectangle ( 0, 0, bmp.Width, bmp.Height ),
-                            "",
-                            null, img,
-                            new Rectangle ( 0, 0, img.Width, img.Height ), false,
-                            state );
-
-                if ( i == SelectedIndex )
-                    g.FillRectangle ( Brushes.Yellow,
-                        new Rectangle ( 2, (this.Alignment == TabAlignment.Bottom ? bmp.Height - 3 : 0),
-                            bmp.Width - 2, 3 ) );
-
-                if ( HoverControlNum == i && !HoverControl.isLock )
-                    DrawTabCloseButton ( g, new Rectangle ( bmp.Width - 22, 2, 20, bmp.Height - 2 ) );
-
-                if ( this.Alignment == TabAlignment.Left || this.Alignment == TabAlignment.Right )
+                // タブの画像を作成する
+                using ( Bitmap bmp = new Bitmap ( imgSize.Width, imgSize.Height ) )
                 {
-                    StringFormat sf = new StringFormat ();
-                    sf.Alignment = StringAlignment.Near;
-                    sf.LineAlignment = StringAlignment.Center;
-                    var text = page.Text;
-                    g = Graphics.FromImage ( bmp );
-                    g.DrawString ( text,
-                        (isBold ? this.BoldFont : this.NormalFont),
-                        StringBrush,
-                        new RectangleF ( 2, 2, bmp.Width, bmp.Height ),
-                        sf );
-                    sf.Dispose ();
-                }
+                    using ( Graphics g = Graphics.FromImage ( bmp ) )
+                    using ( Image img = new Bitmap ( imgSize.Width, imgSize.Height ) )
+                    {
+                        using ( Graphics gg = Graphics.FromImage ( img ) )
+                        {
+                            /*
+                            LinearGradientBrush gb = new LinearGradientBrush (
+                                g.VisibleClipBounds,
+                                Color.Red,
+                                Color.Gray,
+                                LinearGradientMode.Vertical );
+                            */
 
-                g.Dispose ();
+                            gg.FillRectangle ( BackBrush, new Rectangle ( 2, 2, imgSize.Width - 4, imgSize.Height - 2 ) );
+                        }
 
-                // 画像を回転する
-                if ( this.Alignment == TabAlignment.Bottom )
-                {
-                    bmp.RotateFlip ( RotateFlipType.Rotate180FlipNone );
-                }
-                else if ( this.Alignment == TabAlignment.Left )
-                {
-                    bmp.RotateFlip ( RotateFlipType.Rotate270FlipNone );
-                }
-                else if ( this.Alignment == TabAlignment.Right )
-                {
-                    bmp.RotateFlip ( RotateFlipType.Rotate90FlipNone );
-                }
+                        TabRenderer.DrawTabItem ( g,
+                                    new Rectangle ( 0, 0, bmp.Width, bmp.Height ),
+                                    "",
+                                    null, img,
+                                    new Rectangle ( 0, 0, img.Width, img.Height ), false,
+                                    state );
 
-                if ( this.Alignment != TabAlignment.Left && this.Alignment != TabAlignment.Right )
-                {
-                    StringFormat sf2 = new StringFormat ();
-                    sf2.Alignment = StringAlignment.Near;
-                    sf2.LineAlignment = StringAlignment.Center;
-                    var text2 = page.Text;
-                    g = Graphics.FromImage ( bmp );
-                    g.DrawString ( text2,
-                        (isBold ? this.BoldFont : this.NormalFont),
-                        StringBrush,
-                        new RectangleF ( 2, 3, bmp.Width, bmp.Height ),
-                        sf2 );
-                    sf2.Dispose ();
-                }
+                        if ( i == SelectedIndex )
+                            g.FillRectangle ( Brushes.Yellow,
+                                new Rectangle ( 2, (this.Alignment == TabAlignment.Bottom ? bmp.Height - 3 : 0),
+                                    bmp.Width - 2, 3 ) );
 
-                // 画像を描画する
-                e.Graphics.DrawImage ( bmp, tabRect.X, tabRect.Y, bmp.Width, bmp.Height );
-                bmp.Dispose ();
-                g.Dispose ();
+                        if ( HoverControlNum == i && !HoverControl.isLock )
+                            DrawTabCloseButton ( g, new Rectangle ( bmp.Width - 22, 2, 20, bmp.Height - 2 ) );
+
+                        if ( this.Alignment == TabAlignment.Left || this.Alignment == TabAlignment.Right )
+                        {
+                            using ( StringFormat sf = new StringFormat () )
+                            {
+                                sf.Alignment = StringAlignment.Near;
+                                sf.LineAlignment = StringAlignment.Center;
+                                g.DrawString ( page.Text,
+                                               (isBold ? this.BoldFont : this.NormalFont),
+                                               StringBrush,
+                                               new RectangleF ( 2, 2, bmp.Width, bmp.Height ),
+                                               sf );
+                            }
+                        }
+                    }
+
+                    // 画像を回転する
+                    if ( this.Alignment == TabAlignment.Bottom )
+                    {
+                        bmp.RotateFlip ( RotateFlipType.Rotate180FlipNone );
+                    }
+                    else if ( this.Alignment == TabAlignment.Left )
+                    {
+                        bmp.RotateFlip ( RotateFlipType.Rotate270FlipNone );
+                    }
+                    else if ( this.Alignment == TabAlignment.Right )
+                    {
+                        bmp.RotateFlip ( RotateFlipType.Rotate90FlipNone );
+                    }
+
+                    if ( this.Alignment != TabAlignment.Left && this.Alignment != TabAlignment.Right )
+                    {
+                        using ( StringFormat sf = new StringFormat () )
+                        using ( Graphics g = Graphics.FromImage ( bmp ) )
+                        {
+                            sf.Alignment = StringAlignment.Near;
+                            sf.LineAlignment = StringAlignment.Center;
+                            g.DrawString ( page.Text,
+                                           (isBold ? this.BoldFont : this.NormalFont),
+                                           StringBrush,
+                                           new RectangleF ( 2, 3, bmp.Width, bmp.Height ),
+                                           sf );
+                        }
+                    }
+
+                    // 画像を描画する
+                    e.Graphics.DrawImage ( bmp, tabRect.X, tabRect.Y, bmp.Width, bmp.Height );
+                }
             }
         }
 
