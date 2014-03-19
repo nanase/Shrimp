@@ -271,6 +271,7 @@ namespace Shrimp.Twitter
             }
 
             sig = OAuthBase.UrlEncode(sig);
+            ServicePointManager.DefaultConnectionLimit = 1000;
             string raw_data = null;
             Stream st = null;
             StreamReader sr = null;
@@ -284,6 +285,7 @@ namespace Shrimp.Twitter
                 webreq.Timeout = 60 * 1000;
                 webreq.UserAgent = "Shrimp";
                 webreq.ProtocolVersion = HttpVersion.Version11;
+                webreq.Proxy = null;
                 webreq.AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip;
                 webreq.ServicePoint.ConnectionLimit = 1000;
                 webreq.ContentType = "application/x-www-form-urlencoded";
