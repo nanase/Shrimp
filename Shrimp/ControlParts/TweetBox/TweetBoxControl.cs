@@ -662,9 +662,9 @@ namespace Shrimp.ControlParts.TweetBox
                 if (ext == ".png" || ext == ".jpg" || ext == ".gif")
                 {
                     //  
-                    this.AttachImagePath = fileName[0];
-                    this.SelectImage(true, tmpConfigStatus);
-                    this.SelectTweetBox();
+                    if ( this.loadImage ( fileName[0], false ) )
+                        this.AttachImagePath = (string)fileName[0].Clone();
+                    this.SelectImage ( !String.IsNullOrEmpty ( this.AttachImagePath ), this.tmpConfigStatus );
                 }
             }
         }
