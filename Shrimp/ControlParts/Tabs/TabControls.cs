@@ -480,16 +480,12 @@ namespace Shrimp.ControlParts.Tabs
                 {
                     if (!isVisible)
                     {
-                        if (this.InvokeRequired)
+                        if ( this.IsHandleCreated )
                         {
-                            this.Invoke((MethodInvoker)delegate()
+                            this.BeginInvoke ( (MethodInvoker)delegate ()
                             {
                                 this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
-                            });
-                        }
-                        else
-                        {
-                            this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
+                            } );
                         }
                     }
                 });

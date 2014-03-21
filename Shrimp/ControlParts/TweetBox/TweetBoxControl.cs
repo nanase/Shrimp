@@ -568,11 +568,14 @@ namespace Shrimp.ControlParts.TweetBox
             }
             set
             {
-                this.Invoke((MethodInvoker)delegate()
+                if ( this.IsHandleCreated )
                 {
-                    this.tmpConfigStatus = value;
-                    this.SelectImage(!String.IsNullOrEmpty(this.AttachImagePath), this.tmpConfigStatus);
-                });
+                    this.BeginInvoke ( (MethodInvoker)delegate ()
+                    {
+                        this.tmpConfigStatus = value;
+                        this.SelectImage ( !String.IsNullOrEmpty ( this.AttachImagePath ), this.tmpConfigStatus );
+                    } );
+                }
             }
         }
 

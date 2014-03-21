@@ -625,7 +625,7 @@ namespace Shrimp
             if (us != null)
             {
                 TwitterInfo t = this.accountManager.accounts[selNum];
-                us.stopStreaming(t, true);
+                us.stopStreaming(t, false);
             }
             this.accountManager.RemoveAccount(selNum);
             SaveAccount();
@@ -825,21 +825,15 @@ namespace Shrimp
             get { return this.shrimpSpringLabel.Text; }
             set
             {
-                if (this.IsDisposed)
-                    return;
-                if (this.InvokeRequired && this.IsHandleCreated)
+                try
                 {
-                    this.Invoke((MethodInvoker)delegate()
+                    this.Invoke ( (MethodInvoker)delegate ()
                     {
-                        if (this.IsDisposed)
-                            return;
                         this.shrimpSpringLabel.Text = value;
-                    });
+                    } );
                 }
-                else
-                {
-                    this.shrimpSpringLabel.Text = value;
-                }
+                catch ( Exception )
+                { }
             }
         }
 
@@ -851,16 +845,15 @@ namespace Shrimp
             get { return this.APIStatusLabel.Text; }
             set
             {
-                if (this.InvokeRequired)
+                try
                 {
-                    this.Invoke((MethodInvoker)delegate()
+                    this.Invoke ( (MethodInvoker)delegate ()
                     {
                         this.APIStatusLabel.Text = value;
-                    });
+                    } );
                 }
-                else
+                catch ( Exception )
                 {
-                    this.APIStatusLabel.Text = value;
                 }
             }
         }
@@ -990,6 +983,18 @@ namespace Shrimp
             if (e != null && e.data != null)
             {
                 var tmpTweet = (TwitterStatus)e.data;
+
+                if ( Setting.UserStream.isMuteWithoutFriends )
+                {
+                    if ( e.friends != null )
+                    {
+                        if ( !e.friends.Exists ( ( t ) => tmpTweet.user.id == t ) )
+                        {
+                            //  ミュート
+                            return;
+                        }
+                    }
+                }
                 TwitterStatusChecker.SetIsReply(this.accountManager.accounts, tmpTweet);
                 TwitterStatusChecker.SetIsRetweeted(this.accountManager.accounts, tmpTweet);
 
@@ -1032,6 +1037,19 @@ namespace Shrimp
         {
             if (e != null && e.data != null)
             {
+                if ( Setting.UserStream.isMuteWithoutFriends )
+                {
+                    var tmpData = ( (TwitterNotifyStatus)e.data ).target_object;
+                    if ( e.friends != null && tmpData != null && tmpData is TwitterStatus )
+                    {
+                        var tmpTweet = tmpData as TwitterStatus;
+                        if ( !e.friends.Exists ( ( t ) => tmpTweet.user.id == t ) )
+                        {
+                            //  ミュート
+                            return;
+                        }
+                    }
+                }
                 TwitterStatusChecker.SetNotify(this.accountManager.accounts, (TwitterNotifyStatus)e.data);
                 this.TimelineTabControl.InsertTweet(e.account_source, new TwitterStatus((TwitterNotifyStatus)e.data), TimelineCategories.NotifyTimeline);
             }
@@ -1447,7 +1465,7 @@ namespace Shrimp
                 this.iconDownloadTimer.Stop();
                 this.iconDownloadTimer = null;
 
-
+                this.TimelineTabControl.StopTabQueue ();
                 this.TimelineTabControl.SaveTabs();
 
                 this.db.Close();
@@ -1464,7 +1482,7 @@ namespace Shrimp
                         Process.Start("ShrimpAutoUpdater.exe");
                     }
                 }
-                System.Environment.Exit ( 0 );
+                //System.Environment.Exit ( 0 );
             }
         }
 
