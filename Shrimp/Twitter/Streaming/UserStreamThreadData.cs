@@ -5,17 +5,16 @@ namespace Shrimp.Twitter.Streaming
     class UserStreamThreadData
     {
         private Thread thread;
-        private bool isFinished = false;
 
         public UserStreamThreadData()
         {
 
         }
 
-        public UserStreamThreadData(Thread thread, bool isFinished)
+        public UserStreamThreadData ( Thread thread, bool isStopFlag )
         {
             this.thread = thread;
-            this.isFinished = isFinished;
+            this.isStopFlag = isStopFlag;
         }
 
         public Thread Thread
@@ -24,12 +23,27 @@ namespace Shrimp.Twitter.Streaming
             set { this.thread = value; }
         }
 
+        /// <summary>
+        /// スレッドの終了フラグがたっているかどうか
+        /// </summary>
         public bool isStopFlag
         {
-            get { return this.isFinished; }
-            set { this.isFinished = value; }
+            get;
+            set;
         }
 
+        /// <summary>
+        /// 終了時、プログラムの終了とかだともう通知を出す必要がないので、通知を抑制するかどうか
+        /// </summary>
+        public bool isDestroy
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// スレッドが終了したかどうか
+        /// </summary>
         public bool isFinishedThread
         {
             get;

@@ -56,6 +56,7 @@ namespace Shrimp.Twitter.Streaming
 
             var thread = new Thread(new ParameterizedThreadStart(this.StartStreaming));
             this.workerThreads[srv.UserId] = new UserStreamThreadData(thread, false);
+            
             thread.Start(new object[6] { srv, param, completedHandler, notifyHandler, disconnectHandler, this.workerThreads[srv.UserId] });
 
             this.isStartedStreaming = true;
@@ -66,7 +67,7 @@ namespace Shrimp.Twitter.Streaming
         /// </summary>
         /// <param name="srv"></param>
         /// <param name="isJoin"></param>
-        public void stopStreaming(TwitterInfo srv, bool isJoin = false)
+        public void stopStreaming(TwitterInfo srv, bool isDestroy = false)
         {
             if (!this.workerThreads.ContainsKey(srv.UserId))
                 return;
@@ -77,8 +78,12 @@ namespace Shrimp.Twitter.Streaming
                 //
                 //Thread.Sleep ( 1 );
                 this.workerThreads[srv.UserId].isStopFlag = true;
+                this.workerThreads[srv.UserId].isDestroy = isDestroy;
                 Thread.Sleep(0);
+                if ( isDestroy )
                 this.workerThreads[srv.UserId].Thread.Abort();
+                else
+                    this.workerThreads[srv.UserId].Thread.Abort ();
                 // this.workerThreads[srv.user_id] = null;
                 // this.workerThreads.Remove ( srv.user_id );
             }
@@ -89,41 +94,6 @@ namespace Shrimp.Twitter.Streaming
             if (this.workerThreads.All((d) => d.Value.isFinishedThread == true))
                 this.isStartedStreaming = false;
         }
-
-        public void StopStreamingAll()
-        {
-            /*
-            foreach ( KeyValuePair<decimal,Thread> t in this.workerThreads )
-            {
-                if ( t.Value != null )
-                {
-                    t.Value.Abort ();
-                }
-            }
-            this.isStartedStreaming = false;
-            this.workerThreads.Clear ();
-            */
-        }
-
-        /*
-        /// <summary>
-        /// 非同期で行われる処理の内容
-        /// </summary>
-        /// <param name="srv"></param>
-        public void loadWorker ( object args )
-        {
-            object[] obj = (object[])args;
-            TwitterInfo srv = (TwitterInfo)obj[0];
-            List<OAuthBase.QueryParameter> param = (List<OAuthBase.QueryParameter>)obj[1];
-            UserStreaming.TweetEventHandler completedHandler = (UserStreaming.TweetEventHandler)obj[2];
-            UserStreaming.NotifyEventHandler notifyEventHandler = (UserStreaming.NotifyEventHandler)obj[3];
-            UserStreaming.UserStreamingconnectStatusEventHandler disconnectHandler = (UserStreaming.UserStreamingconnectStatusEventHandler)obj[4];
-            srv.stopStreamingFlag = false;
-            srv.StartStreaming ( param, completedHandler, notifyEventHandler, disconnectHandler );
-            //loadWorkerControl = new loadWorkerDelegate ( srv.StartStreaming );
-            //loadWorkerResult = loadWorkerControl.BeginInvoke ( param, completedHandler, notifyEventHandler, disconnectHandler, null, null );
-        }
-        */
 
         /// <summary>
         /// HttpWebRequestのパラメータを設定します
@@ -197,52 +167,16 @@ namespace Shrimp.Twitter.Streaming
                     }
                     //  接続開始
                     streamQueue.Enqueue
-                        (new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.Unused, null, null), disconnectHandler));
-                    bool isFirstTime = false;
+                        (new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.Unused, null, null, null), disconnectHandler));
 
                     while (!sender.isStopFlag && !sr.EndOfStream)
                     {
                         string t = sr.ReadLine();
+
                         if (!String.IsNullOrEmpty(t) && !sender.isStopFlag)
                         {
-                            var data = DynamicJson.Parse(t);
-
-                            if (!isFirstTime)
-                            {
-                                if (data.IsDefined("friends"))
-                                {
-                                    friends = ((List<decimal>)data.friends);
-                                }
-                                isFirstTime = true;
-                                ReconnectCount = 0;
-                                streamQueue.Enqueue
-                                    (new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.OK, null, null), disconnectHandler));
-                                continue;
-                            }
-
-                            if (data.IsDefined("id"))
-                            {
-                                //  ツイート
-                                streamQueue.Enqueue
-                                    (new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.OK, new TwitterStatus(data), null), completedHandler));
-                            }
-                            else if (data.IsDefined("event"))
-                            {
-                                //  イベント
-                                if (data["event"] == "favorite" || data["event"] == "unfavorite" ||
-                                    data["event"] == "follow" || data["event"] == "unfollow")
-                                {
-                                    streamQueue.Enqueue
-                                        (new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.OK, new TwitterNotifyStatus(data), null), notifyHandler));
-                                }
-                            }
-                            else if (data.IsDefined("direct_message"))
-                            {
-                                //  ダイレクトメッセージ
-                                var directMessage = new TwitterDirectMessageStatus(data.direct_message);
-                                streamQueue.Enqueue
-                                        (new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.OK, directMessage, null), completedHandler));
-                            }
+                            this.RaiseEvents ( srv, t, ref friends, streamQueue );
+                            ReconnectCount = 0;
                             //  深愛
                         }
                     }
@@ -258,9 +192,13 @@ namespace Shrimp.Twitter.Streaming
                     if (ReconnectCount < 6)
                         ReconnectCount++;
 
-                    streamQueue.Enqueue
-                        (new UserStreamQueueData(this,
-                            new TwitterCompletedEventArgs(srv, (sender.isStopFlag ? HttpStatusCode.RequestTimeout : HttpStatusCode.Continue), null, null), disconnectHandler));
+                    if ( !sender.isDestroy )
+                    {
+                        streamQueue.Enqueue
+                            ( new UserStreamQueueData ( this,
+                                new TwitterCompletedEventArgs ( srv, ( sender.isStopFlag ? HttpStatusCode.RequestTimeout : HttpStatusCode.Continue ),
+                                    friends, null, null ), disconnectHandler ) );
+                    }
 
                     if (sr != null)
                         sr.Close();
@@ -270,6 +208,8 @@ namespace Shrimp.Twitter.Streaming
                     sr = null;
 
                     streamQueue.Wait();
+
+                    Console.WriteLine ( "終了" );
                 }
                 if (sender.isStopFlag)
                     break;
@@ -285,6 +225,42 @@ namespace Shrimp.Twitter.Streaming
             set
             {
                 this._isStartedStreaming = value;
+            }
+        }
+
+        /// <summary>
+        /// イベントが発生した際に実行される
+        /// </summary>
+        /// <param name="line"></param>
+        private void RaiseEvents ( TwitterInfo srv, string line, ref List<decimal> friends, UserStreamQueue streamQueue )
+        {
+            var data = DynamicJson.Parse ( line );
+
+            if ( data.IsDefined ( "friends" ) )
+            {
+                friends = ( (List<decimal>)data.friends );
+                streamQueue.Enqueue
+                    ( new UserStreamQueueData ( this, new TwitterCompletedEventArgs ( srv, HttpStatusCode.OK, friends, null, null ), disconnectHandler ) );
+            } else if ( data.IsDefined ( "id" ) )
+            {
+                //  ツイート
+                streamQueue.Enqueue
+                    ( new UserStreamQueueData ( this, new TwitterCompletedEventArgs ( srv, HttpStatusCode.OK, friends, new TwitterStatus ( data ), null ), completedHandler ) );
+            } else if ( data.IsDefined ( "event" ) )
+            {
+                //  イベント
+                if ( data["event"] == "favorite" || data["event"] == "unfavorite" ||
+                    data["event"] == "follow" || data["event"] == "unfollow" )
+                {
+                    streamQueue.Enqueue
+                        ( new UserStreamQueueData ( this, new TwitterCompletedEventArgs ( srv, HttpStatusCode.OK, friends, new TwitterNotifyStatus ( data ), null ), notifyHandler ) );
+                }
+            } else if ( data.IsDefined ( "direct_message" ) )
+            {
+                //  ダイレクトメッセージ
+                var directMessage = new TwitterDirectMessageStatus ( data.direct_message );
+                streamQueue.Enqueue
+                        ( new UserStreamQueueData ( this, new TwitterCompletedEventArgs ( srv, HttpStatusCode.OK, friends, directMessage, null ), completedHandler ) );
             }
         }
     }
