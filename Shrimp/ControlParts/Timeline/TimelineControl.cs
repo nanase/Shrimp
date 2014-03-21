@@ -415,6 +415,11 @@ namespace Shrimp.ControlParts.Timeline
             }
         }
 
+        /// <summary>
+        /// 返信を書くときの準備をする
+        /// </summary>
+        /// <param name="tweetID"></param>
+        /// <param name="isDirectMessage"></param>
         public void ReplySelectedTweet(decimal tweetID, bool isDirectMessage)
         {
             if (tweetID >= 0)
@@ -1355,6 +1360,11 @@ namespace Shrimp.ControlParts.Timeline
             return true;
         }
 
+        /// <summary>
+        /// キーが押されたとき
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void TimelineControl_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control && e.KeyCode == Keys.C)
@@ -1397,6 +1407,11 @@ namespace Shrimp.ControlParts.Timeline
             }
         }
 
+        /// <summary>
+        /// タイムラインにフォーカスが移動したとき
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TimelineControl_Enter(object sender, EventArgs e)
         {
             this.ActiveControl = this.Controls[0];
