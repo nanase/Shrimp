@@ -11,6 +11,7 @@ namespace Shrimp.Module.Queue
     class TabQueue : Queue<TabQueueData>, IQueue
     {
         private System.Timers.Timer queueCheckTimer;
+        private bool isStopRequest = false;
 
         public TabQueue()
         {
@@ -48,6 +49,9 @@ namespace Shrimp.Module.Queue
         /// <param name="data"></param>
         public new void Enqueue(TabQueueData data)
         {
+            if ( isStopRequest )
+                return;
+
             lock (((ICollection)this).SyncRoot)
             {
                 base.Enqueue(data);
@@ -69,6 +73,7 @@ namespace Shrimp.Module.Queue
 
         public void Wait()
         {
+            this.isStopRequest = true;
             while (true)
             {
                 lock (((ICollection)this).SyncRoot)
@@ -90,7 +95,8 @@ namespace Shrimp.Module.Queue
             {
                 if (this.Count != 0)
                 {
-                    var tmp = this.Dequeue();
+                    var tmp = base.Dequeue();
+                    tmp.ActionData.BeginInvoke ( null, null );
                 }
             }
         }
