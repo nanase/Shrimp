@@ -5,6 +5,7 @@ using System.Data.Common;
 using System.Data.SQLite;
 using System.Globalization;
 using Shrimp.Twitter.Status;
+using System.Threading.Tasks;
 
 namespace Shrimp.SQL
 {
@@ -190,10 +191,13 @@ namespace Shrimp.SQL
                 com.Parameters.Add(new SQLiteParameter(DbType.Decimal) { Value = id });
             }
             com.Prepare();
-            this.InsertDataNow(com);
+            this.InsertData(com);
         }
 
-
+		/// <summary>
+		/// ユーザ情報をデータベースに書き込む
+		/// </summary>
+		/// <param name="user"></param>
         public void InsertUser(TwitterUserStatus user)
         {
             var t = user;
@@ -219,6 +223,10 @@ namespace Shrimp.SQL
             this.InsertData(com);
         }
 
+		/// <summary>
+		/// ユーザ一覧をデータベースにいっきに書き込む
+		/// </summary>
+		/// <param name="users"></param>
         public void InsertUserRange(List<TwitterUserStatus> users)
         {
             var com = this.sql.CreateCommand();
@@ -267,6 +275,10 @@ namespace Shrimp.SQL
             this.InsertData(com);
         }
 
+		/// <summary>
+		/// ツイートをデータベースに書き込む
+		/// </summary>
+		/// <param name="tweet"></param>
         public void InsertTweet(TwitterStatus tweet)
         {
             var t = tweet.DynamicTweet;
@@ -401,23 +413,56 @@ namespace Shrimp.SQL
             this.InsertData(com);
         }
 
-        public void InsertDataNow(SQLiteCommand com)
+		/// <summary>
+		/// データを書き込む
+		/// </summary>
+		/// <param name="com"></param>
+        public void InsertData(SQLiteCommand com)
         {
-            lock (lockObj)
-            {
-                try
-                {
-                    com.ExecuteNonQuery();
-                    com.Dispose();
-                }
-                catch (Exception e)
-                {
-                    //  ?
-                    Console.WriteLine(e.Message);
-                }
-            }
+			Task.Factory.StartNew(() =>
+			{
+				lock (lockObj)
+				{
+					try
+					{
+						com.ExecuteNonQuery();
+						com.Dispose();
+					}
+					catch (Exception e)
+					{
+						//  ?
+						Console.WriteLine(e.Message);
+					}
+				}
+			});
         }
 
+		/*
+		/// <summary>
+		/// データをデータベースに書き込む
+		/// </summary>
+		/// <param name="com"></param>
+		public void InsertData(SQLiteCommand com)
+		{
+			Task.Factory.StartNew(() =>
+			{
+				lock (lockObj)
+				{
+					try
+					{
+						com.ExecuteNonQuery();
+						com.Dispose();
+					}
+					catch (Exception e)
+					{
+						//  ?
+						Console.WriteLine(e.Message);
+					}
+				}
+			});
+		}
+		*/
+		/*
         public void InsertData(SQLiteCommand com)
         {
             lock (lockObj)
@@ -455,5 +500,6 @@ namespace Shrimp.SQL
                 }
             }
         }
+		*/
     }
 }
