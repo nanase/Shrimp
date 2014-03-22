@@ -122,6 +122,9 @@ namespace Shrimp.Twitter.Status
             set;
         }
 
+		/// <summary>
+		/// 通知の種類がフォロー・アンフォローであるかどうか
+		/// </summary>
         public bool isFollow
         {
             get
@@ -130,11 +133,25 @@ namespace Shrimp.Twitter.Status
             }
         }
 
+		/// <summary>
+		/// 通知の種類が、リツイートであるかどうか
+		/// </summary>
         public bool isRetweeted
         {
             get
             {
                 return (this.notify_event == "retweeted");
+            }
+        }
+
+		/// <summary>
+		/// 通知の種類が、プロフィールの更新であるかどうか
+		/// </summary>
+        public bool isUpdateProfile
+        {
+            get
+            {
+                return ( this.notify_event == "user_update" );
             }
         }
 

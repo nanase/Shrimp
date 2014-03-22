@@ -56,7 +56,8 @@ namespace Shrimp.Twitter.Status
                 this.retweeted_status.source_url = (string)sqlData[6].Clone();
                 this.retweeted_status.retweet_count = Decimal.Parse(sqlData[7]);
                 this.retweeted_status.favorite_count = Decimal.Parse(sqlData[8]);
-
+				this.retweeted_status.retweet_users = new NotifySourceUsers();
+				this.retweeted_status.favorite_users = new NotifySourceUsers();
                 this.retweeted_status.isReply = (int.Parse(sqlData[9]) == 0 ? false : true);
                 this.retweeted_status.replyID = Decimal.Parse(sqlData[10]);
                 this.retweeted_status.isDirectMessage = (int.Parse(sqlData[11]) == 0 ? false : true);
@@ -89,6 +90,8 @@ namespace Shrimp.Twitter.Status
                 this.source_url = (string)sqlData[6].Clone();
                 this.retweet_count = Decimal.Parse(sqlData[7]);
                 this.favorite_count = Decimal.Parse(sqlData[8]);
+				this.retweet_users = new NotifySourceUsers();
+				this.favorite_users = new NotifySourceUsers();
                 this.entities = new TwitterEntities(this.text);
 
                 this.isReply = (int.Parse(sqlData[9]) == 0 ? false : true);
@@ -125,6 +128,8 @@ namespace Shrimp.Twitter.Status
             this.in_reply_to_status_id = (raw_data.in_reply_to_status_id == null ? 0 : Decimal.Parse(raw_data.in_reply_to_status_id_str));
             this.in_reply_to_user_id = (raw_data.in_reply_to_user_id == null ? 0 : Decimal.Parse(raw_data.in_reply_to_user_id_str));
             this.retweet_count = (decimal)raw_data.retweet_count;
+			this.retweet_users = new NotifySourceUsers();
+			this.favorite_users = new NotifySourceUsers();
             this.retweeted = (bool)raw_data.retweeted;
             this.retweeted_status = (raw_data.IsDefined("retweeted_status") ? new TwitterStatus(raw_data.retweeted_status) : null);
             if (raw_data.IsDefined("entities"))
@@ -178,6 +183,14 @@ namespace Shrimp.Twitter.Status
                 this.user = s;
                 this.text = "【フォロー通知】\n@" + t.screen_name + "(" + t.name + ")を" + (status.notify_event == "follow" ? "フォロー" : "アンフォロー") + "しました";
                 this.entities = new TwitterEntities(this.text);
+            }
+            else if ( status.isUpdateProfile )
+            {
+                GenerateDummyTwitterStatus ();
+                var s = status.source as TwitterUserStatus;
+                this.user = s;
+                this.text = "【プロフィール更新通知】\n@"+ s.screen_name +"("+ s.name +")がプロフィールを更新しました。\n"+ s.description +"";
+                this.entities = new TwitterEntities ( this.text );
             }
         }
 
@@ -429,6 +442,24 @@ namespace Shrimp.Twitter.Status
             set;
         }
 
+		/// <summary>
+		/// リツイートユーザー一覧
+		/// </summary>
+		public virtual NotifySourceUsers retweet_users
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// お気に入りユーザ一覧
+		/// </summary>
+		public virtual NotifySourceUsers favorite_users
+		{
+			get;
+			set;
+		}
+
         /// <summary>
         /// すでにふぁぼられてる？
         /// </summary>
@@ -494,6 +525,8 @@ namespace Shrimp.Twitter.Status
             dest.replyID = this.replyID;
             dest.retweet_count = this.retweet_count;
             dest.retweeted = this.retweeted;
+			dest.retweet_users = (this.retweet_users != null ? (NotifySourceUsers)this.retweet_users.Clone() : null);
+			dest.favorite_users = ( this.favorite_users != null ? (NotifySourceUsers)this.favorite_users.Clone() : null );
             dest.retweeted_status = (this.retweeted_status != null ? (TwitterStatus)this.retweeted_status.Clone() : null);
             dest.source = (string)this.source.Clone();
             dest.source_url = (string)this.source_url.Clone();

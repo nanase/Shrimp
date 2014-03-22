@@ -148,7 +148,7 @@ namespace Shrimp.Twitter.REST
         {
             if (res != null && res.IsAlive)
             {
-                res.Abort();
+                res.Abort ();
             }
         }
     }
