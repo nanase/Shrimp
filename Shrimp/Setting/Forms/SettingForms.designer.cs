@@ -46,7 +46,9 @@
             System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("グローバルミュート");
             System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("ショートカットキーの設定");
             System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("プラグイン");
-            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("Shrimpの情報");
+            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("ひみつのあいことば");
+            System.Windows.Forms.TreeNode treeNode13 = new System.Windows.Forms.TreeNode("Shrimpの情報", new System.Windows.Forms.TreeNode[] {
+            treeNode12});
             this.MainSplit = new System.Windows.Forms.SplitContainer();
             this.SettingListView = new System.Windows.Forms.TreeView();
             ((System.ComponentModel.ISupportInitialize)(this.MainSplit)).BeginInit();
@@ -94,14 +96,16 @@
             treeNode10.Text = "ショートカットキーの設定";
             treeNode11.Name = "PluginNode";
             treeNode11.Text = "プラグイン";
-            treeNode12.Name = "ShrimpInfo";
-            treeNode12.Text = "Shrimpの情報";
+            treeNode12.Name = "PrivateFunctionMenu";
+            treeNode12.Text = "ひみつのあいことば";
+            treeNode13.Name = "ShrimpInfo";
+            treeNode13.Text = "Shrimpの情報";
             this.SettingListView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode8,
             treeNode9,
             treeNode10,
             treeNode11,
-            treeNode12});
+            treeNode13});
             this.SettingListView.Size = new System.Drawing.Size(145, 441);
             this.SettingListView.TabIndex = 0;
             this.SettingListView.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.SettingListView_NodeMouseClick);
