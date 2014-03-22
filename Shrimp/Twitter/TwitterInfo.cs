@@ -17,7 +17,6 @@ namespace Shrimp.Twitter
         #region 定義
         //private OAuthBase oauth = new OAuthBase ();
         //public  event newTweetEventHandler newTweetEvent;
-        private volatile bool stopStreamingFlag = false;
 
         public delegate void NewTweetEventHandler(object sender, UserStreamingEventArgs e);
         #endregion
@@ -230,13 +229,12 @@ namespace Shrimp.Twitter
         }
 
         /// <summary>
-        /// WebSocket
+        /// Twitterへアクセスするためのソケット
         /// </summary>
         /// <param name="url">URL</param>
         /// <param name="method">GET or POST</param>
         /// <param name="param">パラメータ</param>
-        /// <returns></returns>
-        // FIXME: 適切な名前をつけてね
+        /// <returns>取得した結果を返却します</returns>
         private TwitterSocket Socket(string url, string method, List<OAuthBase.QueryParameter> param, TwitterUpdateImage image = null)
         {
             OAuthBase oAuth = new OAuthBase();
@@ -383,114 +381,5 @@ namespace Shrimp.Twitter
             }
             return new TwitterSocket((webreq != null ? webreq.RequestUri : null), code, raw_data);
         }
-
-        /*
-        /// <summary>
-        /// ストリーミングを開始する
-        /// 
-        /// </summary>
-        /// <param name="param"></param>
-        public void StartStreaming ( List<OAuthBase.QueryParameter> param, UserStreaming.TweetEventHandler newTweetHandler, UserStreaming.NotifyEventHandler notifyHandler,
-                                        UserStreaming.UserStreamingconnectStatusEventHandler connectStatusHandler )
-        {
-            OAuthBase oAuth = new OAuthBase ();
-            string nonce = oAuth.GenerateNonce ();
-            string timestamp = oAuth.GenerateTimeStamp ();
-            Uri uri;
-            uri = new Uri ( twitterStreamingAPI );
-
-            //OAuthBace.csを用いてsignature生成
-            string normalizedUrl, normalizedRequestParameters;
-            string sig = oAuth.GenerateSignature ( uri, param, "oob", consumer_key, consumer_secret, access_token_key, access_token_secret,
-                                                    "GET", timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters );
-            sig = OAuthBase.UrlEncode ( sig );
-
-            Stream st = null;
-            StreamReader sr = null;
-            HttpStatusCode code = HttpStatusCode.OK;
-            HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create ( string.Format ( "{0}?{1}&oauth_signature={2}", normalizedUrl, normalizedRequestParameters, sig ) );
-            webreq.Method = "GET";
-            webreq.UserAgent = "Shrimp";
-            webreq.ProtocolVersion = HttpVersion.Version11;
-            webreq.AutomaticDecompression = DecompressionMethods.Deflate;
-            webreq.ServicePoint.ConnectionLimit = 1000;
-            webreq.Timeout = 30 * 1000;
-            webreq.KeepAlive = true;
-            webreq.ContentType = "application/x-www-form-urlencoded";
-
-            try
-            {
-                HttpWebResponse webres = (HttpWebResponse)webreq.GetResponse ();
-                st = webres.GetResponseStream ();
-                if ( webres != null && webres.ContentEncoding.ToLower () == "gzip" )
-                {
-                    //gzip。
-                    GZipStream gzip = new GZipStream ( st, CompressionMode.Decompress );
-                    sr = new StreamReader ( gzip, Encoding.GetEncoding ( 932 ) );
-                }
-                else
-                {
-                    sr = new StreamReader ( st, Encoding.GetEncoding ( 932 ) );
-                }
-                if ( connectStatusHandler != null )
-                    connectStatusHandler.Invoke ( this, new TwitterCompletedEventArgs ( HttpStatusCode.Unused, null, null ) );
-                bool isFirstTime = false;
-
-                while ( !this.stopStreamingFlag )
-                {
-                    string t = sr.ReadLine ();
-                    if ( !String.IsNullOrEmpty ( t ) && !this.stopStreamingFlag )
-                    {
-                        if ( !isFirstTime )
-                        {
-                            isFirstTime = true;
-                            if ( connectStatusHandler != null )
-                                connectStatusHandler.BeginInvoke ( this, new TwitterCompletedEventArgs ( HttpStatusCode.OK, null, null ), null, null );
-                            continue;
-                        }
-                        var data = DynamicJson.Parse ( t );
-                        if ( data.IsDefined ( "id" ) )
-                        {
-                            if ( newTweetHandler != null )
-                                newTweetHandler.BeginInvoke ( this, new TwitterCompletedEventArgs ( HttpStatusCode.OK, new TwitterStatus ( data ), null ), null, null );
-                        }
-                        else if ( data.IsDefined ( "event" ) )
-                        {
-                            if ( data["event"] == "favorite" || data["event"] == "unfavorite" ||
-                                data["event"] == "follow" || data["event"] == "unfollow" )
-                            {
-                                if ( notifyHandler != null )
-                                    notifyHandler.BeginInvoke ( this, new TwitterCompletedEventArgs ( HttpStatusCode.OK, new TwitterNotifyStatus ( data ), null ), null, null );
-                            }
-                        }
-                        //  深愛
-                    }
-                }
-                Console.WriteLine ( "!?" );
-            }
-            catch ( Exception e )
-            {
-                LogControl.AddLogs ( "UserStreamが切断されました: " + e.Message + "" );
-            }
-            finally
-            {
-                if ( connectStatusHandler != null )
-                    connectStatusHandler.Invoke ( this, new TwitterCompletedEventArgs ( HttpStatusCode.RequestTimeout, null, null ) );
-                if ( sr != null )
-                    sr.Close ();
-                if ( st != null )
-                    st.Close ();
-
-                sr = null;
-                st = null;
-
-               this.stopStreamingFlag = false;
-
-                
-            }
-
-            return;
-        }
-         * */
     }
 }

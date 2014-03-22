@@ -2,13 +2,15 @@
 
 namespace Shrimp.Module.Queue
 {
+	/// <summary>
+	/// タブのキュー
+	/// </summary>
     class TabQueueData
     {
         public delegate void TabQueueActionDelegate ();
 
         private readonly TabQueueActionDelegate _tabQueueDelegate;
         private readonly ShrimpTabs _sender;
-        private readonly object _raw_data;
 
         public TabQueueData ( ShrimpTabs sender, TabQueueActionDelegate _tabQueueDelegate )
         {

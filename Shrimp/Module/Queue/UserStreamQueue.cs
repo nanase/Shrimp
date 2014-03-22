@@ -108,7 +108,6 @@ namespace Shrimp.Module.Queue
                     var tmp = this.DequeueWithoutSync ();
                     if ( this.stopFlag )
                         return;
-
                     Task.Factory.StartNew ( () =>
                     {
                         if ( tmp.EventHandler is UserStreaming.TweetEventDelegate )
