@@ -14,6 +14,7 @@ namespace Shrimp.Twitter.Status
         public bool Retweeted;
         public bool OwnFavorited;
         public bool OwnUnFavorited;
+        public bool UserUpdated;
 
         public NotifyFilter()
         {
@@ -24,6 +25,7 @@ namespace Shrimp.Twitter.Status
             this.OwnFavorited = true;
             this.OwnUnFavorited = true;
             this.Retweeted = true;
+            this.UserUpdated = true;
         }
 
         /// <summary>
@@ -47,8 +49,10 @@ namespace Shrimp.Twitter.Status
                 return true;
             if (this.Unfollowed && status.notify_event == "unfollow")
                 return true;
+            if ( this.UserUpdated && status.isUpdateProfile )
+                return true;
 
-            if (!this.Favorited && !this.UnFavorited && !this.Followed && !this.Unfollowed && !this.OwnUnFavorited && !this.OwnFavorited && !this.Retweeted)
+            if ( !this.Favorited && !this.UnFavorited && !this.Followed && !this.Unfollowed && !this.OwnUnFavorited && !this.OwnFavorited && !this.Retweeted && !this.UserUpdated )
                 return true;
             return false;
         }
@@ -63,6 +67,7 @@ namespace Shrimp.Twitter.Status
             dest.OwnFavorited = this.OwnFavorited;
             dest.OwnUnFavorited = this.OwnUnFavorited;
             dest.Retweeted = this.Retweeted;
+            dest.UserUpdated = this.UserUpdated;
             return dest;
         }
     }

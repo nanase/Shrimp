@@ -57,7 +57,8 @@
             "(自分のツイートが)お気に入りから削除されたとき",
             "フォローされたとき",
             "アンフォローしたとき",
-            "リツイートされたとき"});
+            "リツイートされたとき",
+            "ユーザがプロフィールを更新したとき"});
             this.notifyBox.Location = new System.Drawing.Point(3, 15);
             this.notifyBox.Name = "notifyBox";
             this.notifyBox.Size = new System.Drawing.Size(348, 194);

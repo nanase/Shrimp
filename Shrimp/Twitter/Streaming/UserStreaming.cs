@@ -56,7 +56,7 @@ namespace Shrimp.Twitter.Streaming
 
             var thread = new Thread(new ParameterizedThreadStart(this.StartStreaming));
             this.workerThreads[srv.UserId] = new UserStreamThreadData(thread, false);
-            
+			thread.Name = "UserStream:" + srv.ScreenName + "";
             thread.Start(new object[6] { srv, param, completedHandler, notifyHandler, disconnectHandler, this.workerThreads[srv.UserId] });
 
             this.isStartedStreaming = true;
@@ -128,94 +128,109 @@ namespace Shrimp.Twitter.Streaming
             List<decimal> friends = new List<decimal>();
             UserStreamQueue streamQueue = new UserStreamQueue();
             int ReconnectCount = 0;
+			HttpWebResponse webres = null;
+			Stream st = null;
+			StreamReader sr = null;
+			bool isAbortException = false;
 
             Uri uri;
             uri = new Uri(TwitterInfo.TwitterStreamingAPI);
 
-            //  再接続処理も含めて。
-            while (!sender.isStopFlag)
-            {
-                OAuthBase oAuth = new OAuthBase();
-                string nonce = oAuth.GenerateNonce();
-                string timestamp = oAuth.GenerateTimeStamp();
+			while (true)
+			{
+				try
+				{
+					Thread.Sleep(ReconnectCount * 10000);
 
-                //OAuthBace.csを用いてsignature生成
-                string normalizedUrl, normalizedRequestParameters;
-                string sig = oAuth.GenerateSignature(uri, param, "oob", srv.ConsumerKey, srv.ConsumerSecret, srv.AccessTokenKey, srv.AccessTokenSecret,
-                                                        "GET", timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters);
-                sig = OAuthBase.UrlEncode(sig);
+					//  再接続処理も含めて。
+					while (!sender.isStopFlag)
+					{
+						OAuthBase oAuth = new OAuthBase();
+						string nonce = oAuth.GenerateNonce();
+						string timestamp = oAuth.GenerateTimeStamp();
 
-                HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(string.Format("{0}?{1}&oauth_signature={2}", normalizedUrl, normalizedRequestParameters, sig));
-                this.SetWebReq(webreq);
-                HttpWebResponse webres = null;
-                Stream st = null;
-                StreamReader sr = null;
-                try
-                {
-                    webres = (HttpWebResponse)webreq.GetResponse();
-                    st = webres.GetResponseStream();
+						//OAuthBace.csを用いてsignature生成
+						string normalizedUrl, normalizedRequestParameters;
+						string sig = oAuth.GenerateSignature(uri, param, "oob", srv.ConsumerKey, srv.ConsumerSecret, srv.AccessTokenKey, srv.AccessTokenSecret,
+																"GET", timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters);
+						sig = OAuthBase.UrlEncode(sig);
 
-                    if (webres != null && webres.ContentEncoding.ToLower() == "gzip")
-                    {
-                        //gzip。
-                        GZipStream gzip = new GZipStream(st, CompressionMode.Decompress);
-                        sr = new StreamReader(gzip, enc);
-                    }
-                    else
-                    {
-                        sr = new StreamReader(st, enc);
-                    }
-                    //  接続開始
-                    streamQueue.Enqueue
-                        (new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.Unused, null, null, null), disconnectHandler));
+						HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(string.Format("{0}?{1}&oauth_signature={2}", normalizedUrl, normalizedRequestParameters, sig));
+						this.SetWebReq(webreq);
 
-                    while (!sender.isStopFlag && !sr.EndOfStream)
-                    {
-                        string t = sr.ReadLine();
+						webres = (HttpWebResponse)webreq.GetResponse();
+						st = webres.GetResponseStream();
 
-                        if (!String.IsNullOrEmpty(t) && !sender.isStopFlag)
-                        {
-                            this.RaiseEvents ( srv, t, ref friends, streamQueue );
-                            ReconnectCount = 0;
-                            //  深愛
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    LogControl.AddLogs("UserStreamが例外により切断されました: " + e.Message + "");
-                }
-                finally
-                {
-                    if (sender.isStopFlag)
-                        sender.isFinishedThread = true;
-                    if (ReconnectCount < 6)
-                        ReconnectCount++;
+						if (webres != null && webres.ContentEncoding.ToLower() == "gzip")
+						{
+							//gzip。
+							GZipStream gzip = new GZipStream(st, CompressionMode.Decompress);
+							sr = new StreamReader(gzip, enc);
+						}
+						else
+						{
+							sr = new StreamReader(st, enc);
+						}
+						//  接続開始
+						streamQueue.Enqueue
+							(new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.Unused, null, null, null), disconnectHandler));
 
-                    if ( !sender.isDestroy )
-                    {
-                        streamQueue.Enqueue
-                            ( new UserStreamQueueData ( this,
-                                new TwitterCompletedEventArgs ( srv, ( sender.isStopFlag ? HttpStatusCode.RequestTimeout : HttpStatusCode.Continue ),
-                                    friends, null, null ), disconnectHandler ) );
-                    }
+						//	データ取得
+						while (!sender.isStopFlag && !sr.EndOfStream)
+						{
+							string t = sr.ReadLine();
 
-                    if (sr != null)
-                        sr.Close();
-                    if (st != null)
-                        st.Close();
+							//	空白でないのなら、データを振り分ける
+							if (!String.IsNullOrEmpty(t) && !sender.isStopFlag)
+							{
+								this.RaiseEvents(srv, t, ref friends, streamQueue);
+								ReconnectCount = 0;
+								//  深愛
+							}
+						}
+						
+					}
+				}
+				catch (Exception e)
+				{
+					if (e is ThreadAbortException)
+					{
+						LogControl.AddLogs("UserStreamスレッドがAbortされます");
+						isAbortException = true;
+					}
+					else
+					{
+						LogControl.AddLogs("UserStreamが例外により切断されました: " + e.Message + "");
+					}
+				}
+				finally
+				{
+					if (sender.isStopFlag)
+						sender.isFinishedThread = true;
+					if (ReconnectCount < 6)
+						ReconnectCount++;
 
-                    sr = null;
+					if (!sender.isDestroy)
+					{
+						streamQueue.Enqueue
+							(new UserStreamQueueData(this,
+								new TwitterCompletedEventArgs(srv, (sender.isStopFlag ? HttpStatusCode.RequestTimeout : HttpStatusCode.Continue),
+									friends, null, null), disconnectHandler));
+					}
 
-                    streamQueue.Wait();
+					if (sr != null)
+						sr.Close();
+					if (st != null)
+						st.Close();
 
-                    Console.WriteLine ( "終了" );
-                }
-                if (sender.isStopFlag)
-                    break;
-                Thread.Sleep(ReconnectCount * 10000);
-            }
+					sr = null;
 
+					streamQueue.Wait();
+					Console.WriteLine("終了");
+				}
+				if (isAbortException)
+					break;
+			}
             return;
         }
 
@@ -227,6 +242,13 @@ namespace Shrimp.Twitter.Streaming
                 this._isStartedStreaming = value;
             }
         }
+
+		/// <summary>
+		/// UserStreamスレッドが終了したときに呼び出される
+		/// </summary>
+		private void StoppedUserStreaming()
+		{
+		}
 
         /// <summary>
         /// イベントが発生した際に実行される
@@ -250,7 +272,7 @@ namespace Shrimp.Twitter.Streaming
             {
                 //  イベント
                 if ( data["event"] == "favorite" || data["event"] == "unfavorite" ||
-                    data["event"] == "follow" || data["event"] == "unfollow" )
+                    data["event"] == "follow" || data["event"] == "unfollow" || data["event"] == "user_update" )
                 {
                     streamQueue.Enqueue
                         ( new UserStreamQueueData ( this, new TwitterCompletedEventArgs ( srv, HttpStatusCode.OK, friends, new TwitterNotifyStatus ( data ), null ), notifyHandler ) );

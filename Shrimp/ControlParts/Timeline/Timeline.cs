@@ -114,7 +114,8 @@ namespace Shrimp.ControlParts.Timeline
                             (notify.notify_event == tweet.NotifyStatus.notify_event) &&
                             (notify.source.id == tweet.NotifyStatus.source.id) &&
                             (notify.target.id == tweet.NotifyStatus.target.id) &&
-                            (notify.isFollow ? true : ((TwitterStatus)notify.target_object).id == ((TwitterStatus)tweet.NotifyStatus.target_object).id)))
+                            (notify.isFollow ? true : 
+                            ( notify.target_object != null ? ((TwitterStatus)notify.target_object).id == ((TwitterStatus)tweet.NotifyStatus.target_object).id : false ) ) ) )
                             return;
                     }
                 }
