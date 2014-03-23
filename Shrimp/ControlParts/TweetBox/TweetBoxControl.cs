@@ -508,8 +508,11 @@ namespace Shrimp.ControlParts.TweetBox
         private void TweetBox_KeyDown(object sender, KeyEventArgs e)
         {
             var textbox = sender as TextBox;
-            if ((e.Control || e.Shift) && e.KeyValue == 13)
-                this.TweetSendButton.PerformClick();
+            if ( ( e.Control || e.Shift ) && e.KeyValue == 13 )
+            {
+                this.TweetSendButton.PerformClick ();
+                e.SuppressKeyPress = false;
+            }
         }
 
         private void TweetBox_Leave(object sender, EventArgs e)
