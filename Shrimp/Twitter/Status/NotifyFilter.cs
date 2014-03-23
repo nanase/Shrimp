@@ -35,25 +35,25 @@ namespace Shrimp.Twitter.Status
         /// <returns></returns>
         public bool isHit(TwitterNotifyStatus status)
         {
-            if ( this.OwnFavorited && status.isFaved )
+            if ( this.OwnFavorited && status.isFavToMe )
                 return true;
-            if ( this.OwnUnFavorited && status.isUnFaved )
+            if ( this.OwnUnFavorited && status.isUnFavToMe )
                 return true;
-            if ( this.Retweeted && status.isRetweeted )
+            if ( this.Retweeted && status.isRetweetedCategory )
                 return true;
-            if (this.Favorited && !status.isFaved && status.notify_event == "favorite")
+            if (this.Favorited && status.isFav)
                 return true;
-            if (this.UnFavorited && !status.isUnFaved && status.notify_event == "unfavorite")
+            if (this.UnFavorited && status.isUnFav)
                 return true;
-            if (this.Followed && status.notify_event == "follow")
+            if (this.Followed && status.isFollowCategory)
                 return true;
-            if (this.Unfollowed && status.notify_event == "unfollow")
+            if ( this.Unfollowed && status.isUnFollowCategory)
                 return true;
-            if ( this.UserUpdated && status.isUpdateProfile )
+            if ( this.UserUpdated && status.isUpdateProfileCategory )
                 return true;
 
-            if ( !this.Favorited && !this.UnFavorited && !this.Followed && !this.Unfollowed && !this.OwnUnFavorited && !this.OwnFavorited && !this.Retweeted && !this.UserUpdated )
-                return true;
+            //if ( !this.Favorited && !this.UnFavorited && !this.Followed && !this.Unfollowed && !this.OwnUnFavorited && !this.OwnFavorited && !this.Retweeted && !this.UserUpdated )
+            //    return true;
             return false;
         }
 

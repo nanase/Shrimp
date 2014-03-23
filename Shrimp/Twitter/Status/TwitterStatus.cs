@@ -159,32 +159,39 @@ namespace Shrimp.Twitter.Status
                 if (status.isFav)
                 {
                     this.text = "【お気に入り通知】@" + status.source.screen_name + "がお気に入り追加しました\n" + this.text + "";
-                }
-                if (status.isFaved)
+                } else 
+                if (status.isFavToMe)
                 {
                     this.text = "【お気に入り通知】@" + status.source.screen_name + "にお気に入り追加されました\n" + this.text + "";
-                }
-                if (status.isUnFav)
+                } else
+                if (status.isUnFav || status.isUnFavToMe)
                 {
                     this.text = "【お気に入り削除通知】@" + status.source.screen_name + "がお気に入りから削除しました\n" + this.text + "";
-                }
-                if (status.isUnFaved)
-                {
-                    this.text = "【お気に入り削除通知】お気に入りから削除しました\n" + this.text + "";
                 }
                 this.entities = new TwitterEntities(this.text);
                 //this.text += ( status.notify_event == "favorite" ? "がふぁぼられました" : "があんふぁぼられました" );
             }
-            else if (status.notify_event == "follow" || status.notify_event == "unfollow")
+            else if (status.isFollowsCategory)
             {
                 GenerateDummyTwitterStatus();
                 var s = status.source as TwitterUserStatus;
                 var t = status.target as TwitterUserStatus;
                 this.user = s;
-                this.text = "【フォロー通知】\n@" + t.screen_name + "(" + t.name + ")を" + (status.notify_event == "follow" ? "フォロー" : "アンフォロー") + "しました";
+                if ( status.isOwnFollow || status.isOwnUnFollow )
+                {
+                    this.text = "【フォロー通知】\n@" + t.screen_name + "(" + t.name + ")を" + ( status.isOwnFollow ? "フォロー" : "アンフォロー" ) + "しました";
+                }
+                else if ( status.isFollowToMe || status.isUnFollowToMe )
+                {
+                    this.text = "【フォロー通知】\n@" + t.screen_name + "(" + t.name + ")に" + ( status.isFollowToMe ? "フォロー" : "アンフォロー" ) + "されました";
+                }
+                else if ( status.isFollow || status.isUnFollow )
+                {
+                    this.text = "【フォロー通知】\n@" + t.screen_name + "(" + t.name + ")を" + ( status.isFollow ? "フォロー" : "アンフォロー" ) + "しました";
+                }
                 this.entities = new TwitterEntities(this.text);
             }
-            else if ( status.isUpdateProfile )
+            else if ( status.isUpdateProfileCategory )
             {
                 GenerateDummyTwitterStatus ();
                 var s = status.source as TwitterUserStatus;
@@ -231,7 +238,7 @@ namespace Shrimp.Twitter.Status
         {
             get
             {
-                return (this.NotifyStatus != null && this.NotifyStatus.isFollow);
+                return (this.NotifyStatus != null && this.NotifyStatus.isFollowsCategory);
             }
         }
 
@@ -296,6 +303,14 @@ namespace Shrimp.Twitter.Status
                 return @" UNION"
                 + @" SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?";
             }
+        }
+
+        /// <summary>
+        /// タイムラインSQLを取得する
+        /// </summary>
+        public static string GetUserTweets ( decimal id )
+        {
+            return "SELECT * FROM tweet AS tweets cross join user on tweets.user_id = user.id WHERE tweets.user_id = '"+ id +"' order by id desc limit 3200";
         }
 
         /// <summary>

@@ -634,7 +634,7 @@ namespace Shrimp.ControlParts.Timeline
                             tweet.id = this.tweets[0].id + 1;
                         }
 
-                        if (!tweet.NotifyStatus.isRetweeted && (tweet.NotifyStatus.isOwnFav || tweet.NotifyStatus.isOwnUnFav))
+                        if (!tweet.NotifyStatus.isRetweetedCategory && (tweet.NotifyStatus.isOwnFav || tweet.NotifyStatus.isOwnUnFav))
                         {
                             var notify_tweet = tweet.NotifyStatus.target_object as TwitterStatus;
                             now_tweet = this.tweets.Find((t) => t.id == notify_tweet.id);
@@ -1337,15 +1337,15 @@ namespace Shrimp.ControlParts.Timeline
             {
                 if (!this.IsDisposed)
                 {
-                    this.Invoke((MethodInvoker)delegate()
+                    this.BeginInvoke ( (MethodInvoker)delegate ()
                     {
-                        if (!this.IsDisposed)
+                        if ( !this.IsDisposed )
                         {
-                            this.Invalidate();
-                            this.Update();
+                            this.Invalidate ();
+                            this.Update ();
                         }
 
-                    });
+                    } );
                 }
             }
             else

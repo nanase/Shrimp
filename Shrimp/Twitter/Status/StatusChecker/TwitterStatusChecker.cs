@@ -54,6 +54,8 @@ namespace Shrimp.Twitter.Status.StatusChecker
         {
             if (tweet == null)
                 return;
+            tweet.SetParameters ( accounts );
+            /*
             if (tweet.notify_event == "favorite")
             {
                 var sourceUser = tweet.source;
@@ -71,6 +73,7 @@ namespace Shrimp.Twitter.Status.StatusChecker
                 tweet.isOwnUnFav = (sourceUser.id == targetUser.id) || (accounts.FindIndex((t) => t.UserId == sourceUser.id) >= 0);
                 tweet.isUnFav = !(tweet.isUnFaved | tweet.isOwnUnFav);
             }
+            */
         }
     }
 }

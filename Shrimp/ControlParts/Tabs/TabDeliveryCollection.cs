@@ -127,6 +127,16 @@ namespace Shrimp.ControlParts.Tabs
         /// <returns></returns>
         public bool isMatch(decimal user_id, TimelineCategories destCategory, object checkObject)
         {
+            if ( checkObject is TwitterNotifyStatus )
+            {
+                //  ふぁぼだったら、全部に配る
+                TwitterNotifyStatus notify = checkObject as TwitterNotifyStatus;
+                if ( notify.isOwnUnFav || notify.isOwnFav )
+                {
+                    return true;
+                }
+            }
+
             if ((destCategory != TimelineCategories.ListTimeline && destCategory != TimelineCategories.BookmarkTimeline) && this.deliveries.FindIndex((tabs) => tabs.Category.isAllUserAccept) < 0)
             {
                 var isMatchID = this.deliveries.FindIndex((tabs) =>
@@ -156,7 +166,8 @@ namespace Shrimp.ControlParts.Tabs
                 {
                     TimelineCategory cat = tmp.Category;
 
-                    if (cat.notifyFilter != null && cat.category == TimelineCategories.NotifyTimeline &&cat.notifyFilter.isHit((TwitterNotifyStatus)checkObject))
+                    if (cat.notifyFilter != null && cat.category == TimelineCategories.NotifyTimeline &&
+                        cat.notifyFilter.isHit((TwitterNotifyStatus)checkObject))
                     {
                         return true;
                     }
