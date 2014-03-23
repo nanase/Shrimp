@@ -47,6 +47,17 @@ namespace Shrimp.Module.Queue
             }
         }
 
+        /// <summary>
+        /// キューを消去します
+        /// </summary>
+        public new void Clear ()
+        {
+            lock ( ( (ICollection)this ).SyncRoot )
+            {
+                base.Clear ();
+            }
+        }
+
 
         /// <summary>
         /// エンキュー
