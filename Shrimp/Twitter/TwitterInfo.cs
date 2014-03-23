@@ -70,6 +70,18 @@ namespace Shrimp.Twitter
         public Bitmap IconData { get; set; }
 
         /// <summary>
+        /// フォローカーソル
+        /// </summary>
+        [XmlElement ( "friends_cursor" )]
+        public decimal friends_cursor { get; set; }
+
+        /// <summary>
+        /// フォロワーカーソル
+        /// </summary>
+        [XmlElement ( "follower_cursor" )]
+        public decimal follower_cursor { get; set; }
+
+        /// <summary>
         /// TwitterAPIのURLの根幹を取得
         /// </summary>
         [XmlIgnore]
