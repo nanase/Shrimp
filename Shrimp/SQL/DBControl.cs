@@ -6,6 +6,7 @@ using System.Data.SQLite;
 using System.Globalization;
 using Shrimp.Twitter.Status;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Shrimp.SQL
 {
@@ -17,8 +18,10 @@ namespace Shrimp.SQL
         private SQLiteConnection sql;
         private SQLiteCommand command;
         private Queue<SQLiteCommand> commandStack = new Queue<SQLiteCommand>();
+        private Queue<Task> commandQueue = new Queue<Task> ();
         private object lockObj = new object();
         private object lockTransaction = new object();
+        private object lockQueue = new object ();
 
         public DBControl(string fileName)
         {
@@ -62,34 +65,17 @@ namespace Shrimp.SQL
         /// </summary>
         public void Close()
         {
-            lock (lockObj)
+            while ( true )
             {
-                if (this.commandStack.Count != 0)
+                Thread.Sleep ( 1 );
+                lock ( lockQueue )
                 {
-                    using (DbTransaction transaction = this.sql.BeginTransaction())
+                    if ( commandQueue.Count != 0 )
                     {
-                        try
-                        {
-                            for (int i = 0; i < this.commandStack.Count; i++)
-                            {
-                                var cmd = this.commandStack.Dequeue();
-                                if (cmd == null || cmd.CommandText == null)
-                                    continue;
-                                cmd.ExecuteNonQuery();
-                                cmd.Dispose();
-                            }
-
-                        }
-                        catch (Exception e)
-                        {
-                            //  ?
-                            Console.WriteLine(e.Message);
-                        }
-
-                        transaction.Commit();
+                        continue;
                     }
-                    this.commandStack.Clear();
                 }
+                break;
             }
             this.sql.Close();
         }
@@ -229,6 +215,9 @@ namespace Shrimp.SQL
 		/// <param name="users"></param>
         public void InsertUserRange(List<TwitterUserStatus> users)
         {
+            if ( users == null || users.Count == 0 )
+                return;
+
             var com = this.sql.CreateCommand();
             var isFirst = false;
             const int ParamNum = 14;
@@ -315,6 +304,8 @@ namespace Shrimp.SQL
         /// <param name="tweets"></param>
         public void InsertDMRange(List<TwitterDirectMessageStatus> tweets)
         {
+            if ( tweets == null || tweets.Count == 0 )
+                return;
             var com = this.sql.CreateCommand();
             bool isFirst = false;
             const int ParamNum = 19;
@@ -360,6 +351,9 @@ namespace Shrimp.SQL
         /// <param name="tweets"></param>
         public void InsertTweetRange(List<TwitterStatus> tweets)
         {
+            if ( tweets == null || tweets.Count == 0 )
+                return;
+
             var com = this.sql.CreateCommand();
             bool isFirst = false;
             const int ParamNum = 19;
@@ -419,7 +413,7 @@ namespace Shrimp.SQL
 		/// <param name="com"></param>
         public void InsertData(SQLiteCommand com)
         {
-			Task.Factory.StartNew(() =>
+			Task dest = new Task (() =>
 			{
 				lock (lockObj)
 				{
@@ -434,7 +428,16 @@ namespace Shrimp.SQL
 						Console.WriteLine(e.Message);
 					}
 				}
+                lock ( lockQueue )
+                {
+                    commandQueue.Dequeue ();
+                }
 			});
+            lock ( lockQueue )
+            {
+                commandQueue.Enqueue ( dest );
+            }
+            dest.Start ();
         }
 
 		/*
