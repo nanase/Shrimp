@@ -170,6 +170,21 @@ namespace Shrimp.ControlParts.TweetBox
             }
         }
 
+        public void AddWord ( string text, bool isScreenName )
+        {
+            this.TweetBox.AddWord ( text, isScreenName );
+        }
+
+        public void AddWordRange ( List<string> text, bool isScreenName )
+        {
+            this.TweetBox.AddWordRange ( text, isScreenName );
+        }
+
+        public void ResetListPosition ()
+        {
+            this.TweetBox.ResetListPosition ();
+        }
+
         /// <summary>
         /// 選択されたアイコン
         /// </summary>
