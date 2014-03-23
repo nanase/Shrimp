@@ -29,6 +29,7 @@ namespace Shrimp
         /// </summary>
         private void InitializeComponent ()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Shrimp));
             this.statusBar = new System.Windows.Forms.StatusStrip();
             this.notifyLabel = new System.Windows.Forms.ToolStripStatusLabel();
@@ -51,6 +52,10 @@ namespace Shrimp
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.単行モードToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.userStreamへ接続するToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ShrimpNotify = new System.Windows.Forms.NotifyIcon(this.components);
+            this.ShrimpNotifyContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.ViewShrimpWindowMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.ExitShrimpMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.statusBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.MainSplit)).BeginInit();
             this.MainSplit.Panel1.SuspendLayout();
@@ -58,6 +63,7 @@ namespace Shrimp
             ((System.ComponentModel.ISupportInitialize)(this.TimelineSplit)).BeginInit();
             this.TimelineSplit.SuspendLayout();
             this.MenuBar.SuspendLayout();
+            this.ShrimpNotifyContextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusBar
@@ -228,6 +234,36 @@ namespace Shrimp
             this.userStreamへ接続するToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.userStreamへ接続するToolStripMenuItem.Text = "UserStreamへ接続する";
             // 
+            // ShrimpNotify
+            // 
+            this.ShrimpNotify.ContextMenuStrip = this.ShrimpNotifyContextMenuStrip;
+            this.ShrimpNotify.Icon = ((System.Drawing.Icon)(resources.GetObject("ShrimpNotify.Icon")));
+            this.ShrimpNotify.Text = "Shrimp";
+            this.ShrimpNotify.Visible = true;
+            this.ShrimpNotify.DoubleClick += new System.EventHandler(this.ShrimpNotify_DoubleClick);
+            // 
+            // ShrimpNotifyContextMenuStrip
+            // 
+            this.ShrimpNotifyContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ViewShrimpWindowMenu,
+            this.ExitShrimpMenu});
+            this.ShrimpNotifyContextMenuStrip.Name = "ShrimpNotifyContextMenuStrip";
+            this.ShrimpNotifyContextMenuStrip.Size = new System.Drawing.Size(101, 48);
+            // 
+            // ViewShrimpWindowMenu
+            // 
+            this.ViewShrimpWindowMenu.Name = "ViewShrimpWindowMenu";
+            this.ViewShrimpWindowMenu.Size = new System.Drawing.Size(100, 22);
+            this.ViewShrimpWindowMenu.Text = "表示";
+            this.ViewShrimpWindowMenu.Click += new System.EventHandler(this.ViewShrimpWindowMenu_Click);
+            // 
+            // ExitShrimpMenu
+            // 
+            this.ExitShrimpMenu.Name = "ExitShrimpMenu";
+            this.ExitShrimpMenu.Size = new System.Drawing.Size(100, 22);
+            this.ExitShrimpMenu.Text = "終了";
+            this.ExitShrimpMenu.Click += new System.EventHandler(this.ExitShrimpMenu_Click);
+            // 
             // Shrimp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -243,6 +279,7 @@ namespace Shrimp
             this.Activated += new System.EventHandler(this.Shrimp_Activated);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Shrimp_FormClosing);
             this.Load += new System.EventHandler(this.Shrimp_Load);
+            this.Move += new System.EventHandler(this.Shrimp_Move);
             this.statusBar.ResumeLayout(false);
             this.statusBar.PerformLayout();
             this.MainSplit.Panel1.ResumeLayout(false);
@@ -252,6 +289,7 @@ namespace Shrimp
             this.TimelineSplit.ResumeLayout(false);
             this.MenuBar.ResumeLayout(false);
             this.MenuBar.PerformLayout();
+            this.ShrimpNotifyContextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -280,5 +318,9 @@ namespace Shrimp
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem connectUserstreamMenu;
         private System.Windows.Forms.ToolStripStatusLabel APIStatusLabel;
+        private System.Windows.Forms.NotifyIcon ShrimpNotify;
+        private System.Windows.Forms.ContextMenuStrip ShrimpNotifyContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem ViewShrimpWindowMenu;
+        private System.Windows.Forms.ToolStripMenuItem ExitShrimpMenu;
     }
 }
