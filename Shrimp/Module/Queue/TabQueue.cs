@@ -16,7 +16,7 @@ namespace Shrimp.Module.Queue
         public TabQueue()
         {
             this.queueCheckTimer = new System.Timers.Timer();
-            this.queueCheckTimer.Interval = 100;
+            this.queueCheckTimer.Interval = 50;
             this.queueCheckTimer.Elapsed += new ElapsedEventHandler(queueCheckTimer_Elapsed);
             this.queueCheckTimer.Start();
         }
