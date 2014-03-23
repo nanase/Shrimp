@@ -12,6 +12,7 @@ using Shrimp.Log;
 using Shrimp.Module.Queue;
 using Shrimp.Twitter.REST;
 using Shrimp.Twitter.Status;
+using System.Net.Sockets;
 
 namespace Shrimp.Twitter.Streaming
 {
@@ -135,6 +136,7 @@ namespace Shrimp.Twitter.Streaming
 
             Uri uri;
             uri = new Uri(TwitterInfo.TwitterStreamingAPI);
+            HttpWebRequest webreq = null;
 
 			while (true)
 			{
@@ -155,11 +157,12 @@ namespace Shrimp.Twitter.Streaming
 																"GET", timestamp, null, nonce, out normalizedUrl, out normalizedRequestParameters);
 						sig = OAuthBase.UrlEncode(sig);
 
-						HttpWebRequest webreq = (HttpWebRequest)WebRequest.Create(string.Format("{0}?{1}&oauth_signature={2}", normalizedUrl, normalizedRequestParameters, sig));
+						webreq = (HttpWebRequest)WebRequest.Create(string.Format("{0}?{1}&oauth_signature={2}", normalizedUrl, normalizedRequestParameters, sig));
 						this.SetWebReq(webreq);
 
 						webres = (HttpWebResponse)webreq.GetResponse();
 						st = webres.GetResponseStream();
+                        
 
 						if (webres != null && webres.ContentEncoding.ToLower() == "gzip")
 						{
@@ -171,6 +174,7 @@ namespace Shrimp.Twitter.Streaming
 						{
 							sr = new StreamReader(st, enc);
 						}
+
 						//  接続開始
 						streamQueue.Enqueue
 							(new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.Unused, null, null, null), disconnectHandler));
@@ -210,6 +214,7 @@ namespace Shrimp.Twitter.Streaming
 					if (ReconnectCount < 6)
 						ReconnectCount++;
 
+                    streamQueue.Clear ();
 					if (!sender.isDestroy)
 					{
 						streamQueue.Enqueue
@@ -217,6 +222,9 @@ namespace Shrimp.Twitter.Streaming
 								new TwitterCompletedEventArgs(srv, (sender.isStopFlag ? HttpStatusCode.RequestTimeout : HttpStatusCode.Continue),
 									friends, null, null), disconnectHandler));
 					}
+
+                    if ( webreq != null )
+                        webreq.Abort ();
 
 					if (sr != null)
 						sr.Close();
@@ -274,8 +282,10 @@ namespace Shrimp.Twitter.Streaming
                 if ( data["event"] == "favorite" || data["event"] == "unfavorite" ||
                     data["event"] == "follow" || data["event"] == "unfollow" || data["event"] == "user_update" )
                 {
+                    var notify = new TwitterNotifyStatus ( srv, data );
+                    friendsControl ( friends, notify );
                     streamQueue.Enqueue
-                        ( new UserStreamQueueData ( this, new TwitterCompletedEventArgs ( srv, HttpStatusCode.OK, friends, new TwitterNotifyStatus ( data ), null ), notifyHandler ) );
+                        ( new UserStreamQueueData ( this, new TwitterCompletedEventArgs ( srv, HttpStatusCode.OK, friends, notify, null ), notifyHandler ) );
                 }
             } else if ( data.IsDefined ( "direct_message" ) )
             {
@@ -283,6 +293,18 @@ namespace Shrimp.Twitter.Streaming
                 var directMessage = new TwitterDirectMessageStatus ( data.direct_message );
                 streamQueue.Enqueue
                         ( new UserStreamQueueData ( this, new TwitterCompletedEventArgs ( srv, HttpStatusCode.OK, friends, directMessage, null ), completedHandler ) );
+            }
+        }
+
+        private void friendsControl ( List<decimal> friends, TwitterNotifyStatus notify )
+        {
+            if ( notify.isOwnFollow )
+            {
+                friends.Add ( notify.target.id );
+            }
+            if ( notify.isOwnUnFollow )
+            {
+                friends.Remove ( notify.target.id );
             }
         }
     }
