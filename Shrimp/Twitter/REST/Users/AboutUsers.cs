@@ -9,7 +9,7 @@ namespace Shrimp.Twitter.REST.Users
     class AboutUsers : TwitterWorker, IDisposable
     {
         #region 定義
-        private Thread reportSpamResult, UserShowResult;
+        private Thread reportSpamResult, UserShowResult, friendshipsResult, friendResult, followerResult;
         private bool isDisposed;
         #endregion
 
@@ -91,6 +91,55 @@ namespace Shrimp.Twitter.REST.Users
         }
 
         /// <summary>
+        /// フォロー状況を確認する
+        /// </summary>
+        /// <param name="srv"></param>
+        /// <param name="tab"></param>
+        /// <param name="screen_name"></param>
+        /// <param name="user_id"></param>
+        public void FriendsShips ( TwitterInfo srv, TwitterCompletedProcessDelegate completedDelegate, TwitterErrorProcessDelegate errorProcess, string screen_name, decimal user_id )
+        {
+            List<OAuthBase.QueryParameter> q = new List<OAuthBase.QueryParameter> ();
+            if ( screen_name != null )
+                q.Add ( new OAuthBase.QueryParameter ( "target_screen_name", screen_name ) );
+            if ( user_id != 0 )
+                q.Add ( new OAuthBase.QueryParameter ( "target_id", "" + user_id + "" ) );
+            this.friendshipsResult = base.loadAsync ( srv, "GET", workerUserShowResult, completedDelegate, errorProcess, "friendships/show.json", q );
+        }
+
+        /// <summary>
+        /// フォローしているユーザを取得する
+        /// </summary>
+        /// <param name="srv"></param>
+        /// <param name="tab"></param>
+        /// <param name="screen_name"></param>
+        /// <param name="user_id"></param>
+        public void FollowUser ( TwitterInfo srv, TwitterCompletedProcessDelegate completedDelegate, TwitterErrorProcessDelegate errorProcess, decimal cursor )
+        {
+            List<OAuthBase.QueryParameter> q = new List<OAuthBase.QueryParameter> ();
+            if ( cursor != 0 )
+                q.Add ( new OAuthBase.QueryParameter ( "cursor", ""+ cursor ) );
+            q.Add ( new OAuthBase.QueryParameter ( "count", "200" ) );
+            this.friendResult = base.loadAsync ( srv, "GET", workerFriendsResult, completedDelegate, errorProcess, "friends/list.json", q );
+        }
+
+        /// <summary>
+        /// フォローされているユーザを取得する
+        /// </summary>
+        /// <param name="srv"></param>
+        /// <param name="tab"></param>
+        /// <param name="screen_name"></param>
+        /// <param name="user_id"></param>
+        public void FollowerUser ( TwitterInfo srv, TwitterCompletedProcessDelegate completedDelegate, TwitterErrorProcessDelegate errorProcess, decimal cursor )
+        {
+            List<OAuthBase.QueryParameter> q = new List<OAuthBase.QueryParameter> ();
+            if ( cursor != 0 )
+                q.Add ( new OAuthBase.QueryParameter ( "cursor", ""+ cursor ) );
+            q.Add ( new OAuthBase.QueryParameter ( "count", "200" ) );
+            this.followerResult = base.loadAsync ( srv, "GET", workerFriendsResult, completedDelegate, errorProcess, "followers/list.json", q );
+        }
+
+        /// <summary>
         /// プロフィールをアップデートします
         /// </summary>
         /// <param name="srv"></param>
@@ -132,6 +181,28 @@ namespace Shrimp.Twitter.REST.Users
         {
             if (user_data != null)
                 return new TwitterUserStatus(user_data);
+            return null;
+        }
+
+
+        /// <summary>
+        /// 受信したユーザーデータを処理する
+        /// </summary>
+        /// <param name="user_data"></param>
+        /// <returns></returns>
+        private object workerFriendsResult ( dynamic user_data )
+        {
+            if ( user_data != null )
+            {
+                var dest = new TwitterFriendshipResult ();
+                dest.next_cursor = ( (decimal)( user_data.next_cursor ) );
+                foreach ( dynamic data in user_data.users )
+                {
+                    dest.Add ( new TwitterUserStatus ( data ) );
+                }
+                return dest;
+            }
+
             return null;
         }
     }
