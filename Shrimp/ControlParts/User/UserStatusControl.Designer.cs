@@ -74,7 +74,7 @@
             this.UserPage.Name = "UserPage";
             this.UserPage.Size = new System.Drawing.Size(277, 230);
             this.UserPage.TabIndex = 0;
-            this.UserPage.Text = "発言";
+            this.UserPage.Text = "保存済みツイート";
             this.UserPage.UseVisualStyleBackColor = true;
             // 
             // UserTimelinePage
