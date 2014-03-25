@@ -178,22 +178,31 @@ namespace Shrimp.SQL
         {
             var sql = tableName;
             this.command.CommandText = sql;
-            using (SQLiteDataReader sdr = this.command.ExecuteReader())
+            try
             {
-                List<TwitterStatus> tuples = new List<TwitterStatus>();
-                for (int i = 0; sdr.Read(); i++)
+                using ( SQLiteDataReader sdr = this.command.ExecuteReader () )
                 {
-                    string[] column = new string[sdr.FieldCount];
-                    for (int j = 0; j < sdr.FieldCount; j++)
+                    List<TwitterStatus> tuples = new List<TwitterStatus> ();
+                    for ( int i = 0; sdr.Read (); i++ )
                     {
-                        column[j] = sdr[j].ToString();
+                        string[] column = new string[sdr.FieldCount];
+                        for ( int j = 0; j < sdr.FieldCount; j++ )
+                        {
+                            column[j] = sdr[j].ToString ();
+                        }
+                        tuples.Add ( new TwitterStatus ( column ) );
                     }
-                    tuples.Add(new TwitterStatus(column));
-                }
 
-                //リストを配列に変換して返す
-                return tuples;
+                    //リストを配列に変換して返す
+                    return tuples;
+                }
             }
+            catch ( Exception err )
+            {
+                //  ?
+                Console.WriteLine ( err.Message );
+            }
+            return null;
         }
 
         /// <summary>
@@ -206,22 +215,31 @@ namespace Shrimp.SQL
         public List<TwitterStatus> GetTweetByUserID ( string sql, decimal offsetValue, decimal count )
         {
             this.command.CommandText = sql;
-            using ( SQLiteDataReader sdr = this.command.ExecuteReader () )
+            try
             {
-                List<TwitterStatus> tuples = new List<TwitterStatus> ();
-                for ( int i = 0; sdr.Read (); i++ )
+                using ( SQLiteDataReader sdr = this.command.ExecuteReader () )
                 {
-                    string[] column = new string[sdr.FieldCount];
-                    for ( int j = 0; j < sdr.FieldCount; j++ )
+                    List<TwitterStatus> tuples = new List<TwitterStatus> ();
+                    for ( int i = 0; sdr.Read (); i++ )
                     {
-                        column[j] = sdr[j].ToString ();
+                        string[] column = new string[sdr.FieldCount];
+                        for ( int j = 0; j < sdr.FieldCount; j++ )
+                        {
+                            column[j] = sdr[j].ToString ();
+                        }
+                        tuples.Add ( new TwitterStatus ( column ) );
                     }
-                    tuples.Add ( new TwitterStatus ( column ) );
-                }
 
-                //リストを配列に変換して返す
-                return tuples;
+                    //リストを配列に変換して返す
+                    return tuples;
+                }
             }
+            catch ( Exception err )
+            {
+                //  ?
+                Console.WriteLine ( err.Message );
+            }
+            return null;
         }
 
         /// <summary>
@@ -235,22 +253,31 @@ namespace Shrimp.SQL
         {
             var sql = tableName;
             this.command.CommandText = sql;
-            using (SQLiteDataReader sdr = this.command.ExecuteReader())
+            try
             {
-                List<TwitterDirectMessageStatus> tuples = new List<TwitterDirectMessageStatus>();
-                for (int i = 0; sdr.Read(); i++)
+                using ( SQLiteDataReader sdr = this.command.ExecuteReader () )
                 {
-                    string[] column = new string[sdr.FieldCount];
-                    for (int j = 0; j < sdr.FieldCount; j++)
+                    List<TwitterDirectMessageStatus> tuples = new List<TwitterDirectMessageStatus> ();
+                    for ( int i = 0; sdr.Read (); i++ )
                     {
-                        column[j] = sdr[j].ToString();
+                        string[] column = new string[sdr.FieldCount];
+                        for ( int j = 0; j < sdr.FieldCount; j++ )
+                        {
+                            column[j] = sdr[j].ToString ();
+                        }
+                        tuples.Add ( new TwitterDirectMessageStatus ( column ) );
                     }
-                    tuples.Add(new TwitterDirectMessageStatus(column));
-                }
 
-                //リストを配列に変換して返す
-                return tuples;
+                    //リストを配列に変換して返す
+                    return tuples;
+                }
             }
+            catch ( Exception err )
+            {
+                //  ?
+                Console.WriteLine ( err.Message );
+            }
+            return null;
         }
 
         /// <summary>
