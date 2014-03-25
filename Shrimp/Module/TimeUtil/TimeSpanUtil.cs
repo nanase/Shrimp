@@ -5,6 +5,21 @@ namespace Shrimp.Module.TimeUtil
     class TimeSpanUtil
     {
         /// <summary>
+        /// 20xx/x/x x時x分x秒の表記を表示します。
+        /// </summary>
+        /// <param name="tweetSource">時間計る元のツイート時間</param>
+        /// <returns>表示する時刻</returns>
+        public static string AbsoluteTimeToString ( DateTime tweetSource )
+        {
+            //isEnableAbsoluteTime
+            decimal t = DateTime.Now.Year - tweetSource.Year;
+            if ( t != 0 )
+                return tweetSource.ToString ( "yyyy年MM月dd日(ddd) HH時mm分ss秒" );
+            else
+                return tweetSource.ToString ( "MM月dd日(ddd) HH時mm分ss秒" );
+        }
+
+        /// <summary>
         /// ～分前の表記を表示します。
         /// </summary>
         /// <param name="tweetSource">時間計る元のツイート時間</param>
