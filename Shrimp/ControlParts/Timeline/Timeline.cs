@@ -100,23 +100,24 @@ namespace Shrimp.ControlParts.Timeline
         /// タイムラインにツイートを一時的に追加
         /// プッシュされたツイートは、タイムラインへのイベント通知とともに反映される
         /// </summary>
-        public void PushTweet(TwitterStatus tweet)
+        public bool PushTweet(TwitterStatus tweet)
         {
             lock (lockObj)
             {
                 lock (lockStacks)
                 {
                     if (this.tweetStacks.Any((twit) => twit == tweet.id))
-                        return;
+                        return false;
                     if (tweet.isNotify)
                     {
                         if (this.notifyStacks.Any((notify) =>
+                            (!notify.isOwnFav && !notify.isOwnUnFav) &&
                             (notify.notify_event == tweet.NotifyStatus.notify_event) &&
                             (notify.source.id == tweet.NotifyStatus.source.id) &&
                             (notify.target.id == tweet.NotifyStatus.target.id) &&
                             (notify.isFollowsCategory ? true : 
                             ( notify.target_object != null ? ((TwitterStatus)notify.target_object).id == ((TwitterStatus)tweet.NotifyStatus.target_object).id : false ) ) ) )
-                            return;
+                            return false;
                     }
                 }
                 if (!this.isBombDetectTimer && this.bombDetectTweetNum++ > setting_bombDetectTweetNum)
@@ -139,6 +140,7 @@ namespace Shrimp.ControlParts.Timeline
 
                 //  検知用タイマーのフラグは折る
                 this.isBombDetectTimer = false;
+                return true;
             }
         }
 
