@@ -147,6 +147,10 @@ namespace Shrimp.Twitter.Status
             this.source_url = "http://www.twitter.com";
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="status"></param>
         public TwitterStatus(TwitterNotifyStatus status)
         {
             //  通知をツイート化します
