@@ -224,5 +224,15 @@ namespace Shrimp.ControlParts.User
                 ((TimelineControl)tab.Tag).Focus();
             }
         }
+
+        private void UserInfoControl_KeyDown ( object sender, KeyEventArgs e )
+        {
+            TabControl obj = sender as TabControl;
+            TabPage tab = obj.SelectedTab;
+            if ( tab.Tag != null )
+            {
+                ( (TimelineControl)tab.Tag ).TimelineControl_KeyDown ( sender, e );
+            }
+        }
     }
 }
