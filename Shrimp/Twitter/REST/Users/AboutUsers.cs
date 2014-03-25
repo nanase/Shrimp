@@ -114,13 +114,14 @@ namespace Shrimp.Twitter.REST.Users
         /// <param name="tab"></param>
         /// <param name="screen_name"></param>
         /// <param name="user_id"></param>
-        public void FollowUser ( TwitterInfo srv, TwitterCompletedProcessDelegate completedDelegate, TwitterErrorProcessDelegate errorProcess, decimal cursor )
+        public Thread FollowUser ( TwitterInfo srv, TwitterCompletedProcessDelegate completedDelegate, TwitterErrorProcessDelegate errorProcess, decimal cursor )
         {
             List<OAuthBase.QueryParameter> q = new List<OAuthBase.QueryParameter> ();
             if ( cursor != 0 )
                 q.Add ( new OAuthBase.QueryParameter ( "cursor", ""+ cursor ) );
             q.Add ( new OAuthBase.QueryParameter ( "count", "200" ) );
             this.friendResult = base.loadAsync ( srv, "GET", workerFriendsResult, completedDelegate, errorProcess, "friends/list.json", q );
+            return this.friendResult;
         }
 
         /// <summary>
@@ -130,13 +131,14 @@ namespace Shrimp.Twitter.REST.Users
         /// <param name="tab"></param>
         /// <param name="screen_name"></param>
         /// <param name="user_id"></param>
-        public void FollowerUser ( TwitterInfo srv, TwitterCompletedProcessDelegate completedDelegate, TwitterErrorProcessDelegate errorProcess, decimal cursor )
+        public Thread FollowerUser ( TwitterInfo srv, TwitterCompletedProcessDelegate completedDelegate, TwitterErrorProcessDelegate errorProcess, decimal cursor )
         {
             List<OAuthBase.QueryParameter> q = new List<OAuthBase.QueryParameter> ();
             if ( cursor != 0 )
                 q.Add ( new OAuthBase.QueryParameter ( "cursor", ""+ cursor ) );
             q.Add ( new OAuthBase.QueryParameter ( "count", "200" ) );
             this.followerResult = base.loadAsync ( srv, "GET", workerFriendsResult, completedDelegate, errorProcess, "followers/list.json", q );
+            return this.followerResult;
         }
 
         /// <summary>
@@ -195,7 +197,7 @@ namespace Shrimp.Twitter.REST.Users
             if ( user_data != null )
             {
                 var dest = new TwitterFriendshipResult ();
-                dest.next_cursor = ( (decimal)( user_data.next_cursor ) );
+                dest.next_cursor = decimal.Parse ( user_data.next_cursor_str );
                 foreach ( dynamic data in user_data.users )
                 {
                     dest.Add ( new TwitterUserStatus ( data ) );
