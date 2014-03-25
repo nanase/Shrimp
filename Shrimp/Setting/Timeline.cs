@@ -47,6 +47,7 @@ namespace Shrimp.Setting
             isReplyBold = false;
             isConfirmFav = true;
             isConfirmRT = true;
+            isEnableAbsoluteTime = false;
         }
 
         public static void load(Dictionary<string, object> obj)
@@ -91,6 +92,8 @@ namespace Shrimp.Setting
                 isRetweetBold = (bool)obj["isRetweetBold"];
             if (obj.ContainsKey("isReplyBold"))
                 isReplyBold = (bool)obj["isReplyBold"];
+            if ( obj.ContainsKey ( "isEnableAbsoluteTime" ) )
+                isEnableAbsoluteTime = (bool)obj["isEnableAbsoluteTime"];
         }
 
         public static Dictionary<string, object> save()
@@ -115,6 +118,7 @@ namespace Shrimp.Setting
             dest["isNotifyBold"] = isNotifyBold;
             dest["isRetweetBold"] = isRetweetBold;
             dest["isReplyBold"] = isReplyBold;
+            dest["isEnableAbsoluteTime"] = isEnableAbsoluteTime;
             return dest;
         }
 
@@ -326,6 +330,15 @@ namespace Shrimp.Setting
         /// RTの確認画面
         /// </summary>
         public static bool isConfirmRT
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 時間を絶対時間で表示するかどうか
+        /// </summary>
+        public static bool isEnableAbsoluteTime
         {
             get;
             set;
