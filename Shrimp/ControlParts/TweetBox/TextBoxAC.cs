@@ -76,6 +76,10 @@ namespace Shrimp.ControlParts.TweetBox
 
             if (this.listShow)
             {
+                if ( this.offset >= this.Text.Length )
+                {
+                    return;
+                }
                 string repSourceText = this.Text.Substring(this.offset);
                 var tmpStr = this.searchStr(repSourceText + e.KeyChar.ToString());
                 if (this.acf.SetItems(tmpStr, isScreenName) != 0)
@@ -190,6 +194,8 @@ namespace Shrimp.ControlParts.TweetBox
                     string autoText = (string)this.acf.SelectedItem.Clone();
                     autoText += " ";
 
+                    if ( this.Text.Length <= this.offset )
+                        return;
                     string repSourceText = this.Text.Substring(this.offset);
 
                     StringBuilder sb = new System.Text.StringBuilder(this.Text);
