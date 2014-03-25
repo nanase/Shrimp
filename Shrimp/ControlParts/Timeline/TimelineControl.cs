@@ -308,14 +308,15 @@ namespace Shrimp.ControlParts.Timeline
 
 
         /// <summary>
-        /// タイムラインに挿入する
+        /// タイムラインにツイートを追加する
         /// </summary>
-        /// <param name="t"></param>
-        public void InsertTimeline(TwitterStatus t)
+        /// <param name="t">ツイート</param>
+        /// <returns>成功した場合true、失敗したらfalse</returns>
+        public bool InsertTimeline(TwitterStatus t)
         {
             if (timeline == null || t == null)
-                return;
-            this.timeline.PushTweet(t);
+                return false;
+            return this.timeline.PushTweet(t);
         }
 
         /// <summary>
@@ -634,14 +635,15 @@ namespace Shrimp.ControlParts.Timeline
                             tweet.id = this.tweets[0].id + 1;
                         }
 
-                        if (!tweet.NotifyStatus.isRetweetedCategory && (tweet.NotifyStatus.isOwnFav || tweet.NotifyStatus.isOwnUnFav))
+                        if ( ( tweet.NotifyStatus.isOwnFav || tweet.NotifyStatus.isOwnUnFav ) )
                         {
                             var notify_tweet = tweet.NotifyStatus.target_object as TwitterStatus;
-                            now_tweet = this.tweets.Find((t) => t.id == notify_tweet.id);
-                            if (now_tweet != null)
+                            now_tweet = this.tweets.Find ( ( t ) => t.id == notify_tweet.id );
+                            if ( now_tweet != null )
                             {
-                                now_tweet.favorite_count += (tweet.NotifyStatus.isOwnFav ? 1 : -1);
-                                now_tweet.favorited = (tweet.NotifyStatus.isOwnFav ? true : false);
+                                now_tweet.favorite_count += ( tweet.NotifyStatus.isOwnFav ? 1 : -1 );
+                                now_tweet.favorited = ( tweet.NotifyStatus.isOwnFav ? true : false );
+
                             }
                             else
                             {
