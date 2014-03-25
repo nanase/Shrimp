@@ -9,15 +9,23 @@ namespace Shrimp.ControlParts.TabSetting
         private readonly listDataCollection list;
         public EventHandler OnChangedDetail;
 
-        public ListSelectView(listDataCollection list)
+        public ListSelectView(listDataCollection list, listData nowlist)
         {
             InitializeComponent();
             this.list = list;
 
+            int i = 0;
             foreach (listData l in list.lists)
             {
                 this.listSelectCombobox.Items.Add(l.name);
+                if ( nowlist != null && l.name == nowlist.name )
+                    this.listSelectCombobox.SelectedIndex = i;
+                i++;
             }
+
+            if ( nowlist == null )
+                this.listSelectCombobox.SelectedIndex = 0;
+
         }
 
         /// <summary>
