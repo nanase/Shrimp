@@ -107,7 +107,9 @@ namespace Shrimp.ControlParts.Timeline
             //  生成
             LayoutPicture(offset_start_x, image_size);
             LayoutName(TimelineUtil.GenerateName(dynamic_t) + " ", Setting.Fonts.NameFont);
-            LayoutTime(TimeSpanUtil.agoToString(dynamic_t.created_at) + " ", Setting.Fonts.NameFont);
+            var time = ( Setting.Timeline.isEnableAbsoluteTime ? TimeSpanUtil.AbsoluteTimeToString ( dynamic_t.created_at ) :
+                TimeSpanUtil.agoToString ( dynamic_t.created_at ) );
+            LayoutTime(time + " ", Setting.Fonts.NameFont);
             LayoutText(dynamic_t.text, Setting.Fonts.TweetFont);
             if (dynamic_t.media_count != 0)
                 LayoutImage(dynamic_t.media_count, dynamic_t.entities.media);
@@ -139,7 +141,9 @@ namespace Shrimp.ControlParts.Timeline
             tmp.CellWidthSize = maxWidth;
             MaxWidth = maxWidth;
 
-            LayoutTime(TimeSpanUtil.agoToString(dynamic_t.created_at), Setting.Fonts.NameFont);
+            var time = ( Setting.Timeline.isEnableAbsoluteTime ? TimeSpanUtil.AbsoluteTimeToString ( dynamic_t.created_at ) :
+    TimeSpanUtil.agoToString ( dynamic_t.created_at ) );
+            LayoutTime(time, Setting.Fonts.NameFont);
             double line_x = MaxWidth - (16.0 + tmp.Time.Size.Width + 10);
             //  生成
             LayoutPicture(offset_start_x, image_size);
