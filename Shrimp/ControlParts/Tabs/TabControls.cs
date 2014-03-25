@@ -468,9 +468,9 @@ namespace Shrimp.ControlParts.Tabs
                 return;
             if (!this.isMatchQuery(tweet))
             {
-                res.InsertTimeline(tweet);
+               var isSuccess = res.InsertTimeline(tweet);
 
-                if ( tweet.isNotify && (tweet.NotifyStatus.isOwnFav || tweet.NotifyStatus.isOwnUnFav) )
+                if ( !isSuccess || (tweet.isNotify && (tweet.NotifyStatus.isOwnFav || tweet.NotifyStatus.isOwnUnFav) ) )
                     return;
 
                 this.unreadNum++;
