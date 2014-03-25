@@ -137,6 +137,18 @@ namespace Shrimp.ControlParts.Tabs
                 }
             }
 
+            if ( checkObject is TwitterStatus )
+            {
+                var tweet = checkObject as TwitterStatus;
+                foreach ( TabDelivery tmp in this.deliveries )
+                {
+                    TimelineCategory cat = tmp.Category;
+
+                    if ( cat.ListData != null && cat.ListData.list_users != null && cat.ListData.list_users.Contains ( tweet.user.id ) )
+                        return true;
+                }
+            }
+
             if ((destCategory != TimelineCategories.ListTimeline && destCategory != TimelineCategories.BookmarkTimeline) && this.deliveries.FindIndex((tabs) => tabs.Category.isAllUserAccept) < 0)
             {
                 var isMatchID = this.deliveries.FindIndex((tabs) =>

@@ -21,6 +21,8 @@ using Shrimp.Twitter.REST.List;
 using Shrimp.Twitter.REST.Timelines;
 using Shrimp.Twitter.Status;
 using Shrimp.Module.Queue;
+using System.Threading.Tasks;
+using Shrimp.Twitter.REST;
 
 namespace Shrimp.ControlParts.Tabs
 {
@@ -677,24 +679,30 @@ namespace Shrimp.ControlParts.Tabs
                 if (tab.tabDelivery.isTimeline)
                 {
                     List<TwitterStatus> statuses = null;
-                    if (tab.tabDelivery.TopCategory == TimelineCategories.DirectMessageTimeline)
+                    if ( tab.tabDelivery.TopCategory == TimelineCategories.DirectMessageTimeline )
                     {
                         //  DM
-                        statuses = db.GetlistDirectMessages(tab.getDMTimelineSQL, 0, 0).ConvertAll((t) => (TwitterStatus)t);
+                        statuses = db.GetlistDirectMessages ( tab.getDMTimelineSQL, 0, 0 ).ConvertAll ( ( t ) => (TwitterStatus)t );
                     }
                     else
                     {
-                        statuses = db.GetlistTweets(tab.getTimelineSQL, 0, 0);
+                        statuses = db.GetlistTweets ( tab.getTimelineSQL, 0, 0 );
                     }
-                    if (OnCreatedTweet != null)
+                    if ( statuses != null )
                     {
-                        foreach (TwitterStatus tweet in statuses)
+                        if ( OnCreatedTweet != null )
                         {
-                            OnCreatedTweet.BeginInvoke(new OnCreatedTweetHook(tweet), null, null);
+                            foreach ( TwitterStatus tweet in statuses )
+                            {
+                                OnCreatedTweet.BeginInvoke ( new OnCreatedTweetHook ( tweet ), null, null );
+                            }
                         }
+                        tab.BeginInvoke ( (MethodInvoker)delegate ()
+                        {
+                            tab.InsertTimelineRange ( statuses, true );
+                            tab.SetFirstView ( true );
+                        } );
                     }
-                    tab.InsertTimelineRange(statuses, true);
-                    tab.SetFirstView(true);
                 }
             }
         }
@@ -708,7 +716,7 @@ namespace Shrimp.ControlParts.Tabs
         {
             tabQueue.Enqueue ( new TabQueueData ( this, (Module.Queue.TabQueueData.TabQueueActionDelegate)delegate ()
             {
-                object obj = null;
+                object obj = tweet;
                 //  プラグイン
                 if ( OnCreatedTweet != null )
                 {
@@ -889,6 +897,37 @@ namespace Shrimp.ControlParts.Tabs
 
                 foreach (listData list in destC.lists)
                 {
+                    if ( list.list_users == null || list.list_users_cursor != 0 )
+                    {
+                        //  リストのメンバーを取得
+                        Task.Factory.StartNew ( () =>
+                        {
+                            for ( ; ; )
+                            {
+                                var isLimited = false;
+                                var thread = lists.listMembers ( t,
+                                (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate ( object data )
+                                {
+                                    TwitterFriendshipResult tmp = (TwitterFriendshipResult)data;
+                                    list.list_users_cursor = tmp.next_cursor;
+                                    if ( tmp.Count != 0 )
+                                    {
+                                        if ( list.list_users == null )
+                                            list.list_users = new List<decimal> ();
+                                        list.list_users.AddRange ( tmp.ConvertAll ( ( user ) => user.id ) );
+                                    }
+                                }, (Twitter.REST.TwitterWorker.TwitterErrorProcessDelegate)delegate ( TwitterCompletedEventArgs data )
+                                {
+                                    isLimited = true;
+                                }, list.list_id, list.slug, list.list_users_cursor );
+                                thread.Join ();
+
+                                if ( list.list_users_cursor <= 0 || isLimited )
+                                    break;
+
+                            }
+                        } );
+                    }
                     lists.listStatuses(t,
                     (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
                     {
