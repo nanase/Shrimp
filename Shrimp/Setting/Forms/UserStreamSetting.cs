@@ -19,6 +19,7 @@ namespace Shrimp.Setting.Forms
         {
             UserStreamCheckedBox.SetItemChecked(0, setting["isIncludeFollowingsActivity"]);
             UserStreamCheckedBox.SetItemChecked(1, setting["isRepliesAll"]);
+            UserStreamCheckedBox.SetItemChecked ( 2, setting["isMuteWithoutFriends"] );
         }
 
         public void SaveReflection()
@@ -32,6 +33,8 @@ namespace Shrimp.Setting.Forms
                 setting["isIncludeFollowingsActivity"] = (e.NewValue == CheckState.Checked ? true : false);
             if (e.Index == 1)
                 setting["isRepliesAll"] = (e.NewValue == CheckState.Checked ? true : false);
+            if ( e.Index == 2 )
+                setting["isMuteWithoutFriends"] = ( e.NewValue == CheckState.Checked ? true : false );
             SaveReflection();
         }
     }

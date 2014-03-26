@@ -39,6 +39,7 @@ using Shrimp.Twitter.Status.StatusChecker;
 using Shrimp.Twitter.Streaming;
 using Shrimp.Update;
 using Shrimp.Win32API;
+using Shrimp.ControlParts.Users;
 
 namespace Shrimp
 {
@@ -87,7 +88,7 @@ namespace Shrimp
         public delegate void OnDeletingUserInformationDelegate(int selNum);
         public delegate bool OnAddingUserInformationDelegate(TwitterInfo t);
         public delegate void OnCreatingUpdateFormDelegate(string log);
-        public delegate void OnUserStatusControlAPIDelegate(TimelineControl sender, ActionType type, string screen_name);
+        public delegate void OnUserStatusControlAPIDelegate(TimelineControl sender, ActionType type, string screen_name, decimal id);
         #endregion
 
         public Shrimp()
@@ -440,20 +441,34 @@ namespace Shrimp
 
             TimelineTabControl.SetDB();
             //  設定読み込み
-            if (!this.LoadAccount())
+            if ( !this.LoadAccount () )
             {
-                var accountRegist = new AccountRegister("AZZEt8SJg2CY60h3iB4kaw", "JXqD9GxFrJx6QBz0BV8jkdWfoAGH184Jj1iFJOKRWBU");
+                var accountRegist = new AccountRegister ( "AZZEt8SJg2CY60h3iB4kaw", "JXqD9GxFrJx6QBz0BV8jkdWfoAGH184Jj1iFJOKRWBU" );
                 accountRegist.StartPosition = FormStartPosition.CenterScreen;
-                accountRegist.ShowDialog();
-                if (accountRegist.Tag != null)
+                accountRegist.ShowDialog ();
+                if ( accountRegist.Tag != null )
                 {
-                    this.accountManager.AddNewAccount((TwitterInfo)accountRegist.Tag);
-                    this.SaveAccount();
+                    this.accountManager.AddNewAccount ( (TwitterInfo)accountRegist.Tag );
+                    if ( db != null )
+                    {
+                        this.db.CreateUserTable ( ( (TwitterInfo)accountRegist.Tag ).UserId );
+                    }
+                    this.SaveAccount ();
                 }
                 else
                 {
-                    if (this.accountManager.accounts.Count == 0)
-                        System.Environment.Exit(0);
+                    if ( this.accountManager.accounts.Count == 0 )
+                        System.Environment.Exit ( 0 );
+                }
+            }
+            else
+            {
+                foreach ( TwitterInfo srv in this.accountManager.accounts )
+                {
+                    if ( db != null )
+                    {
+                        this.db.CreateUserTable ( srv.UserId );
+                    }
                 }
             }
 
@@ -522,6 +537,9 @@ namespace Shrimp
                 this.ConnectUserStream();
             if (Setting.Update.isUpdateEnable && !Setting.Update.isIgnoreUpdate)
                 CheckUpdate.CheckUpdateSync(OnCreatingUpdateForm);
+
+			//Form1 fmm = new Form1();
+			//fmm.Show();
         }
 
         private void OnCreatingUpdateForm(string log)
@@ -625,9 +643,13 @@ namespace Shrimp
             if (us != null)
             {
                 TwitterInfo t = this.accountManager.accounts[selNum];
-                us.stopStreaming(t, true);
+                us.stopStreaming(t, false);
             }
-            this.accountManager.RemoveAccount(selNum);
+            if ( db != null )
+            {
+                this.db.DestroyUserTabel ( this.accountManager.accounts[selNum].UserId );
+            }
+            this.accountManager.RemoveAccount ( selNum );
             SaveAccount();
             //ChangeAnyDatasEnd();
         }
@@ -653,6 +675,10 @@ namespace Shrimp
                     us.loadAsync(t, q);
                 }
                 LoadUserInformation();
+                if ( db != null )
+                {
+                    this.db.CreateUserTable ( t.UserId );
+                }
                 SaveAccount();
                 isOK = true;
             }
@@ -707,6 +733,29 @@ namespace Shrimp
                             return;
                         this.tmplistDatas.AddlistRange(res_data);
                     }, null, null, t.UserId);
+
+                    userAPI.FollowerUser ( twIn, (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate ( object data )
+                    {
+                        TwitterFriendshipResult user = (TwitterFriendshipResult)data;
+                        twIn.follower_cursor = user.next_cursor;
+                        if ( user.Count != 0 )
+                        {
+                            if ( db != null )
+                                db.InsertUserRange ( user );
+                            this.tweetBox.AddWordRange ( user.ConvertAll ( ( us ) => "@" + us.screen_name + "" ), true );
+                        }
+                    }, null, twIn.follower_cursor );
+                    userAPI.FollowUser ( twIn, (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate ( object data )
+                    {
+                        TwitterFriendshipResult user = (TwitterFriendshipResult)data;
+                        twIn.friends_cursor = user.next_cursor;
+                        if ( user.Count != 0 )
+                        {
+                            if ( db != null )
+                                db.InsertUserRange ( user );
+                            this.tweetBox.AddWordRange ( user.ConvertAll ( ( us ) => "@" + us.screen_name + "" ), true );
+                        }
+                    }, null, twIn.friends_cursor );
                 }
             });
 
@@ -825,21 +874,15 @@ namespace Shrimp
             get { return this.shrimpSpringLabel.Text; }
             set
             {
-                if (this.IsDisposed)
-                    return;
-                if (this.InvokeRequired && this.IsHandleCreated)
+                try
                 {
-                    this.Invoke((MethodInvoker)delegate()
+                    this.Invoke ( (MethodInvoker)delegate ()
                     {
-                        if (this.IsDisposed)
-                            return;
                         this.shrimpSpringLabel.Text = value;
-                    });
+                    } );
                 }
-                else
-                {
-                    this.shrimpSpringLabel.Text = value;
-                }
+                catch ( Exception )
+                { }
             }
         }
 
@@ -851,16 +894,15 @@ namespace Shrimp
             get { return this.APIStatusLabel.Text; }
             set
             {
-                if (this.InvokeRequired)
+                try
                 {
-                    this.Invoke((MethodInvoker)delegate()
+                    this.Invoke ( (MethodInvoker)delegate ()
                     {
                         this.APIStatusLabel.Text = value;
-                    });
+                    } );
                 }
-                else
+                catch ( Exception )
                 {
-                    this.APIStatusLabel.Text = value;
                 }
             }
         }
@@ -990,7 +1032,20 @@ namespace Shrimp
             if (e != null && e.data != null)
             {
                 var tmpTweet = (TwitterStatus)e.data;
-                TwitterStatusChecker.SetIsReply(this.accountManager.accounts, tmpTweet);
+                TwitterStatusChecker.SetIsReply ( this.accountManager.accounts, tmpTweet );
+
+                if ( Setting.UserStream.isMuteWithoutFriends && tmpTweet.isReply )
+                {
+                    if ( e.friends != null )
+                    {
+                        if ( !e.friends.Exists ( ( t ) => tmpTweet.user.id == t ) )
+                        {
+                            //  ミュート
+                            return;
+                        }
+                    }
+                }
+                
                 TwitterStatusChecker.SetIsRetweeted(this.accountManager.accounts, tmpTweet);
 
                 //db.InsertTweet ( tmpTweet );
@@ -1032,6 +1087,19 @@ namespace Shrimp
         {
             if (e != null && e.data != null)
             {
+                if ( Setting.UserStream.isMuteWithoutFriends )
+                {
+                    var tmpData = ( (TwitterNotifyStatus)e.data ).target_object;
+                    if ( e.friends != null && tmpData != null && tmpData is TwitterStatus )
+                    {
+                        var tmpTweet = tmpData as TwitterStatus;
+                        if ( !e.friends.Exists ( ( t ) => tmpTweet.user.id == t ) )
+                        {
+                            //  ミュート
+                            return;
+                        }
+                    }
+                }
                 TwitterStatusChecker.SetNotify(this.accountManager.accounts, (TwitterNotifyStatus)e.data);
                 this.TimelineTabControl.InsertTweet(e.account_source, new TwitterStatus((TwitterNotifyStatus)e.data), TimelineCategories.NotifyTimeline);
             }
@@ -1299,15 +1367,25 @@ namespace Shrimp
         /// <param name="sender"></param>
         /// <param name="type"></param>
         /// <param name="screen_name"></param>
-        void OnUserStatusControlAPI(TimelineControl sender, ActionType type, string screen_name)
+        void OnUserStatusControlAPI(TimelineControl sender, ActionType type, string screen_name, decimal id)
         {
+
+            if ( type == ActionType.UserDBTimeline )
+            {
+                sender.BeginInvoke ( (MethodInvoker)delegate ()
+                {
+                    //sender.initialize ();
+                    sender.InsertTimelineRange ( db.GetTweetByUserID ( TwitterStatus.GetUserTweets ( id ), 0, 1000 ) );
+                } );
+            }
+
             if (type == ActionType.UserFavoriteTimeline)
             {
                 timelines.FavoriteTimeline(this.accountManager.SelectedAccount,
                 (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
                 {
                     List<TwitterStatus> tmp = (List<TwitterStatus>)data;
-                    sender.Invoke((MethodInvoker)delegate()
+                    sender.BeginInvoke((MethodInvoker)delegate()
                     {
                         //sender.initialize ();
                         sender.InsertTimelineRange(tmp);
@@ -1321,7 +1399,7 @@ namespace Shrimp
                 (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
                 {
                     List<TwitterStatus> tmp = (List<TwitterStatus>)data;
-                    sender.Invoke((MethodInvoker)delegate()
+                    sender.BeginInvoke ( (MethodInvoker)delegate ()
                     {
                         //sender.initialize ();
                         sender.InsertTimelineRange(tmp);
@@ -1335,7 +1413,7 @@ namespace Shrimp
                 (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
                 {
                     List<TwitterStatus> tmp = (List<TwitterStatus>)data;
-                    sender.Invoke((MethodInvoker)delegate()
+                    sender.BeginInvoke ( (MethodInvoker)delegate ()
                     {
                         //sender.initialize ();
                         sender.InsertTimelineRange(tmp);
@@ -1429,39 +1507,40 @@ namespace Shrimp
 
         private void Shrimp_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (!this.isDisposedShrimp)
+            if ( !this.isDisposedShrimp )
             {
-                this.Hide();
-                if (this.us != null)
+                this.Hide ();
+                this.ShrimpNotify.Visible = false;
+                if ( this.us != null )
                 {
-                    foreach (TwitterInfo t in this.accountManager.accounts)
+                    foreach ( TwitterInfo t in this.accountManager.accounts )
                     {
-                        us.stopStreaming(t, true);
+                        us.stopStreaming ( t, true );
                     }
                 }
-                this.timelines.Dispose();
+                this.timelines.Dispose ();
                 this.timelines = null;
-                ImageCache.StopCrawling();
-                this.crollingTweetTimer.Stop();
+                ImageCache.StopCrawling ();
+                this.crollingTweetTimer.Stop ();
                 this.crollingTweetTimer = null;
-                this.iconDownloadTimer.Stop();
+                this.iconDownloadTimer.Stop ();
                 this.iconDownloadTimer = null;
 
+                this.TimelineTabControl.StopTabQueue ();
+                this.TimelineTabControl.SaveTabs ();
 
-                this.TimelineTabControl.SaveTabs();
-
-                this.db.Close();
-                this.SaveAccount();
+                this.db.Close ();
+                this.SaveAccount ();
                 Setting.FormSetting.Bounds = this.Bounds;
                 Setting.FormSetting.WindowState = this.WindowState;
                 Setting.FormSetting.TimelineSplitterDistance = this.TimelineSplit.SplitterDistance;
-                SettingSerializer.Save();
+                SettingSerializer.Save ();
                 this.isDisposedShrimp = true;
-                if (this.BootingUpdater)
+                if ( this.BootingUpdater )
                 {
-                    if (File.Exists("ShrimpAutoUpdater.exe"))
+                    if ( File.Exists ( "ShrimpAutoUpdater.exe" ) )
                     {
-                        Process.Start("ShrimpAutoUpdater.exe");
+                        Process.Start ( "ShrimpAutoUpdater.exe" );
                     }
                 }
                 System.Environment.Exit ( 0 );
@@ -1510,6 +1589,29 @@ namespace Shrimp
         {
             SplitContainer obj = sender as SplitContainer;
             this.tweetBox.BoxHeight = (this.Height - obj.SplitterDistance) / 2;
+        }
+
+        private void ShrimpNotify_DoubleClick ( object sender, EventArgs e )
+        {
+            this.Visible = true;
+            if ( this.WindowState == FormWindowState.Minimized )
+                this.WindowState = FormWindowState.Normal;
+            this.Activate ();
+        }
+
+        private void ExitShrimpMenu_Click ( object sender, EventArgs e )
+        {
+            this.Close ();
+        }
+
+        private void ViewShrimpWindowMenu_Click ( object sender, EventArgs e )
+        {
+            this.ShrimpNotify_DoubleClick ( sender, e );
+        }
+
+        private void Shrimp_Move ( object sender, EventArgs e )
+        {
+            this.tweetBox.ResetListPosition ();
         }
     }
 }

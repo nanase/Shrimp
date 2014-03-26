@@ -63,6 +63,8 @@ namespace Shrimp.Setting.Forms
                 tlSetting["isNotifyBold"] = (e.NewValue == CheckState.Checked ? true : false);
             if (e.Index == 5)
                 tlSetting["isReplyBold"] = (e.NewValue == CheckState.Checked ? true : false);
+            if ( e.Index == 6 )
+                tlSetting["isEnableAbsoluteTime"] = ( e.NewValue == CheckState.Checked ? true : false );
             SaveReflection();
         }
 
@@ -107,6 +109,8 @@ namespace Shrimp.Setting.Forms
             this.timelineSettingCheckBox.SetItemChecked(3, (bool)tlSetting["isRetweetBold"]);
             this.timelineSettingCheckBox.SetItemChecked(4, (bool)tlSetting["isNotifyBold"]);
             this.timelineSettingCheckBox.SetItemChecked(5, (bool)tlSetting["isReplyBold"]);
+            this.timelineSettingCheckBox.SetItemChecked ( 6, (bool)tlSetting["isEnableAbsoluteTime"] );
+            
 
             this.SavingTweetNumNumeric.Value = (((int)tlSetting["SavedTimelineTweetNum"]) < this.SavingTweetNumNumeric.Minimum ? this.SavingTweetNumNumeric.Minimum : ((int)tlSetting["SavedTimelineTweetNum"]));
             this.AnimationCheckBox.SetItemChecked(0, (bool)tlSetting["isEnableInsertAnimation"]);

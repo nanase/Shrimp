@@ -150,7 +150,7 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
         public void DrawNormalText()
         {
             var opt = new StringFormat() { Trimming = StringTrimming.EllipsisCharacter };
-            g.DrawString(this.drawCellSize.Tweet.Detail, Setting.Fonts.NameFont, Setting.Colors.TweetColor, this.drawCellSize.Tweet.Rect, opt);
+            g.DrawString(this.drawCellSize.Tweet.Detail, Setting.Fonts.TweetFont, Setting.Colors.TweetColor, this.drawCellSize.Tweet.Rect, opt);
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ namespace Shrimp.ControlParts.Timeline
         /// <summary>
         /// タイムラインにツイートを送信する
         /// </summary>
-        void PushTweet(TwitterStatus tweet);
+        bool PushTweet(TwitterStatus tweet);
         /// <summary>
         /// スタックに詰まれたツイートを拾う
         /// </summary>

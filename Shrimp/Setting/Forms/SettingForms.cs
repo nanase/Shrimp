@@ -102,6 +102,11 @@ namespace Shrimp.Setting.Forms
                 BeforeSelectControl = new FontForm ();
             }
 
+            if ( node.Name == "PrivateFunctionMenu" )
+            {
+                BeforeSelectControl = new PrivateFunction ();
+            }
+
             if (BeforeSelectControl != null)
             {
                 BeforeSelectControl.Dock = DockStyle.Fill;

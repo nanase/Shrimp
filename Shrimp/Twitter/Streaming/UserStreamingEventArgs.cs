@@ -1,8 +1,9 @@
 ﻿using Shrimp.Twitter.Status;
+using System;
 
 namespace Shrimp.Twitter.Streaming
 {
-    public class UserStreamingEventArgs
+    public class UserStreamingEventArgs : EventArgs 
     {
         private readonly int _error_code = 0;
         private readonly TwitterStatus ret;

@@ -468,7 +468,11 @@ namespace Shrimp.ControlParts.Tabs
                 return;
             if (!this.isMatchQuery(tweet))
             {
-                res.InsertTimeline(tweet);
+               var isSuccess = res.InsertTimeline(tweet);
+
+                if ( !isSuccess || (tweet.isNotify && (tweet.NotifyStatus.isOwnFav || tweet.NotifyStatus.isOwnUnFav) ) )
+                    return;
+
                 this.unreadNum++;
                 if (this.isFlash)
                 {
@@ -480,16 +484,12 @@ namespace Shrimp.ControlParts.Tabs
                 {
                     if (!isVisible)
                     {
-                        if (this.InvokeRequired)
+                        if ( this.IsHandleCreated )
                         {
-                            this.Invoke((MethodInvoker)delegate()
+                            this.BeginInvoke ( (MethodInvoker)delegate ()
                             {
                                 this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
-                            });
-                        }
-                        else
-                        {
-                            this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
+                            } );
                         }
                     }
                 });

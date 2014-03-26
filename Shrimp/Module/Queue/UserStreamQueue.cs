@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Timers;
 using Shrimp.Twitter.Streaming;
+using System.Threading.Tasks;
 
 namespace Shrimp.Module.Queue
 {
@@ -12,9 +13,11 @@ namespace Shrimp.Module.Queue
     class UserStreamQueue : Queue<UserStreamQueueData>, IQueue
     {
         private System.Timers.Timer queueCheckTimer;
+        private bool stopFlag = false;
 
-        public UserStreamQueue()
+        public UserStreamQueue( )//ref bool stopFlag )
         {
+            //this.stopFlag = stopFlag;
             this.queueCheckTimer = new System.Timers.Timer();
             this.queueCheckTimer.Interval = 50;
             this.queueCheckTimer.Elapsed += new ElapsedEventHandler(queueCheckTimer_Elapsed);
@@ -44,6 +47,17 @@ namespace Shrimp.Module.Queue
             }
         }
 
+        /// <summary>
+        /// キューを消去します
+        /// </summary>
+        public new void Clear ()
+        {
+            lock ( ( (ICollection)this ).SyncRoot )
+            {
+                base.Clear ();
+            }
+        }
+
 
         /// <summary>
         /// エンキュー
@@ -70,6 +84,14 @@ namespace Shrimp.Module.Queue
             return data;
         }
 
+        /// <summary>
+        /// デキュー(lockなし)
+        /// </summary>
+        public new UserStreamQueueData DequeueWithoutSync ()
+        {
+            return base.Dequeue ();
+        }
+
 
         public void Wait()
         {
@@ -94,22 +116,27 @@ namespace Shrimp.Module.Queue
             {
                 if (this.Count != 0)
                 {
-                    var tmp = this.Dequeue();
-                    if (tmp.EventHandler is UserStreaming.TweetEventDelegate)
+                    var tmp = this.DequeueWithoutSync ();
+                    if ( this.stopFlag )
+                        return;
+                    Task.Factory.StartNew ( () =>
                     {
-                        UserStreaming.TweetEventDelegate obj = tmp.EventHandler as UserStreaming.TweetEventDelegate;
-                        obj.BeginInvoke(tmp.sender, tmp.args, null, null);
-                    }
-                    if (tmp.EventHandler is UserStreaming.NotifyEventDelegate)
-                    {
-                        UserStreaming.NotifyEventDelegate obj = tmp.EventHandler as UserStreaming.NotifyEventDelegate;
-                        obj.BeginInvoke(tmp.sender, tmp.args, null, null);
-                    }
-                    if (tmp.EventHandler is UserStreaming.UserStreamingconnectStatusEventDelegate)
-                    {
-                        UserStreaming.UserStreamingconnectStatusEventDelegate obj = tmp.EventHandler as UserStreaming.UserStreamingconnectStatusEventDelegate;
-                        obj.BeginInvoke(tmp.sender, tmp.args, null, null);
-                    }
+                        if ( tmp.EventHandler is UserStreaming.TweetEventDelegate )
+                        {
+                            UserStreaming.TweetEventDelegate obj = tmp.EventHandler as UserStreaming.TweetEventDelegate;
+                            obj.BeginInvoke ( tmp.sender, tmp.args, null, null );
+                        }
+                        if ( tmp.EventHandler is UserStreaming.NotifyEventDelegate )
+                        {
+                            UserStreaming.NotifyEventDelegate obj = tmp.EventHandler as UserStreaming.NotifyEventDelegate;
+                            obj.BeginInvoke ( tmp.sender, tmp.args, null, null );
+                        }
+                        if ( tmp.EventHandler is UserStreaming.UserStreamingconnectStatusEventDelegate )
+                        {
+                            UserStreaming.UserStreamingconnectStatusEventDelegate obj = tmp.EventHandler as UserStreaming.UserStreamingconnectStatusEventDelegate;
+                            obj.BeginInvoke ( tmp.sender, tmp.args, null, null );
+                        }
+                    } );
                 }
             }
         }

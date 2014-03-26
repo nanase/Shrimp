@@ -132,7 +132,7 @@ namespace Shrimp.Module
             {
                 var t = nico_re.Match(url);
                 string id = t.Groups["id"].Value;
-                if (id != null && id.Substring(0, 2) != "lv")
+                if (id != null && id.Substring ( 0, 1 ) != "l")
                 {
                     int id_int = Int32.Parse(id.Substring(2));
                     isThumb = true;

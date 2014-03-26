@@ -125,7 +125,7 @@ namespace Shrimp.Twitter.REST
                 //  ああ・・・
                 data = res;
             }
-            OnLoadCompleted(completedProcess, errorProcess, new TwitterCompletedEventArgs(srv, res.StatusCode, workerResult.Invoke(data), res));
+            OnLoadCompleted(completedProcess, errorProcess, new TwitterCompletedEventArgs(srv, res.StatusCode, null, workerResult.Invoke(data), res));
         }
 
 
@@ -148,7 +148,7 @@ namespace Shrimp.Twitter.REST
         {
             if (res != null && res.IsAlive)
             {
-                res.Abort();
+                res.Abort ();
             }
         }
     }

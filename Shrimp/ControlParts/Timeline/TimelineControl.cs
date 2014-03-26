@@ -308,14 +308,15 @@ namespace Shrimp.ControlParts.Timeline
 
 
         /// <summary>
-        /// タイムラインに挿入する
+        /// タイムラインにツイートを追加する
         /// </summary>
-        /// <param name="t"></param>
-        public void InsertTimeline(TwitterStatus t)
+        /// <param name="t">ツイート</param>
+        /// <returns>成功した場合true、失敗したらfalse</returns>
+        public bool InsertTimeline(TwitterStatus t)
         {
             if (timeline == null || t == null)
-                return;
-            this.timeline.PushTweet(t);
+                return false;
+            return this.timeline.PushTweet(t);
         }
 
         /// <summary>
@@ -415,6 +416,11 @@ namespace Shrimp.ControlParts.Timeline
             }
         }
 
+        /// <summary>
+        /// 返信を書くときの準備をする
+        /// </summary>
+        /// <param name="tweetID"></param>
+        /// <param name="isDirectMessage"></param>
         public void ReplySelectedTweet(decimal tweetID, bool isDirectMessage)
         {
             if (tweetID >= 0)
@@ -629,14 +635,15 @@ namespace Shrimp.ControlParts.Timeline
                             tweet.id = this.tweets[0].id + 1;
                         }
 
-                        if (!tweet.NotifyStatus.isRetweeted && (tweet.NotifyStatus.isOwnFav || tweet.NotifyStatus.isOwnUnFav))
+                        if ( ( tweet.NotifyStatus.isOwnFav || tweet.NotifyStatus.isOwnUnFav ) )
                         {
                             var notify_tweet = tweet.NotifyStatus.target_object as TwitterStatus;
-                            now_tweet = this.tweets.Find((t) => t.id == notify_tweet.id);
-                            if (now_tweet != null)
+                            now_tweet = this.tweets.Find ( ( t ) => t.id == notify_tweet.id );
+                            if ( now_tweet != null )
                             {
-                                now_tweet.favorite_count += (tweet.NotifyStatus.isOwnFav ? 1 : -1);
-                                now_tweet.favorited = (tweet.NotifyStatus.isOwnFav ? true : false);
+                                now_tweet.favorite_count += ( tweet.NotifyStatus.isOwnFav ? 1 : -1 );
+                                now_tweet.favorited = ( tweet.NotifyStatus.isOwnFav ? true : false );
+
                             }
                             else
                             {
@@ -1332,15 +1339,15 @@ namespace Shrimp.ControlParts.Timeline
             {
                 if (!this.IsDisposed)
                 {
-                    this.Invoke((MethodInvoker)delegate()
+                    this.BeginInvoke ( (MethodInvoker)delegate ()
                     {
-                        if (!this.IsDisposed)
+                        if ( !this.IsDisposed )
                         {
-                            this.Invalidate();
-                            this.Update();
+                            this.Invalidate ();
+                            this.Update ();
                         }
 
-                    });
+                    } );
                 }
             }
             else
@@ -1355,6 +1362,11 @@ namespace Shrimp.ControlParts.Timeline
             return true;
         }
 
+        /// <summary>
+        /// キーが押されたとき
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void TimelineControl_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control && e.KeyCode == Keys.C)
@@ -1397,6 +1409,11 @@ namespace Shrimp.ControlParts.Timeline
             }
         }
 
+        /// <summary>
+        /// タイムラインにフォーカスが移動したとき
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TimelineControl_Enter(object sender, EventArgs e)
         {
             this.ActiveControl = this.Controls[0];

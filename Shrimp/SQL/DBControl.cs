@@ -5,6 +5,8 @@ using System.Data.Common;
 using System.Data.SQLite;
 using System.Globalization;
 using Shrimp.Twitter.Status;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Shrimp.SQL
 {
@@ -16,8 +18,11 @@ namespace Shrimp.SQL
         private SQLiteConnection sql;
         private SQLiteCommand command;
         private Queue<SQLiteCommand> commandStack = new Queue<SQLiteCommand>();
+        private Queue<SQLiteCommand> commandQueue = new Queue<SQLiteCommand> ();
+        private System.Timers.Timer queueTimer = new System.Timers.Timer ();
         private object lockObj = new object();
         private object lockTransaction = new object();
+        private object lockQueue = new object ();
 
         public DBControl(string fileName)
         {
@@ -26,12 +31,62 @@ namespace Shrimp.SQL
             connBuilder.Version = 3;
             //Set page size to NTFS cluster size = 4096 bytes
             connBuilder.PageSize = 4096;
-            connBuilder.CacheSize = 10000;
+            connBuilder.CacheSize = 1024*1024;
             connBuilder.JournalMode = SQLiteJournalModeEnum.Wal;
             connBuilder.Pooling = true;
             this.sql = new SQLiteConnection(connBuilder.ToString());
             this.sql.Open();
             this.command = this.sql.CreateCommand();
+            this.queueTimer.Interval = 30 * 1000;
+            this.queueTimer.Elapsed += new System.Timers.ElapsedEventHandler ( queueTimer_Elapsed );
+            this.queueTimer.Start ();
+        }
+
+        void queueTimer_Elapsed ( object sender, System.Timers.ElapsedEventArgs e )
+        {
+            this.ProcessQueue ();
+        }
+
+        private void ProcessQueue ()
+        {
+            Task.Factory.StartNew ( () =>
+            {
+                SQLiteCommand[] list = null;
+
+                lock ( lockQueue )
+                {
+                    if ( commandQueue.Count == 0 )
+                        return;
+                    list = commandQueue.ToArray ();
+                }
+
+                lock ( lockObj )
+                {
+                    using ( SQLiteTransaction trans = sql.BeginTransaction () )
+                    {
+                        try
+                        {
+                            foreach ( SQLiteCommand cmd in list )
+                            {
+                                cmd.ExecuteNonQuery ();
+                                cmd.Dispose ();
+                            }
+                            trans.Commit ();
+                        }
+                        catch ( Exception err )
+                        {
+                            //  ?
+                            Console.WriteLine ( err.Message );
+                        }
+                    }
+                }
+
+                lock ( lockQueue )
+                {
+                    commandQueue.Clear ();
+                }
+
+            } );
         }
 
         /// <summary>
@@ -39,6 +94,7 @@ namespace Shrimp.SQL
         /// </summary>
         public void Dispose()
         {
+            this.queueTimer.Dispose ();
             this.commandStack.Clear();
             this.commandStack = null;
             this.sql.Close();
@@ -52,8 +108,40 @@ namespace Shrimp.SQL
         /// <param name="com"></param>
         public void CreateTable(string com)
         {
-            this.command.CommandText = com;
-            this.command.ExecuteNonQuery();
+            var dest = this.sql.CreateCommand ();
+            dest.CommandText = com;
+            this.InsertData ( dest );
+
+        }
+
+        /// <summary>
+        /// フォローしているユーザテーブルを作成します
+        /// </summary>
+        /// <param name="com"></param>
+        public void CreateUserTable ( decimal user_id )
+        {
+            var com = this.sql.CreateCommand ();
+            com.CommandText = "CREATE TABLE IF NOT EXISTS '" + user_id + "_FRIENDS' (id primary key ON CONFLICT ignore)";
+            this.InsertData ( com );
+
+            com = this.sql.CreateCommand ();
+            com.CommandText = "CREATE TABLE IF NOT EXISTS '" + user_id + "_FOLLOWER' (id primary key ON CONFLICT ignore)";
+            this.InsertData ( com );
+        }
+
+        /// <summary>
+        /// テーブルを削除します
+        /// </summary>
+        /// <param name="user_id"></param>
+        public void DestroyUserTabel ( decimal user_id )
+        {
+            var com = this.sql.CreateCommand ();
+            com.CommandText = "DROP TABLE " + user_id + "_FRIENDS";
+            this.InsertData ( com );
+
+            com = this.sql.CreateCommand ();
+            com.CommandText = "DROP TABLE " + user_id + "_FOLLOWER";
+            this.InsertData ( com );
         }
 
         /// <summary>
@@ -61,35 +149,21 @@ namespace Shrimp.SQL
         /// </summary>
         public void Close()
         {
-            lock (lockObj)
+            queueTimer.Stop ();
+            this.ProcessQueue ();
+            while ( true )
             {
-                if (this.commandStack.Count != 0)
+                Thread.Sleep ( 1 );
+                lock ( lockQueue )
                 {
-                    using (DbTransaction transaction = this.sql.BeginTransaction())
+                    if ( commandQueue.Count != 0 )
                     {
-                        try
-                        {
-                            for (int i = 0; i < this.commandStack.Count; i++)
-                            {
-                                var cmd = this.commandStack.Dequeue();
-                                if (cmd == null || cmd.CommandText == null)
-                                    continue;
-                                cmd.ExecuteNonQuery();
-                                cmd.Dispose();
-                            }
-
-                        }
-                        catch (Exception e)
-                        {
-                            //  ?
-                            Console.WriteLine(e.Message);
-                        }
-
-                        transaction.Commit();
+                        continue;
                     }
-                    this.commandStack.Clear();
                 }
+                break;
             }
+            this.queueTimer.Stop ();
             this.sql.Close();
         }
 
@@ -104,22 +178,68 @@ namespace Shrimp.SQL
         {
             var sql = tableName;
             this.command.CommandText = sql;
-            using (SQLiteDataReader sdr = this.command.ExecuteReader())
+            try
             {
-                List<TwitterStatus> tuples = new List<TwitterStatus>();
-                for (int i = 0; sdr.Read(); i++)
+                using ( SQLiteDataReader sdr = this.command.ExecuteReader () )
                 {
-                    string[] column = new string[sdr.FieldCount];
-                    for (int j = 0; j < sdr.FieldCount; j++)
+                    List<TwitterStatus> tuples = new List<TwitterStatus> ();
+                    for ( int i = 0; sdr.Read (); i++ )
                     {
-                        column[j] = sdr[j].ToString();
+                        string[] column = new string[sdr.FieldCount];
+                        for ( int j = 0; j < sdr.FieldCount; j++ )
+                        {
+                            column[j] = sdr[j].ToString ();
+                        }
+                        tuples.Add ( new TwitterStatus ( column ) );
                     }
-                    tuples.Add(new TwitterStatus(column));
-                }
 
-                //リストを配列に変換して返す
-                return tuples;
+                    //リストを配列に変換して返す
+                    return tuples;
+                }
             }
+            catch ( Exception err )
+            {
+                //  ?
+                Console.WriteLine ( err.Message );
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// ユーザのツイートを取得する
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="offsetValue"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public List<TwitterStatus> GetTweetByUserID ( string sql, decimal offsetValue, decimal count )
+        {
+            this.command.CommandText = sql;
+            try
+            {
+                using ( SQLiteDataReader sdr = this.command.ExecuteReader () )
+                {
+                    List<TwitterStatus> tuples = new List<TwitterStatus> ();
+                    for ( int i = 0; sdr.Read (); i++ )
+                    {
+                        string[] column = new string[sdr.FieldCount];
+                        for ( int j = 0; j < sdr.FieldCount; j++ )
+                        {
+                            column[j] = sdr[j].ToString ();
+                        }
+                        tuples.Add ( new TwitterStatus ( column ) );
+                    }
+
+                    //リストを配列に変換して返す
+                    return tuples;
+                }
+            }
+            catch ( Exception err )
+            {
+                //  ?
+                Console.WriteLine ( err.Message );
+            }
+            return null;
         }
 
         /// <summary>
@@ -133,22 +253,31 @@ namespace Shrimp.SQL
         {
             var sql = tableName;
             this.command.CommandText = sql;
-            using (SQLiteDataReader sdr = this.command.ExecuteReader())
+            try
             {
-                List<TwitterDirectMessageStatus> tuples = new List<TwitterDirectMessageStatus>();
-                for (int i = 0; sdr.Read(); i++)
+                using ( SQLiteDataReader sdr = this.command.ExecuteReader () )
                 {
-                    string[] column = new string[sdr.FieldCount];
-                    for (int j = 0; j < sdr.FieldCount; j++)
+                    List<TwitterDirectMessageStatus> tuples = new List<TwitterDirectMessageStatus> ();
+                    for ( int i = 0; sdr.Read (); i++ )
                     {
-                        column[j] = sdr[j].ToString();
+                        string[] column = new string[sdr.FieldCount];
+                        for ( int j = 0; j < sdr.FieldCount; j++ )
+                        {
+                            column[j] = sdr[j].ToString ();
+                        }
+                        tuples.Add ( new TwitterDirectMessageStatus ( column ) );
                     }
-                    tuples.Add(new TwitterDirectMessageStatus(column));
-                }
 
-                //リストを配列に変換して返す
-                return tuples;
+                    //リストを配列に変換して返す
+                    return tuples;
+                }
             }
+            catch ( Exception err )
+            {
+                //  ?
+                Console.WriteLine ( err.Message );
+            }
+            return null;
         }
 
         /// <summary>
@@ -190,10 +319,13 @@ namespace Shrimp.SQL
                 com.Parameters.Add(new SQLiteParameter(DbType.Decimal) { Value = id });
             }
             com.Prepare();
-            this.InsertDataNow(com);
+            this.InsertData(com);
         }
 
-
+		/// <summary>
+		/// ユーザ情報をデータベースに書き込む
+		/// </summary>
+		/// <param name="user"></param>
         public void InsertUser(TwitterUserStatus user)
         {
             var t = user;
@@ -219,8 +351,15 @@ namespace Shrimp.SQL
             this.InsertData(com);
         }
 
+		/// <summary>
+		/// ユーザ一覧をデータベースにいっきに書き込む
+		/// </summary>
+		/// <param name="users"></param>
         public void InsertUserRange(List<TwitterUserStatus> users)
         {
+            if ( users == null || users.Count == 0 )
+                return;
+
             var com = this.sql.CreateCommand();
             var isFirst = false;
             const int ParamNum = 14;
@@ -267,6 +406,10 @@ namespace Shrimp.SQL
             this.InsertData(com);
         }
 
+		/// <summary>
+		/// ツイートをデータベースに書き込む
+		/// </summary>
+		/// <param name="tweet"></param>
         public void InsertTweet(TwitterStatus tweet)
         {
             var t = tweet.DynamicTweet;
@@ -303,6 +446,8 @@ namespace Shrimp.SQL
         /// <param name="tweets"></param>
         public void InsertDMRange(List<TwitterDirectMessageStatus> tweets)
         {
+            if ( tweets == null || tweets.Count == 0 )
+                return;
             var com = this.sql.CreateCommand();
             bool isFirst = false;
             const int ParamNum = 19;
@@ -348,6 +493,9 @@ namespace Shrimp.SQL
         /// <param name="tweets"></param>
         public void InsertTweetRange(List<TwitterStatus> tweets)
         {
+            if ( tweets == null || tweets.Count == 0 )
+                return;
+
             var com = this.sql.CreateCommand();
             bool isFirst = false;
             const int ParamNum = 19;
@@ -401,23 +549,44 @@ namespace Shrimp.SQL
             this.InsertData(com);
         }
 
-        public void InsertDataNow(SQLiteCommand com)
+		/// <summary>
+		/// データを書き込む
+		/// </summary>
+		/// <param name="com"></param>
+        public void InsertData(SQLiteCommand com)
         {
-            lock (lockObj)
+            lock ( lockQueue )
             {
-                try
-                {
-                    com.ExecuteNonQuery();
-                    com.Dispose();
-                }
-                catch (Exception e)
-                {
-                    //  ?
-                    Console.WriteLine(e.Message);
-                }
+                commandQueue.Enqueue ( com );
             }
         }
 
+		/*
+		/// <summary>
+		/// データをデータベースに書き込む
+		/// </summary>
+		/// <param name="com"></param>
+		public void InsertData(SQLiteCommand com)
+		{
+			Task.Factory.StartNew(() =>
+			{
+				lock (lockObj)
+				{
+					try
+					{
+						com.ExecuteNonQuery();
+						com.Dispose();
+					}
+					catch (Exception e)
+					{
+						//  ?
+						Console.WriteLine(e.Message);
+					}
+				}
+			});
+		}
+		*/
+		/*
         public void InsertData(SQLiteCommand com)
         {
             lock (lockObj)
@@ -455,5 +624,6 @@ namespace Shrimp.SQL
                 }
             }
         }
+		*/
     }
 }

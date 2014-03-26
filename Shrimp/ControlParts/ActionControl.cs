@@ -18,6 +18,7 @@ namespace Shrimp.ControlParts
         URL,
         Media,
         Mention,
+        UserDBTimeline,
         UserFavoriteTimeline,
         UserTimeline,
         UserConversation,

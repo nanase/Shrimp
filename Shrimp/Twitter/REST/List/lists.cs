@@ -9,7 +9,7 @@ namespace Shrimp.Twitter.REST.List
     class lists : TwitterWorker, IDisposable
     {
         #region 定義
-        private Thread listResult, listStatusesResult;
+        private Thread listResult, listStatusesResult, listMemberResult;
         private bool isDisposed;
         #endregion
 
@@ -64,6 +64,22 @@ namespace Shrimp.Twitter.REST.List
         }
 
         /// <summary>
+        /// リストのタイムラインを取得
+        /// </summary>
+        public Thread listMembers ( TwitterInfo srv, TwitterCompletedProcessDelegate completedDelegate, TwitterErrorProcessDelegate errorProcess, decimal list_id, string slug, decimal cursor )
+        {
+            List<OAuthBase.QueryParameter> q = new List<OAuthBase.QueryParameter> ();
+            if ( list_id > 0 )
+                q.Add ( new OAuthBase.QueryParameter ( "list_id", "" + list_id + "" ) );
+            if ( slug != null )
+                q.Add ( new OAuthBase.QueryParameter ( "slug", slug ) );
+            if ( cursor != 0 )
+                q.Add ( new OAuthBase.QueryParameter ( "cursor", cursor.ToString () ) );
+            this.listMemberResult = base.loadAsync ( srv, "GET", workerResultlistMemeber, completedDelegate, errorProcess, "lists/members.json", q );
+            return this.listMemberResult;
+        }
+
+        /// <summary>
         /// 受信したデータを処理する
         /// </summary>
         /// <param name="data"></param>
@@ -97,6 +113,19 @@ namespace Shrimp.Twitter.REST.List
                     result_status.Add(new TwitterStatus(tweet));
             }
             return result_status;
+        }
+
+        private object workerResultlistMemeber ( dynamic data )
+        {
+            if ( data == null )
+                return null;
+            var dest = new TwitterFriendshipResult ();
+            foreach ( var user in data.users )
+            {
+                dest.Add ( new TwitterUserStatus ( user ) );
+            }
+            dest.next_cursor = decimal.Parse ( data.next_cursor_str );
+            return dest;
         }
     }
 }

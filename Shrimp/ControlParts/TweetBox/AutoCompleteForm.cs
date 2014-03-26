@@ -21,11 +21,40 @@ namespace Shrimp.ControlParts.TweetBox
 
         public void AddWord(string word, bool isScreenName)
         {
-            if (isScreenName)
-                this.screen_name.Add(word);
+            if ( isScreenName )
+            {
+                if ( this.screen_name.Contains ( word ) )
+                    return;
+                this.screen_name.Add ( word );
+            }
             else
-                this.hashtags.Add(word);
+            {
+                if ( this.hashtags.Contains ( word ) )
+                    return;
+                this.hashtags.Add ( word );
+            }
         }
+
+        public void AddWordRange ( List<string> word, bool isScreenName )
+        {
+            if ( isScreenName )
+            {
+                foreach ( string tmp in word )
+                {
+                    if ( this.screen_name.Contains ( tmp ) )
+                        continue;
+                    this.screen_name.Add ( tmp );
+                }
+            } else {
+                foreach ( string tmp in word )
+                {
+                    if ( this.hashtags.Contains ( tmp ) )
+                        continue;
+                    this.hashtags.Add ( tmp );
+                }
+            }
+        }
+
 
         public int ItemTotalHeight
         {
@@ -86,7 +115,7 @@ namespace Shrimp.ControlParts.TweetBox
             var selNum = this.acfBox.SelectedIndex;
             if (isScreenName)
             {
-                var item = this.screen_name.FindAll((word) => word.IndexOf(text) >= 0);
+                var item = this.screen_name.FindAll((word) => word.TrimStart('@').IndexOf(text.TrimStart('@'), StringComparison.OrdinalIgnoreCase) >= 0);
                 if (item != null)
                 {
                     this.acfBox.Items.Clear();

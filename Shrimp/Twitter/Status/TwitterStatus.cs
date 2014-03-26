@@ -56,7 +56,8 @@ namespace Shrimp.Twitter.Status
                 this.retweeted_status.source_url = (string)sqlData[6].Clone();
                 this.retweeted_status.retweet_count = Decimal.Parse(sqlData[7]);
                 this.retweeted_status.favorite_count = Decimal.Parse(sqlData[8]);
-
+				this.retweeted_status.retweet_users = new NotifySourceUsers();
+				this.retweeted_status.favorite_users = new NotifySourceUsers();
                 this.retweeted_status.isReply = (int.Parse(sqlData[9]) == 0 ? false : true);
                 this.retweeted_status.replyID = Decimal.Parse(sqlData[10]);
                 this.retweeted_status.isDirectMessage = (int.Parse(sqlData[11]) == 0 ? false : true);
@@ -89,6 +90,8 @@ namespace Shrimp.Twitter.Status
                 this.source_url = (string)sqlData[6].Clone();
                 this.retweet_count = Decimal.Parse(sqlData[7]);
                 this.favorite_count = Decimal.Parse(sqlData[8]);
+				this.retweet_users = new NotifySourceUsers();
+				this.favorite_users = new NotifySourceUsers();
                 this.entities = new TwitterEntities(this.text);
 
                 this.isReply = (int.Parse(sqlData[9]) == 0 ? false : true);
@@ -125,6 +128,8 @@ namespace Shrimp.Twitter.Status
             this.in_reply_to_status_id = (raw_data.in_reply_to_status_id == null ? 0 : Decimal.Parse(raw_data.in_reply_to_status_id_str));
             this.in_reply_to_user_id = (raw_data.in_reply_to_user_id == null ? 0 : Decimal.Parse(raw_data.in_reply_to_user_id_str));
             this.retweet_count = (decimal)raw_data.retweet_count;
+			this.retweet_users = new NotifySourceUsers();
+			this.favorite_users = new NotifySourceUsers();
             this.retweeted = (bool)raw_data.retweeted;
             this.retweeted_status = (raw_data.IsDefined("retweeted_status") ? new TwitterStatus(raw_data.retweeted_status) : null);
             if (raw_data.IsDefined("entities"))
@@ -142,6 +147,10 @@ namespace Shrimp.Twitter.Status
             this.source_url = "http://www.twitter.com";
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="status"></param>
         public TwitterStatus(TwitterNotifyStatus status)
         {
             //  通知をツイート化します
@@ -154,30 +163,45 @@ namespace Shrimp.Twitter.Status
                 if (status.isFav)
                 {
                     this.text = "【お気に入り通知】@" + status.source.screen_name + "がお気に入り追加しました\n" + this.text + "";
-                }
-                if (status.isFaved)
+                } else 
+                if (status.isFavToMe)
                 {
                     this.text = "【お気に入り通知】@" + status.source.screen_name + "にお気に入り追加されました\n" + this.text + "";
-                }
-                if (status.isUnFav)
+                } else
+                if (status.isUnFav || status.isUnFavToMe)
                 {
                     this.text = "【お気に入り削除通知】@" + status.source.screen_name + "がお気に入りから削除しました\n" + this.text + "";
-                }
-                if (status.isUnFaved)
-                {
-                    this.text = "【お気に入り削除通知】お気に入りから削除しました\n" + this.text + "";
                 }
                 this.entities = new TwitterEntities(this.text);
                 //this.text += ( status.notify_event == "favorite" ? "がふぁぼられました" : "があんふぁぼられました" );
             }
-            else if (status.notify_event == "follow" || status.notify_event == "unfollow")
+            else if (status.isFollowsCategory)
             {
                 GenerateDummyTwitterStatus();
                 var s = status.source as TwitterUserStatus;
                 var t = status.target as TwitterUserStatus;
                 this.user = s;
-                this.text = "【フォロー通知】\n@" + t.screen_name + "(" + t.name + ")を" + (status.notify_event == "follow" ? "フォロー" : "アンフォロー") + "しました";
+                if ( status.isOwnFollow || status.isOwnUnFollow )
+                {
+                    this.text = "【フォロー通知】\n@" + t.screen_name + "(" + t.name + ")を" + ( status.isOwnFollow ? "フォロー" : "アンフォロー" ) + "しました";
+                }
+                else if ( status.isFollowToMe || status.isUnFollowToMe )
+                {
+                    this.text = "【フォロー通知】\n@" + t.screen_name + "(" + t.name + ")に" + ( status.isFollowToMe ? "フォロー" : "アンフォロー" ) + "されました";
+                }
+                else if ( status.isFollow || status.isUnFollow )
+                {
+                    this.text = "【フォロー通知】\n@" + t.screen_name + "(" + t.name + ")を" + ( status.isFollow ? "フォロー" : "アンフォロー" ) + "しました";
+                }
                 this.entities = new TwitterEntities(this.text);
+            }
+            else if ( status.isUpdateProfileCategory )
+            {
+                GenerateDummyTwitterStatus ();
+                var s = status.source as TwitterUserStatus;
+                this.user = s;
+                this.text = "【プロフィール更新通知】\n@"+ s.screen_name +"("+ s.name +")がプロフィールを更新しました。\n"+ s.description +"";
+                this.entities = new TwitterEntities ( this.text );
             }
         }
 
@@ -218,7 +242,7 @@ namespace Shrimp.Twitter.Status
         {
             get
             {
-                return (this.NotifyStatus != null && this.NotifyStatus.isFollow);
+                return (this.NotifyStatus != null && this.NotifyStatus.isFollowsCategory);
             }
         }
 
@@ -283,6 +307,14 @@ namespace Shrimp.Twitter.Status
                 return @" UNION"
                 + @" SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?";
             }
+        }
+
+        /// <summary>
+        /// タイムラインSQLを取得する
+        /// </summary>
+        public static string GetUserTweets ( decimal id )
+        {
+            return "SELECT * FROM tweet AS tweets cross join user on tweets.user_id = user.id WHERE tweets.user_id = '"+ id +"' order by id desc limit 3200";
         }
 
         /// <summary>
@@ -429,6 +461,24 @@ namespace Shrimp.Twitter.Status
             set;
         }
 
+		/// <summary>
+		/// リツイートユーザー一覧
+		/// </summary>
+		public virtual NotifySourceUsers retweet_users
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// お気に入りユーザ一覧
+		/// </summary>
+		public virtual NotifySourceUsers favorite_users
+		{
+			get;
+			set;
+		}
+
         /// <summary>
         /// すでにふぁぼられてる？
         /// </summary>
@@ -494,6 +544,8 @@ namespace Shrimp.Twitter.Status
             dest.replyID = this.replyID;
             dest.retweet_count = this.retweet_count;
             dest.retweeted = this.retweeted;
+			dest.retweet_users = (this.retweet_users != null ? (NotifySourceUsers)this.retweet_users.Clone() : null);
+			dest.favorite_users = ( this.favorite_users != null ? (NotifySourceUsers)this.favorite_users.Clone() : null );
             dest.retweeted_status = (this.retweeted_status != null ? (TwitterStatus)this.retweeted_status.Clone() : null);
             dest.source = (string)this.source.Clone();
             dest.source_url = (string)this.source_url.Clone();

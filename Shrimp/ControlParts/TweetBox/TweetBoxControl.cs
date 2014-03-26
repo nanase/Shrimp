@@ -170,6 +170,21 @@ namespace Shrimp.ControlParts.TweetBox
             }
         }
 
+        public void AddWord ( string text, bool isScreenName )
+        {
+            this.TweetBox.AddWord ( text, isScreenName );
+        }
+
+        public void AddWordRange ( List<string> text, bool isScreenName )
+        {
+            this.TweetBox.AddWordRange ( text, isScreenName );
+        }
+
+        public void ResetListPosition ()
+        {
+            this.TweetBox.ResetListPosition ();
+        }
+
         /// <summary>
         /// 選択されたアイコン
         /// </summary>
@@ -508,8 +523,11 @@ namespace Shrimp.ControlParts.TweetBox
         private void TweetBox_KeyDown(object sender, KeyEventArgs e)
         {
             var textbox = sender as TextBox;
-            if ((e.Control || e.Shift) && e.KeyValue == 13)
-                this.TweetSendButton.PerformClick();
+            if ( ( e.Control || e.Shift ) && e.KeyValue == 13 )
+            {
+                this.TweetSendButton.PerformClick ();
+                e.SuppressKeyPress = false;
+            }
         }
 
         private void TweetBox_Leave(object sender, EventArgs e)
@@ -568,11 +586,14 @@ namespace Shrimp.ControlParts.TweetBox
             }
             set
             {
-                this.Invoke((MethodInvoker)delegate()
+                if ( this.IsHandleCreated )
                 {
-                    this.tmpConfigStatus = value;
-                    this.SelectImage(!String.IsNullOrEmpty(this.AttachImagePath), this.tmpConfigStatus);
-                });
+                    this.BeginInvoke ( (MethodInvoker)delegate ()
+                    {
+                        this.tmpConfigStatus = value;
+                        this.SelectImage ( !String.IsNullOrEmpty ( this.AttachImagePath ), this.tmpConfigStatus );
+                    } );
+                }
             }
         }
 
@@ -662,9 +683,9 @@ namespace Shrimp.ControlParts.TweetBox
                 if (ext == ".png" || ext == ".jpg" || ext == ".gif")
                 {
                     //  
-                    this.AttachImagePath = fileName[0];
-                    this.SelectImage(true, tmpConfigStatus);
-                    this.SelectTweetBox();
+                    if ( this.loadImage ( fileName[0], false ) )
+                        this.AttachImagePath = (string)fileName[0].Clone();
+                    this.SelectImage ( !String.IsNullOrEmpty ( this.AttachImagePath ), this.tmpConfigStatus );
                 }
             }
         }

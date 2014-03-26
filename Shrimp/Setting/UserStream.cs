@@ -12,6 +12,7 @@ namespace Shrimp.Setting
             isRepliesAll = false;
             isIncludeFollowingsActivity = false;
             isEnableUserstream = true;
+            isMuteWithoutFriends = false;
         }
 
         public static void load(Dictionary<string, bool> obj)
@@ -24,6 +25,8 @@ namespace Shrimp.Setting
                 isIncludeFollowingsActivity = obj["isIncludeFollowingsActivity"];
             if (obj.ContainsKey("isEnableUserstream"))
                 isEnableUserstream = obj["isEnableUserstream"];
+            if ( obj.ContainsKey ( "isMuteWithoutFriends" ) )
+                isMuteWithoutFriends = obj["isMuteWithoutFriends"];
         }
 
         public static Dictionary<string, bool> save()
@@ -32,6 +35,7 @@ namespace Shrimp.Setting
             dest["isIncludeFollowingsActivity"] = isIncludeFollowingsActivity;
             dest["isRepliesAll"] = isRepliesAll;
             dest["isEnableUserstream"] = isEnableUserstream;
+            dest["isMuteWithoutFriends"] = isMuteWithoutFriends;
             return dest;
         }
 
@@ -59,6 +63,15 @@ namespace Shrimp.Setting
         /// include_followings_activiy
         /// </summary>
         public static bool isIncludeFollowingsActivity
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// フォロー外のリプライを受信しない
+        /// </summary>
+        public static bool isMuteWithoutFriends
         {
             get;
             set;

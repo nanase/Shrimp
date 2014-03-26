@@ -14,7 +14,7 @@ namespace Shrimp.ControlParts.TweetBox
         bool _listShow = false;
         bool isScreenName = false;
         int offset = 0;
-        bool EnableAutoComplete = false;
+        bool EnableAutoComplete = true;
 
         public TextBoxAC()
         {
@@ -32,6 +32,16 @@ namespace Shrimp.ControlParts.TweetBox
             this.acf.AddWord("#hage", false);
             this.acf.AddWord("#hoge", false);
             */
+        }
+
+        public void AddWord ( string text, bool isScreenName )
+        {
+            this.acf.AddWord ( text, isScreenName );
+        }
+
+        public void AddWordRange ( List<string> text, bool isScreenName )
+        {
+            this.acf.AddWordRange ( text, isScreenName );
         }
 
         public bool listShow
@@ -66,6 +76,10 @@ namespace Shrimp.ControlParts.TweetBox
 
             if (this.listShow)
             {
+                if ( this.offset >= this.Text.Length )
+                {
+                    return;
+                }
                 string repSourceText = this.Text.Substring(this.offset);
                 var tmpStr = this.searchStr(repSourceText + e.KeyChar.ToString());
                 if (this.acf.SetItems(tmpStr, isScreenName) != 0)
@@ -93,6 +107,20 @@ namespace Shrimp.ControlParts.TweetBox
                 this.acf.ShowWithoutActive();
                 this.acf.SelectedIndex = 0;
                 this.Focus();
+            }
+        }
+
+        /// <summary>
+        /// リスト位置をリセット
+        /// </summary>
+        public void ResetListPosition ()
+        {
+            if ( this.listShow )
+            {
+                this.offset = this.SelectionStart;
+                Point point = this.GetCaretPosition ();
+                point.Y += (int)Math.Ceiling ( this.Font.GetHeight () ); //13 is the .y postion of the richtectbox
+                this.acf.Location = this.PointToScreen ( point );
             }
         }
 
@@ -166,6 +194,8 @@ namespace Shrimp.ControlParts.TweetBox
                     string autoText = (string)this.acf.SelectedItem.Clone();
                     autoText += " ";
 
+                    if ( this.Text.Length <= this.offset )
+                        return;
                     string repSourceText = this.Text.Substring(this.offset);
 
                     StringBuilder sb = new System.Text.StringBuilder(this.Text);

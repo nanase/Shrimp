@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Shrimp.Twitter.Status
 {
@@ -17,7 +18,7 @@ namespace Shrimp.Twitter.Status
             this.notify_event = "retweeted";
         }
 
-        public TwitterNotifyStatus(dynamic raw_data)
+        public TwitterNotifyStatus(TwitterInfo srv, dynamic raw_data)
         {
             if (raw_data.IsDefined("target") && raw_data.target != null)
                 this.target = new TwitterUserStatus(raw_data.target);
@@ -30,6 +31,7 @@ namespace Shrimp.Twitter.Status
                                         raw_data.created_at,
                                         "ddd MMM dd HH:mm:ss K yyyy",
                                         System.Globalization.DateTimeFormatInfo.InvariantInfo);
+            this.SetParameter ( srv );
         }
 
         /// <summary>
@@ -78,18 +80,93 @@ namespace Shrimp.Twitter.Status
         }
 
         /// <summary>
-        /// 独自パラメータ。ふぁぼられたらこれがくる
+        /// パラメータを設定するコマンド
         /// </summary>
-        public bool isFaved
+        /// <param name="srv"></param>
+        public void SetParameter ( TwitterInfo srv )
+        {
+            //  TwitterInfoを元に、パラメータをセットする
+            if ( this.source.id == srv.UserId )
+            {
+                //
+                if ( this.isFavoriteCategory )
+                    this.isOwnFav = true;
+                if ( this.isUnfavoriteCategory )
+                    this.isOwnUnFav = true;
+                if ( this.isFollowCategory )
+                    this.isOwnFollow = true;
+                if ( this.isUnFollowCategory )
+                    this.isOwnUnFollow = true;
+
+            } else if ( this.target.id == srv.UserId )
+            {
+                //
+                if ( this.isFavoriteCategory )
+                    this.isFavToMe = true;
+                if ( this.isUnfavoriteCategory )
+                    this.isUnFavToMe = true;
+                if ( this.isFollowCategory )
+                    this.isFollowToMe = true;
+                if ( this.isUnFollowCategory )
+                    this.isUnFollowToMe = true;
+            }
+            else
+            {
+                //
+                if ( this.isFavoriteCategory )
+                    this.isFav = true;
+                if ( this.isUnfavoriteCategory )
+                    this.isUnFav = true;
+                if ( this.isFollowCategory )
+                    this.isFollow = true;
+                if ( this.isUnFollowCategory )
+                    this.isUnFollow = true;
+            }
+        }
+
+        /// <summary>
+        /// パラメータを複数セットする
+        /// </summary>
+        /// <param name="srvs"></param>
+        public void SetParameters ( List<TwitterInfo> srvs )
+        {
+            foreach ( TwitterInfo srv in srvs )
+            {
+                this.SetParameter ( srv );
+            }
+        }
+
+        /// <summary>
+        /// ふぁぼ
+        /// </summary>
+        public bool isFav
         {
             get;
             set;
         }
 
         /// <summary>
-        /// 他の人へのふぁぼ
+        /// あんふぁぼ
         /// </summary>
-        public bool isFav
+        public bool isUnFav
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 自分宛のふぁぼ
+        /// </summary>
+        public bool isFavToMe
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 自分宛のあんふぁぼ
+        /// </summary>
+        public bool isUnFavToMe
         {
             get;
             set;
@@ -104,33 +181,127 @@ namespace Shrimp.Twitter.Status
             set;
         }
 
-        public bool isUnFaved
-        {
-            get;
-            set;
-        }
-
-        public bool isUnFav
-        {
-            get;
-            set;
-        }
-
+        /// <summary>
+        /// 自分で発行したあんふぁぼ
+        /// </summary>
         public bool isOwnUnFav
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// フォロー
+        /// </summary>
         public bool isFollow
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// アンフォロー
+        /// </summary>
+        public bool isUnFollow
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 自分宛のフォロー
+        /// </summary>
+        public bool isFollowToMe
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 自分宛のアンフォロー
+        /// </summary>
+        public bool isUnFollowToMe
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 自分のフォロー
+        /// </summary>
+        public bool isOwnFollow
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 自分のアンフォロー
+        /// </summary>
+        public bool isOwnUnFollow
+        {
+            get;
+            set;
+        }
+        /// <summary>
+		/// 通知の種類がふぁぼかどうか
+		/// </summary>
+        public bool isFavoriteCategory
         {
             get
             {
-                return (this.notify_event == "follow" || this.notify_event == "unfollow");
+                return (this.notify_event == "favorite");
             }
         }
 
-        public bool isRetweeted
+        /// <summary>
+		/// 通知の種類があんふぁぼかどうか
+		/// </summary>
+        public bool isUnfavoriteCategory
+        {
+            get
+            {
+                return (this.notify_event == "unfavorite");
+            }
+        }
+
+		/// <summary>
+		/// 通知の種類がフォロー・アンフォローであるかどうか
+		/// </summary>
+        public bool isFollowsCategory
+        {
+            get
+            {
+                return ( this.isFollowCategory || this.isUnFollowCategory );
+            }
+        }
+
+        /// <summary>
+        /// 通知の種類がフォローかどうか
+        /// </summary>
+        public bool isFollowCategory
+        {
+            get
+            {
+                return (this.notify_event == "follow");
+            }
+        }
+
+        /// <summary>
+        /// 通知の種類がアンフォローかどうか
+        /// </summary>
+        public bool isUnFollowCategory
+        {
+            get
+            {
+                return (this.notify_event == "unfollow");
+            }
+        }
+
+		/// <summary>
+		/// 通知の種類が、リツイートであるかどうか
+		/// </summary>
+        public bool isRetweetedCategory
         {
             get
             {
@@ -138,15 +309,34 @@ namespace Shrimp.Twitter.Status
             }
         }
 
+		/// <summary>
+		/// 通知の種類が、プロフィールの更新であるかどうか
+		/// </summary>
+        public bool isUpdateProfileCategory
+        {
+            get
+            {
+                return ( this.notify_event == "user_update" );
+            }
+        }
+
         public object Clone()
         {
             var dest = new TwitterNotifyStatus();
             dest.isFav = this.isFav;
-            dest.isFaved = this.isFaved;
+            dest.isFavToMe = this.isFavToMe;
             dest.isOwnFav = this.isOwnFav;
             dest.isOwnUnFav = this.isOwnUnFav;
             dest.isUnFav = this.isUnFav;
-            dest.isUnFaved = this.isUnFaved;
+            dest.isUnFavToMe = this.isUnFavToMe;
+
+            dest.isFollow = this.isFollow;
+            dest.isUnFollow = this.isUnFollow;
+            dest.isOwnFollow = this.isOwnFollow;
+            dest.isOwnUnFollow = this.isOwnUnFollow;
+            dest.isFollowToMe = this.isFollowToMe;
+            dest.isUnFollowToMe = this.isUnFollowToMe;
+
             dest.notify_event = (string)this.notify_event.Clone();
             dest.source = (TwitterUserStatus)this.source.Clone();
             dest.target = (TwitterUserStatus)this.target.Clone();

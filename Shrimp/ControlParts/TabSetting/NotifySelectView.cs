@@ -19,6 +19,7 @@ namespace Shrimp.ControlParts.TabSetting
             notifyBox.SetItemChecked(4, notifyFilter.Followed);
             notifyBox.SetItemChecked(5, notifyFilter.Unfollowed);
             notifyBox.SetItemChecked ( 6, notifyFilter.Retweeted );
+            notifyBox.SetItemChecked ( 7, notifyFilter.UserUpdated );
             tmpFilter = notifyFilter;
             this.isInitialized = true;
         }
@@ -42,6 +43,8 @@ namespace Shrimp.ControlParts.TabSetting
                     tmpFilter.OwnFavorited = !tmpFilter.OwnFavorited;
                 if ( item == "(自分のツイートが)お気に入りから削除されたとき" )
                     tmpFilter.OwnUnFavorited = !tmpFilter.OwnUnFavorited;
+                if ( item == "ユーザがプロフィールを更新したとき" )
+                    tmpFilter.UserUpdated = !tmpFilter.UserUpdated;
 
             }
             //return notify;

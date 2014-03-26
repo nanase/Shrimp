@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml.Serialization;
+using System.Collections.Generic;
 
 namespace Shrimp.Twitter.REST.List
 {
@@ -12,6 +13,8 @@ namespace Shrimp.Twitter.REST.List
         private string _slug;
         private string _name;
         private decimal _create_user_id;
+        private List<decimal> _list_users;
+        private decimal _list_user_cursor;
 
         public listData()
         {
@@ -95,5 +98,25 @@ namespace Shrimp.Twitter.REST.List
             set { this._create_user_id = value; }
         }
 
+        /// <summary>
+        /// リストのユーザ一覧
+        /// </summary>
+        [XmlIgnore]
+        public List<decimal> list_users
+        {
+            get { return this._list_users; }
+            set { this._list_users = value; }
+        }
+
+
+        /// <summary>
+        /// リストのユーザ一覧カーソル
+        /// </summary>
+        [XmlIgnore]
+        public decimal list_users_cursor
+        {
+            get { return this._list_user_cursor; }
+            set { this._list_user_cursor = value; }
+        }
     }
 }

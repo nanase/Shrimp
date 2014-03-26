@@ -20,6 +20,9 @@ using Shrimp.Twitter.REST.DirectMessage;
 using Shrimp.Twitter.REST.List;
 using Shrimp.Twitter.REST.Timelines;
 using Shrimp.Twitter.Status;
+using Shrimp.Module.Queue;
+using System.Threading.Tasks;
+using Shrimp.Twitter.REST;
 
 namespace Shrimp.ControlParts.Tabs
 {
@@ -34,6 +37,8 @@ namespace Shrimp.ControlParts.Tabs
         private TabControlsCollection tabs = new TabControlsCollection();
         private TabControlContextMenu TabControlContextMenu;
         private bool isDisposeds = false;
+
+        private TabQueue tabQueue = new TabQueue ();
         /// <summary>
         /// アカウント情報を取得するのに必要
         /// </summary>
@@ -501,6 +506,11 @@ namespace Shrimp.ControlParts.Tabs
             }
         }
 
+        public void StopTabQueue ()
+        {
+            this.tabQueue.Wait ();
+        }
+
         /// <summary>
         /// タブを作成する
         /// </summary>
@@ -669,24 +679,30 @@ namespace Shrimp.ControlParts.Tabs
                 if (tab.tabDelivery.isTimeline)
                 {
                     List<TwitterStatus> statuses = null;
-                    if (tab.tabDelivery.TopCategory == TimelineCategories.DirectMessageTimeline)
+                    if ( tab.tabDelivery.TopCategory == TimelineCategories.DirectMessageTimeline )
                     {
                         //  DM
-                        statuses = db.GetlistDirectMessages(tab.getDMTimelineSQL, 0, 0).ConvertAll((t) => (TwitterStatus)t);
+                        statuses = db.GetlistDirectMessages ( tab.getDMTimelineSQL, 0, 0 ).ConvertAll ( ( t ) => (TwitterStatus)t );
                     }
                     else
                     {
-                        statuses = db.GetlistTweets(tab.getTimelineSQL, 0, 0);
+                        statuses = db.GetlistTweets ( tab.getTimelineSQL, 0, 0 );
                     }
-                    if (OnCreatedTweet != null)
+                    if ( statuses != null )
                     {
-                        foreach (TwitterStatus tweet in statuses)
+                        if ( OnCreatedTweet != null )
                         {
-                            OnCreatedTweet.BeginInvoke(new OnCreatedTweetHook(tweet), null, null);
+                            foreach ( TwitterStatus tweet in statuses )
+                            {
+                                OnCreatedTweet.BeginInvoke ( new OnCreatedTweetHook ( tweet ), null, null );
+                            }
                         }
+                        tab.BeginInvoke ( (MethodInvoker)delegate ()
+                        {
+                            tab.InsertTimelineRange ( statuses, true );
+                            tab.SetFirstView ( true );
+                        } );
                     }
-                    tab.InsertTimelineRange(statuses, true);
-                    tab.SetFirstView(true);
                 }
             }
         }
@@ -698,19 +714,22 @@ namespace Shrimp.ControlParts.Tabs
         /// <param name="destCategories"></param>
         public void InsertTweet(TwitterInfo sourceUser, TwitterStatus tweet, TimelineCategories destCategories)
         {
-            object obj = null;
-            //  プラグイン
-            if (OnCreatedTweet != null)
+            tabQueue.Enqueue ( new TabQueueData ( this, (Module.Queue.TabQueueData.TabQueueActionDelegate)delegate ()
             {
-                var hook = new OnCreatedTweetHook(tweet);
-                OnCreatedTweet.BeginInvoke(hook, null, null);
-                tweet = hook.status;
-            }
+                object obj = tweet;
+                //  プラグイン
+                if ( OnCreatedTweet != null )
+                {
+                    var hook = new OnCreatedTweetHook ( tweet );
+                    OnCreatedTweet.BeginInvoke ( hook, null, null );
+                    tweet = hook.status;
+                }
 
-            if (destCategories == TimelineCategories.NotifyTimeline)
-                obj = tweet.NotifyStatus;
-            decimal id = (sourceUser != null ? sourceUser.UserId : 0);
-            this.tabs.InsertTweet(this.shrimpQueryParser, tweet, id, destCategories, obj);
+                if ( destCategories == TimelineCategories.NotifyTimeline )
+                    obj = tweet.NotifyStatus;
+                decimal id = ( sourceUser != null ? sourceUser.UserId : 0 );
+                this.tabs.InsertTweet ( this.shrimpQueryParser, tweet, id, destCategories, obj );
+            } ) );
         }
 
         /// <summary>
@@ -720,35 +739,43 @@ namespace Shrimp.ControlParts.Tabs
         /// <param name="tweets"></param>
         /// <param name="destCategories"></param>
         /// <param name="obj"></param>
-        public int InsertTweetRange(decimal user_id, List<TwitterStatus> tweets, TimelineCategories destCategories, object obj)
+        public void InsertTweetRange(decimal user_id, List<TwitterStatus> tweets, TimelineCategories destCategories, object obj)
         {
             if (tweets == null || tweets.Count == 0)
-                return 0;
+                return;
 
-            if (OnCreatedTweet != null)
+            tabQueue.Enqueue ( new TabQueueData ( this, (Module.Queue.TabQueueData.TabQueueActionDelegate)delegate()
             {
-                foreach (TwitterStatus tweet in tweets)
+                if (OnCreatedTweet != null)
                 {
-                    OnCreatedTweet.BeginInvoke(new OnCreatedTweetHook(tweet), null, null);
+                    foreach (TwitterStatus tweet in tweets)
+                    {
+                        OnCreatedTweet.BeginInvoke(new OnCreatedTweetHook(tweet), null, null);
+                    }
                 }
-            }
+                this.tabs.InsertTweetRange(this.shrimpQueryParser, tweets, user_id, destCategories, obj);
+            } ) );
 
-            return this.tabs.InsertTweetRange(this.shrimpQueryParser, tweets, user_id, destCategories, obj);
+            return;
         }
 
-        public int InsertTweetRange(TabControls tab, List<TwitterStatus> tweets)
+        public void InsertTweetRange ( TabControls tab, List<TwitterStatus> tweets )
         {
-            if (tweets == null || tweets.Count == 0)
-                return 0;
+            if ( tweets == null || tweets.Count == 0 )
+                return;
 
-            if (OnCreatedTweet != null)
+            tabQueue.Enqueue ( new TabQueueData ( this, (Module.Queue.TabQueueData.TabQueueActionDelegate)delegate ()
             {
-                foreach (TwitterStatus tweet in tweets)
+                if ( OnCreatedTweet != null )
                 {
-                    OnCreatedTweet.BeginInvoke(new OnCreatedTweetHook(tweet), null, null);
+                    foreach ( TwitterStatus tweet in tweets )
+                    {
+                        OnCreatedTweet.BeginInvoke ( new OnCreatedTweetHook ( tweet ), null, null );
+                    }
                 }
-            }
-            return tab.InsertTimelineRange(tweets);
+                tab.InsertTimelineRange ( tweets );
+            } ) );
+            return;
         }
 
         /// <summary>
@@ -776,10 +803,16 @@ namespace Shrimp.ControlParts.Tabs
                      if (tmp.Count != 0)
                      {
                          t.MentionTimelineSinceID = tmp[0].id;
-                         this.Invoke((MethodInvoker)delegate()
-                        {
-                            this.InsertTweetRange(t.UserId, tmp, TimelineCategories.MentionTimeline, null);
-                        });
+                         try
+                         {
+                             this.BeginInvoke ( (MethodInvoker)delegate ()
+                            {
+                                this.InsertTweetRange ( t.UserId, tmp, TimelineCategories.MentionTimeline, null );
+                            } );
+                         }
+                         catch ( Exception )
+                         {
+                         }
                      }
                  }, null, t.MentionTimelineSinceID);
             }
@@ -797,10 +830,16 @@ namespace Shrimp.ControlParts.Tabs
                             db.InsertUserRange(tmp.ConvertAll((dm) => dm.user));
                             t.DirectMessageReceivedSinceID = tmp[0].id;
                             var lis = tmp.ConvertAll((tweet) => (TwitterStatus)tweet);
-                            this.Invoke((MethodInvoker)delegate()
+                            try
                             {
-                                this.InsertTweetRange(t.UserId, lis, TimelineCategories.DirectMessageTimeline, null);
-                            });
+                                this.BeginInvoke ( (MethodInvoker)delegate ()
+                                {
+                                    this.InsertTweetRange ( t.UserId, lis, TimelineCategories.DirectMessageTimeline, null );
+                                } );
+                            }
+                            catch ( Exception )
+                            {
+                            }
                         }
                     }, null, t.DirectMessageReceivedSinceID, 0);
                 directMessage.GetSentDirectMessage(t,
@@ -813,10 +852,16 @@ namespace Shrimp.ControlParts.Tabs
                             db.InsertUserRange(tmp.ConvertAll((dm) => dm.user));
                             t.DirectMessageReceivedSinceID = tmp[0].id;
                             var lis = tmp.ConvertAll((tweet) => (TwitterStatus)tweet);
-                            this.Invoke((MethodInvoker)delegate()
+                            try
                             {
-                                this.InsertTweetRange(t.UserId, lis, TimelineCategories.DirectMessageTimeline, null);
-                            });
+                                this.BeginInvoke ( (MethodInvoker)delegate ()
+                                {
+                                    this.InsertTweetRange ( t.UserId, lis, TimelineCategories.DirectMessageTimeline, null );
+                                } );
+                            }
+                            catch ( Exception )
+                            {
+                            }
                         }
                     }, null, t.DirectMessageSendSinceID, 0);
             }
@@ -831,10 +876,13 @@ namespace Shrimp.ControlParts.Tabs
                      if (tmp.Count != 0)
                      {
                          t.HomeTimelineSinceID = tmp[0].id;
-                         this.Invoke((MethodInvoker)delegate()
-                        {
-                            this.InsertTweetRange(t.UserId, tmp, TimelineCategories.HomeTimeline, null);
-                        });
+                         if ( this.IsHandleCreated )
+                         {
+                             this.BeginInvoke ( (MethodInvoker)delegate ()
+                            {
+                                this.InsertTweetRange ( t.UserId, tmp, TimelineCategories.HomeTimeline, null );
+                            } );
+                         }
                          //delay.Invoke ( per );
                      }
                  }, null, t.HomeTimelineSinceID);
@@ -849,16 +897,50 @@ namespace Shrimp.ControlParts.Tabs
 
                 foreach (listData list in destC.lists)
                 {
+                    if ( list.list_users == null || list.list_users_cursor != 0 )
+                    {
+                        //  リストのメンバーを取得
+                        Task.Factory.StartNew ( () =>
+                        {
+                            for ( ; ; )
+                            {
+                                var isLimited = false;
+                                var thread = lists.listMembers ( t,
+                                (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate ( object data )
+                                {
+                                    TwitterFriendshipResult tmp = (TwitterFriendshipResult)data;
+                                    list.list_users_cursor = tmp.next_cursor;
+                                    if ( tmp.Count != 0 )
+                                    {
+                                        if ( list.list_users == null )
+                                            list.list_users = new List<decimal> ();
+                                        list.list_users.AddRange ( tmp.ConvertAll ( ( user ) => user.id ) );
+                                    }
+                                }, (Twitter.REST.TwitterWorker.TwitterErrorProcessDelegate)delegate ( TwitterCompletedEventArgs data )
+                                {
+                                    isLimited = true;
+                                }, list.list_id, list.slug, list.list_users_cursor );
+                                thread.Join ();
+
+                                if ( list.list_users_cursor <= 0 || isLimited )
+                                    break;
+
+                            }
+                        } );
+                    }
                     lists.listStatuses(t,
                     (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
                     {
                         List<TwitterStatus> tmp = (List<TwitterStatus>)data;
                         if (tmp.Count != 0)
                         {
-                            this.Invoke((MethodInvoker)delegate()
+                            if ( this.IsHandleCreated )
                             {
-                                this.InsertTweetRange(list.create_user_id, tmp, TimelineCategories.ListTimeline, list.list_id);
-                            });
+                                this.BeginInvoke ( (MethodInvoker)delegate ()
+                                {
+                                    this.InsertTweetRange ( list.create_user_id, tmp, TimelineCategories.ListTimeline, list.list_id );
+                                } );
+                            }
                         }
                     }, null, list.list_id, list.slug);
                 }

@@ -19,7 +19,7 @@ namespace Shrimp.ControlParts.TabSetting
             this._category = delivery.Category;
             this._listDatas = listDatas;
 
-            this.listControl = new ListSelectView(this._listDatas);
+            this.listControl = new ListSelectView(this._listDatas, delivery.Category.ListData);
             this.listControl.OnChangedDetail += new EventHandler(listOnChangedDetail);
             if (this._category.notifyFilter == null)
                 this._category.notifyFilter = new Twitter.Status.NotifyFilter();

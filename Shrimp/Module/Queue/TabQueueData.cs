@@ -2,24 +2,29 @@
 
 namespace Shrimp.Module.Queue
 {
+	/// <summary>
+	/// タブのキュー
+	/// </summary>
     class TabQueueData
     {
-        private readonly TabControls _sender;
-        private readonly object _raw_data;
+        public delegate void TabQueueActionDelegate ();
 
-        public TabQueueData(TabControls sender, object raw_data)
+        private readonly TabQueueActionDelegate _tabQueueDelegate;
+        private readonly ShrimpTabs _sender;
+
+        public TabQueueData ( ShrimpTabs sender, TabQueueActionDelegate _tabQueueDelegate )
         {
             //
             this._sender = sender;
-            this._raw_data = raw_data;
+            this._tabQueueDelegate = _tabQueueDelegate;
         }
 
-        public object raw_data
+        public TabQueueActionDelegate ActionData
         {
-            get { return this._raw_data; }
+            get { return this._tabQueueDelegate; }
         }
 
-        public TabControls sender
+        public ShrimpTabs sender
         {
             get { return this._sender; }
         }
