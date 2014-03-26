@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using OAuth;
@@ -39,7 +40,8 @@ using Shrimp.Twitter.Status.StatusChecker;
 using Shrimp.Twitter.Streaming;
 using Shrimp.Update;
 using Shrimp.Win32API;
-using Shrimp.ControlParts.Users;
+using System.Linq;
+using System.Collections;
 
 namespace Shrimp
 {
@@ -80,6 +82,9 @@ namespace Shrimp
         private bool isDisposedShrimp = false;
         private bool BootingUpdater = false;
         private int tweetBoxHeight = 0;
+
+        //  通知の重複避け
+        private Stack<TwitterNotifyStatus> notifyStacks;
 
         #region デリゲート
         public delegate void CallPlugin(string function, object[] args);
@@ -142,6 +147,7 @@ namespace Shrimp
             this.boxHeight = tweetBox.Height;
             this.tweetBox.EnableControls = false;
             this.userControl.isLoadingFinished = true;
+            this.notifyStacks = new Stack<TwitterNotifyStatus> ();
         }
 
         /// <summary>
@@ -540,6 +546,8 @@ namespace Shrimp
 
 			//Form1 fmm = new Form1();
 			//fmm.Show();
+
+            notifyLabel.Text = "Tweets: " + db.GetDatabasesTweets ( "tweet" ) +"";
         }
 
         private void OnCreatingUpdateForm(string log)
@@ -734,28 +742,39 @@ namespace Shrimp
                         this.tmplistDatas.AddlistRange(res_data);
                     }, null, null, t.UserId);
 
-                    userAPI.FollowerUser ( twIn, (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate ( object data )
+                    Task.Factory.StartNew ( () =>
                     {
-                        TwitterFriendshipResult user = (TwitterFriendshipResult)data;
-                        twIn.follower_cursor = user.next_cursor;
-                        if ( user.Count != 0 )
+                        Thread dest = null;
+                        for ( int i = 0; i < 10; i++ )
                         {
-                            if ( db != null )
-                                db.InsertUserRange ( user );
-                            this.tweetBox.AddWordRange ( user.ConvertAll ( ( us ) => "@" + us.screen_name + "" ), true );
+                            dest = userAPI.FollowerUser ( twIn, (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate ( object data )
+                            {
+                                TwitterFriendshipResult user = (TwitterFriendshipResult)data;
+                                twIn.follower_cursor = user.next_cursor;
+                                if ( user.Count != 0 )
+                                {
+                                    if ( db != null )
+                                        db.InsertUserRange ( user );
+                                    this.tweetBox.AddWordRange ( user.ConvertAll ( ( us ) => "@" + us.screen_name + "" ), true );
+                                }
+                            }, null, twIn.follower_cursor );
+
+                            dest.Join ();
+
+                            dest = userAPI.FollowUser ( twIn, (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate ( object data )
+                            {
+                                TwitterFriendshipResult user = (TwitterFriendshipResult)data;
+                                twIn.friends_cursor = user.next_cursor;
+                                if ( user.Count != 0 )
+                                {
+                                    if ( db != null )
+                                        db.InsertUserRange ( user );
+                                    this.tweetBox.AddWordRange ( user.ConvertAll ( ( us ) => "@" + us.screen_name + "" ), true );
+                                }
+                            }, null, twIn.friends_cursor );
+                            dest.Join ();
                         }
-                    }, null, twIn.follower_cursor );
-                    userAPI.FollowUser ( twIn, (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate ( object data )
-                    {
-                        TwitterFriendshipResult user = (TwitterFriendshipResult)data;
-                        twIn.friends_cursor = user.next_cursor;
-                        if ( user.Count != 0 )
-                        {
-                            if ( db != null )
-                                db.InsertUserRange ( user );
-                            this.tweetBox.AddWordRange ( user.ConvertAll ( ( us ) => "@" + us.screen_name + "" ), true );
-                        }
-                    }, null, twIn.friends_cursor );
+                    } );
                 }
             });
 
@@ -878,7 +897,8 @@ namespace Shrimp
                 {
                     this.Invoke ( (MethodInvoker)delegate ()
                     {
-                        this.shrimpSpringLabel.Text = value;
+                        this.shrimpSpringLabel.AddText ( value, null );
+                        //this.shrimpSpringLabel.Text = value;
                     } );
                 }
                 catch ( Exception )
@@ -1085,11 +1105,13 @@ namespace Shrimp
         /// <param name="e"></param>
         void us_notifyHandler(object sender, TwitterCompletedEventArgs e)
         {
+            
             if (e != null && e.data != null)
             {
+                var notify = e.data as TwitterNotifyStatus;
                 if ( Setting.UserStream.isMuteWithoutFriends )
                 {
-                    var tmpData = ( (TwitterNotifyStatus)e.data ).target_object;
+                    var tmpData = notify.target_object;
                     if ( e.friends != null && tmpData != null && tmpData is TwitterStatus )
                     {
                         var tmpTweet = tmpData as TwitterStatus;
@@ -1100,8 +1122,26 @@ namespace Shrimp
                         }
                     }
                 }
+
+                lock ( ( (System.Collections.ICollection)this.notifyStacks ).SyncRoot )
+                {
+                    if ( this.notifyStacks.Any ( ( notifyChk ) =>
+                        ( !notifyChk.isOwnFav && !notifyChk.isOwnUnFav ) &&
+                        ( notifyChk.notify_event == notify.notify_event ) &&
+                        ( notifyChk.source.id == notify.source.id ) &&
+                        ( notifyChk.target.id == notify.target.id ) &&
+                        ( notifyChk.isFollowsCategory ? true :
+                        ( notifyChk.target_object != null ? ( (TwitterStatus)notifyChk.target_object ).id == ( (TwitterStatus)( notify.target_object ) ).id : false ) ) ) )
+                        return;
+
+                    this.notifyStacks.Push ( notify );
+                }
+
                 TwitterStatusChecker.SetNotify(this.accountManager.accounts, (TwitterNotifyStatus)e.data);
-                this.TimelineTabControl.InsertTweet(e.account_source, new TwitterStatus((TwitterNotifyStatus)e.data), TimelineCategories.NotifyTimeline);
+                var notifyText = APIIntroduction.retNotifyIntro ( (TwitterNotifyStatus)e.data );
+                if ( notifyText != null )
+                    ShrimpSpringLabelText = notifyText;
+                this.TimelineTabControl.InsertTweet ( e.account_source, new TwitterStatus ( notify ), TimelineCategories.NotifyTimeline );
             }
         }
 

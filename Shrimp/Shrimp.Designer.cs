@@ -1,4 +1,5 @@
 ﻿using Shrimp.ControlParts.Tabs;
+using Shrimp.ControlParts.Toolstrip;
 namespace Shrimp
 {
     partial class Shrimp
@@ -33,7 +34,7 @@ namespace Shrimp
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Shrimp));
             this.statusBar = new System.Windows.Forms.StatusStrip();
             this.notifyLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.shrimpSpringLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.shrimpSpringLabel = new StatusLabel();
             this.APIStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.settingButton = new ControlParts.Popup.ToolStripButtonPopup();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -90,7 +91,7 @@ namespace Shrimp
             this.shrimpSpringLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Adjust;
             this.shrimpSpringLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.shrimpSpringLabel.Name = "shrimpSpringLabel";
-            this.shrimpSpringLabel.Size = new System.Drawing.Size(537, 17);
+            this.shrimpSpringLabel.Size = new System.Drawing.Size(506, 17);
             this.shrimpSpringLabel.Spring = true;
             this.shrimpSpringLabel.Text = "Welcome to Shrimp";
             // 
@@ -300,7 +301,7 @@ namespace Shrimp
         private System.Windows.Forms.StatusStrip statusBar;
         private System.Windows.Forms.SplitContainer MainSplit;
         private System.Windows.Forms.SplitContainer TimelineSplit;
-        private System.Windows.Forms.ToolStripStatusLabel shrimpSpringLabel;
+        private StatusLabel shrimpSpringLabel;
         private System.Windows.Forms.ToolStripStatusLabel notifyLabel;
         private System.Windows.Forms.MenuStrip MenuBar;
         private System.Windows.Forms.ToolStripMenuItem タイムラインToolStripMenuItem;
