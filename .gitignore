@@ -108,3 +108,4 @@ Backup*/
 UpgradeLog*.XML
 Shrimp/Lib/
 Shrimp/System.Data.SQLite.dll
+*.orig
