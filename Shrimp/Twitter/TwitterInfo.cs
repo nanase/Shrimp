@@ -346,7 +346,7 @@ namespace Shrimp.Twitter
                     bool decompress = (webres != null && webres.ContentEncoding.ToLower() == "gzip");
                         
                     using (var st = webres.GetResponseStream())
-                    using (StreamReader sr = st.OpenStreamReader(decompress, AdditionalEncoding.ShiftJIS)
+                    using (StreamReader sr = st.OpenStreamReader(decompress, AdditionalEncoding.ShiftJIS))
                         raw_data = sr.ReadToEnd();
 
                     if (raw_data == null)

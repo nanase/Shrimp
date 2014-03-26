@@ -26,7 +26,7 @@ namespace Shrimp.Twitter.Streaming
         public UserStreamThreadData(Thread thread, bool isFinished)
         {
             this.Thread = thread;
-            this.isFinished = isFinished;
+            this.IsFinishedThread = isFinished;
         }
     }
 }
