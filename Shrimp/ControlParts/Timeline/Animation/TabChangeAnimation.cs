@@ -63,7 +63,7 @@ namespace Shrimp.ControlParts.Timeline.Animation
         /// <param name="g"></param>
         /// <param name="maxWidth"></param>
         /// <param name="setClickLink"></param>
-        public void Draw(Graphics g, int maxWidth, ControlParts.Timeline.Draw.TweetDraw.SetClickLinkDelegate setClickLink)
+        public void Draw ( Graphics g, int maxWidth, Rectangle clipRectangle, ControlParts.Timeline.Draw.TweetDraw.SetClickLinkDelegate setClickLink, object obj )
         {
             if (Setting.Timeline.TabChangeAnimation == TabAnimation.Move)
             {

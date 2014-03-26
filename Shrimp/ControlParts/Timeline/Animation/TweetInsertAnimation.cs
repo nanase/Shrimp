@@ -106,7 +106,7 @@ namespace Shrimp.ControlParts.Timeline.Animation
             }
         }
 
-        public void Draw(Graphics g, int maxWidth, ControlParts.Timeline.Draw.TweetDraw.SetClickLinkDelegate del)
+        public void Draw ( Graphics g, int maxWidth, Rectangle clipRectangle, ControlParts.Timeline.Draw.TweetDraw.SetClickLinkDelegate del, object obj )
         {
         }
 

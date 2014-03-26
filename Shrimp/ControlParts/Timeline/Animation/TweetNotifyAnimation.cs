@@ -168,7 +168,7 @@ namespace Shrimp.ControlParts.Timeline.Animation
             set;
         }
 
-        public void Draw(Graphics g, int maxWidth, ControlParts.Timeline.Draw.TweetDraw.SetClickLinkDelegate setClickLink)
+        public void Draw ( Graphics g, int maxWidth, Rectangle clipRectangle, ControlParts.Timeline.Draw.TweetDraw.SetClickLinkDelegate setClickLink, object obj )
         {
             if (this.ShowEnable && this.notifyText != null)
             {
