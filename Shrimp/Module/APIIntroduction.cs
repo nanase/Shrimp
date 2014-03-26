@@ -1,8 +1,28 @@
 ﻿
+using Shrimp.Twitter.Status;
 namespace Shrimp.Module
 {
     class APIIntroduction
     {
+        public static string retNotifyIntro ( TwitterNotifyStatus notify )
+        {
+            if ( notify == null )
+                return null;
+            if ( notify.isFavToMe )
+            {
+                return "@" + notify.source.screen_name + "にお気に入り追加されました";
+            }
+            else if ( notify.isUnFavToMe )
+            {
+                return "@" + notify.source.screen_name + "にお気に入り削除されました";
+            }
+            else if ( notify.isFollowToMe )
+            {
+                return "@" + notify.source.screen_name + "にフォローされました";
+            }
+            return null;
+        }
+
         /// <summary>
         /// TwitterAPIの情報を返す
         /// </summary>
