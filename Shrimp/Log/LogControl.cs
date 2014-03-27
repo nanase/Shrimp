@@ -16,7 +16,7 @@ namespace Shrimp.Log
         /// </summary>
         public static int Count { get { return logs.Count; } }
 
-        public static List<string> LogData { get { return logs; } }
+        public static IEnumerable<string> LogData { get { return logs; } }
 
         public static string AllLogData { get { return string.Join ( "\r\n", logs ); } }
         #endregion
