@@ -38,10 +38,5 @@ namespace Shrimp.Log
                 return string.Join ( "\r\n", logs );
             }
         }
-
-        public static string getAllLogs ()
-        {
-            return String.Join ( "\n", logs );
-        }
     }
 }
