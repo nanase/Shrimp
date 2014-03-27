@@ -1,22 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace Shrimp.Module
+namespace Shrimp.Utils
 {
     /// <summary>
     /// Base64のユーティリティーです
     /// </summary>
-    class Base64Util
+    static class Base64Util
     {
         /// <summary>
         /// バイナリをBase64へ変換します
         /// </summary>
         /// <param name="value">バイナリデータ</param>
         /// <returns>変換結果</returns>
-        public static string ToBase64(byte[] value)
+        public static string ToBase64 ( this byte[] array )
         {
-            if (value == null)
-                return null;
-            return Convert.ToBase64String(value);
+            if ( array == null )
+                throw new ArgumentNullException ( "array" );
+
+            return Convert.ToBase64String ( array );
         }
     }
 }

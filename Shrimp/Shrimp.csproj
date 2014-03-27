@@ -305,7 +305,6 @@
       <DependentUpon>LogViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="Module\APIIntroduction.cs" />
-    <Compile Include="Module\Base64Util.cs" />
     <Compile Include="Module\ButtonImage.cs" />
     <Compile Include="Module\EncryptSerializer.cs" />
     <Compile Include="Module\Forms\ShrimpSpeed.cs">
@@ -509,6 +508,7 @@
       <DependentUpon>UpdateForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Utils\AdditionalEncoding.cs" />
+    <Compile Include="Utils\Base64Extension.cs" />
     <Compile Include="Utils\StreamExtension.cs" />
     <Compile Include="Win32API\User32.cs" />
     <EmbeddedResource Include="ControlParts\AuthPanel\AccountRegister.resx">
