@@ -924,7 +924,7 @@ namespace Shrimp.ControlParts.Timeline
             //  切り替えアニメ
             if (this.tabchange_anime.Enable)
             {
-                this.tabchange_anime.Draw(e.Graphics, this.Width, null);
+                this.tabchange_anime.Draw(e.Graphics, this.Width,e.ClipRectangle, null, null);
                 this.ChangingControl = false;
                 return;
             }
@@ -1095,7 +1095,7 @@ namespace Shrimp.ControlParts.Timeline
                 }
                 notify_anime.notifyText = "新着ツイート: " + num + "件\n@" + tweets[0].user.screen_name + ":" + tweets[0].text.Replace("\r", "").Replace("\n", "") + "";
             }
-            notify_anime.Draw(e.Graphics, this.WidthWithoutScrollBar, clickCells.SetClickLink);
+            notify_anime.Draw(e.Graphics, this.WidthWithoutScrollBar, e.ClipRectangle, clickCells.SetClickLink, null);
             this.ChangingControl = false;
         }
 

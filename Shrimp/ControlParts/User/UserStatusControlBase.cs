@@ -271,7 +271,7 @@ namespace Shrimp.ControlParts.User
             //  切り替えアニメ
             if (this.tabchange_anime.Enable)
             {
-                this.tabchange_anime.Draw(e.Graphics, this.Width, null);
+                this.tabchange_anime.Draw(e.Graphics, this.Width, e.ClipRectangle, null, null);
                 return;
             }
             e.Graphics.FillRectangle(Brushes.LightGray, e.ClipRectangle);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 namespace Shrimp.ControlParts.Timeline.Animation
 {
@@ -27,7 +28,7 @@ namespace Shrimp.ControlParts.Timeline.Animation
             throw new NotImplementedException();
         }
 
-        public void Draw(System.Drawing.Graphics g, int maxWidth, Draw.TweetDraw.SetClickLinkDelegate setClickLink)
+        public void Draw ( System.Drawing.Graphics g, int maxWidth, Rectangle clipRectangle, Draw.TweetDraw.SetClickLinkDelegate setClickLink, object obj )
         {
             throw new NotImplementedException();
         }

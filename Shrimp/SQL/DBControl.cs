@@ -206,6 +206,29 @@ namespace Shrimp.SQL
         }
 
         /// <summary>
+        /// DBのツイート数を取得する
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="offsetValue"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public decimal GetDatabasesTweets ( string tableName )
+        {
+            this.command.CommandText = "select count(*) from "+ tableName +"";
+            try
+            {
+                object sdr = this.command.ExecuteScalar ();
+                return Convert.ToDecimal ( sdr ); // val1 = 0.4
+            }
+            catch ( Exception err )
+            {
+                //  ?
+                Console.WriteLine ( err.Message );
+            }
+            return 0;
+        }
+
+        /// <summary>
         /// ユーザのツイートを取得する
         /// </summary>
         /// <param name="tableName"></param>

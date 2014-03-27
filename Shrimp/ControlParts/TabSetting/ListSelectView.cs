@@ -23,7 +23,7 @@ namespace Shrimp.ControlParts.TabSetting
                 i++;
             }
 
-            if ( nowlist == null )
+            if ( nowlist == null && list.Count != 0 )
                 this.listSelectCombobox.SelectedIndex = 0;
 
         }
