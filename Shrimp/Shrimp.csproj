@@ -321,7 +321,7 @@
     <Compile Include="Module\Queue\UserStreamQueueData.cs" />
     <Compile Include="Module\SendingTweet.cs" />
     <Compile Include="Module\SettingSerializer.cs" />
-    <Compile Include="Module\StringUtil\kanaxs.cs" />
+    <Compile Include="Utils\kanaxs.cs" />
     <Compile Include="Module\ThumURLUtil.cs" />
     <Compile Include="Module\TimeUtil\TimeSpanUtil.cs" />
     <Compile Include="Module\ImageUtil\ImageCache.cs" />
