@@ -15,7 +15,7 @@ namespace Shrimp.Log
         {
             if (LogControl.Count != offset)
             {
-                this.textBox1.Text = LogControl.allLogData;
+                this.textBox1.Text = LogControl.AllLogData;
                 this.offset = LogControl.Count;
             }
         }

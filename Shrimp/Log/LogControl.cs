@@ -21,22 +21,10 @@ namespace Shrimp.Log
         /// <summary>
         /// ログ数
         /// </summary>
-        public static int Count
-        {
-            get { return logs.Count; }
-        }
+        public static int Count { get { return logs.Count; } }
 
-        public static List<string> logData
-        {
-            get { return logs; }
-        }
+        public static List<string> LogData { get { return logs; } }
 
-        public static string allLogData
-        {
-            get
-            {
-                return string.Join ( "\r\n", logs );
-            }
-        }
+        public static string AllLogData { get { return string.Join ( "\r\n", logs ); } }
     }
 }
