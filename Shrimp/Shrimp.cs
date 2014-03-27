@@ -711,7 +711,11 @@ namespace Shrimp
             }
             else
             {
-                selected.ShrimpBeam ++;
+                if ( selected.ShrimpBeam < decimal.MaxValue )
+                    selected.ShrimpBeam++;
+                else
+                    selected.ShrimpBeam = 0m;
+
                 statuses.Update ( selected, null, null, "エビビーム！ﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞｗｗｗｗｗ ("+ selected.ShrimpBeam +"回目)", 0 );
             }
             selected.ShrimpBeamLatestDate = DateTime.Now;
