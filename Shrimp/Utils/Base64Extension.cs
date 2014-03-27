@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Shrimp.Utils
+﻿
+namespace System
 {
     /// <summary>
     /// Base64のユーティリティーです
