@@ -5,19 +5,12 @@ namespace Shrimp.Log
 {
     class LogControl
     {
-        #region 定義
+        #region -- Private Static Fields --
         static List<string> logs = new List<string> ();
         static object addObject = new object ();
         #endregion
 
-        public static void AddLogs ( string text )
-        {
-            lock ( addObject )
-            {
-                logs.Add ( text );
-            }
-        }
-
+        #region -- Public Static Properties --
         /// <summary>
         /// ログ数
         /// </summary>
@@ -26,5 +19,16 @@ namespace Shrimp.Log
         public static List<string> LogData { get { return logs; } }
 
         public static string AllLogData { get { return string.Join ( "\r\n", logs ); } }
+        #endregion
+
+        #region -- Public Static Methods --
+        public static void AddLogs ( string text )
+        {
+            lock ( addObject )
+            {
+                logs.Add ( text );
+            }
+        }
+        #endregion
     }
 }
