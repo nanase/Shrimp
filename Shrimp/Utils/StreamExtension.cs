@@ -6,7 +6,7 @@ namespace System.IO
     /// <summary>
     /// Stream に対する拡張メソッドを提供します。
     /// </summary>
-    public static class StreamExtension
+    static class StreamExtension
     {
         /// <summary>
         /// ストリームに対する OpenStreamReader を生成します。
