@@ -9,18 +9,23 @@ namespace Shrimp.Account
     /// </summary>
     public class AccountManager
     {
+        #region -- Public Fields --
+        // TODO: accounts はプロパティにして、IE<TwitterInfo>型にしてもいいかも。
+
         /// <summary>
         /// アカウント集
         /// </summary>
         [XmlElement ( "accounts" )]
-        public List<TwitterInfo> accounts = new List<TwitterInfo>();
+        public List<TwitterInfo> accounts = new List<TwitterInfo> ();
+        #endregion
 
+        #region -- Public Properties --
         /// <summary>
         /// 選択中の位置
         /// </summary>
         [XmlElement ( "accountSelectedNumber" )]
         public int selNum { get; set; }
-
+        
         /// <summary>
         /// 選択中のアカウント
         /// </summary>
@@ -28,35 +33,37 @@ namespace Shrimp.Account
         {
             get
             {
-                if (this.accounts.Count == 0)
+                if ( this.accounts.Count == 0 )
                     return null;
 
-                if (this.selNum < 0)
+                if ( this.selNum < 0 )
                     this.selNum = 0;
 
-                if (this.selNum >= this.accounts.Count - 1)
+                if ( this.selNum >= this.accounts.Count - 1 )
                     this.selNum = this.accounts.Count - 1;
 
                 return this.accounts[selNum];
             }
         }
+        #endregion
 
+        #region -- Public Methods --
         /// <summary>
         /// アカウントの追加
         /// </summary>
         /// <param name="twitterAccount">アカウントデータ</param>
-        public bool AddNewAccount(TwitterInfo twitterAccount)
+        public bool AddNewAccount ( TwitterInfo twitterAccount )
         {
-            foreach (TwitterInfo tmp in this.accounts)
+            foreach ( TwitterInfo tmp in this.accounts )
             {
-                if (tmp.Equals(twitterAccount))
+                if ( tmp.Equals ( twitterAccount ) )
                 {
                     //  おなじやん！！
                     return false;
                 }
             }
 
-            this.accounts.Add(twitterAccount);
+            this.accounts.Add ( twitterAccount );
 
             return true;
         }
@@ -65,29 +72,30 @@ namespace Shrimp.Account
         /// アカウントを削除する
         /// </summary>
         /// <param name="num"></param>
-        public void RemoveAccount(int num)
+        public void RemoveAccount ( int num )
         {
-            this.accounts.RemoveAt(num);
+            this.accounts.RemoveAt ( num );
 
-            if (this.selNum < 0)
+            if ( this.selNum < 0 )
                 this.selNum = 0;
 
-            if (this.selNum >= this.accounts.Count - 1)
+            if ( this.selNum >= this.accounts.Count - 1 )
                 this.selNum = this.accounts.Count - 1;
         }
 
         /// <summary>
         /// 次のアカウントへ進める
         /// </summary>
-        public void NextAccount()
+        public void NextAccount ()
         {
-            if (this.accounts.Count == 0)
+            if ( this.accounts.Count == 0 )
                 return;
 
             this.selNum++;
 
-            if (this.selNum >= this.accounts.Count)
+            if ( this.selNum >= this.accounts.Count )
                 this.selNum = 0;
         }
+        #endregion
     }
 }
