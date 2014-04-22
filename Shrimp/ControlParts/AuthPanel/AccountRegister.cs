@@ -32,10 +32,7 @@ namespace Shrimp.ControlParts.AuthPanel
             {
                 if ( this.accountURLLabel.InvokeRequired )
                 {
-                    this.accountURLLabel.Invoke ( (MethodInvoker)delegate ()
-                    {
-                        this.accountURLLabel.Text = value;
-                    } );
+                    this.accountURLLabel.Invoke ( new Action ( () => this.accountURLLabel.Text = value ) );
                 }
                 else
                 {
@@ -51,10 +48,7 @@ namespace Shrimp.ControlParts.AuthPanel
             {
                 if ( this.accountURLLabel.InvokeRequired )
                 {
-                    this.accountURLLabel.Invoke ( (MethodInvoker)delegate ()
-                    {
-                        this.accountURLLabel.Enabled = value;
-                    } );
+                    this.accountURLLabel.Invoke ( new Action ( () => this.accountURLLabel.Enabled = value ) );
                 }
                 else
                 {
@@ -122,10 +116,7 @@ namespace Shrimp.ControlParts.AuthPanel
                         CompletedAuthorizeTwitter.Invoke ( this, (TwitterInfo)this.destTwitter.Clone () );
                     if ( this.InvokeRequired )
                     {
-                        this.Invoke ( (MethodInvoker)delegate ()
-                        {
-                            this.Close ();
-                        } );
+                        this.Invoke ( new Action ( this.Close ) );
                     }
                     else
                     {
@@ -145,11 +136,11 @@ namespace Shrimp.ControlParts.AuthPanel
 
         private void PinBoxInitialize ()
         {
-            this.Invoke ( (MethodInvoker)delegate ()
+            this.Invoke ( new Action ( () =>
             {
                 this.Pinbox.ResetText ();
                 this.Pinbox.Enabled = false;
-            } );
+            } ) );
         }
 
         /// <summary>
@@ -184,10 +175,7 @@ namespace Shrimp.ControlParts.AuthPanel
             Process.Start ( this.URLLabel );
             if ( this.Pinbox.InvokeRequired )
             {
-                this.Pinbox.Invoke ( (MethodInvoker)delegate ()
-                {
-                    this.Pinbox.Enabled = true;
-                } );
+                this.Pinbox.Invoke ( new Action ( () => this.Pinbox.Enabled = true ) );
             }
             else
             {
