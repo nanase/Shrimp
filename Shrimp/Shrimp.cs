@@ -963,7 +963,7 @@ namespace Shrimp
             {
                 if (e.ClickedItem.Name == "" + t.UserId + "")
                 {
-                    this.accountManager.selNum = i;
+                    this.accountManager.SelectedNumber = i;
                 }
                 i++;
             }
@@ -1599,7 +1599,7 @@ namespace Shrimp
 
             foreach (TwitterInfo t in this.accountManager.accounts)
             {
-                p.InsertAccountName(t, this.accountManager.selNum == i);
+                p.InsertAccountName(t, this.accountManager.SelectedNumber == i);
                 i++;
             }
             p.Show(System.Windows.Forms.Cursor.Position);

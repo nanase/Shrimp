@@ -24,7 +24,7 @@ namespace Shrimp.Account
         /// 選択中の位置
         /// </summary>
         [XmlElement ( "accountSelectedNumber" )]
-        public int selNum { get; set; }
+        public int SelectedNumber { get; set; }
         
         /// <summary>
         /// 選択中のアカウント
@@ -36,13 +36,13 @@ namespace Shrimp.Account
                 if ( this.accounts.Count == 0 )
                     return null;
 
-                if ( this.selNum < 0 )
-                    this.selNum = 0;
+                if ( this.SelectedNumber < 0 )
+                    this.SelectedNumber = 0;
 
-                if ( this.selNum >= this.accounts.Count - 1 )
-                    this.selNum = this.accounts.Count - 1;
+                if ( this.SelectedNumber >= this.accounts.Count - 1 )
+                    this.SelectedNumber = this.accounts.Count - 1;
 
-                return this.accounts[selNum];
+                return this.accounts[SelectedNumber];
             }
         }
         #endregion
@@ -76,11 +76,11 @@ namespace Shrimp.Account
         {
             this.accounts.RemoveAt ( num );
 
-            if ( this.selNum < 0 )
-                this.selNum = 0;
+            if ( this.SelectedNumber < 0 )
+                this.SelectedNumber = 0;
 
-            if ( this.selNum >= this.accounts.Count - 1 )
-                this.selNum = this.accounts.Count - 1;
+            if ( this.SelectedNumber >= this.accounts.Count - 1 )
+                this.SelectedNumber = this.accounts.Count - 1;
         }
 
         /// <summary>
@@ -91,10 +91,10 @@ namespace Shrimp.Account
             if ( this.accounts.Count == 0 )
                 return;
 
-            this.selNum++;
+            this.SelectedNumber++;
 
-            if ( this.selNum >= this.accounts.Count )
-                this.selNum = 0;
+            if ( this.SelectedNumber >= this.accounts.Count )
+                this.SelectedNumber = 0;
         }
         #endregion
     }
