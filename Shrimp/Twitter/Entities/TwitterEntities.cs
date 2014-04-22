@@ -62,7 +62,7 @@ namespace Shrimp.Twitter.Entities
                 foreach (Match t in m)
                 {
                     bool isThumb = false;
-                    string res = ThumURLUtil.getThumbURL(t.Value, out isThumb);
+                    string res = ThumURLUtil.GetThumbURL(t.Value, out isThumb);
                     if (res != null && isThumb)
                     {
                         if (this.media == null)
