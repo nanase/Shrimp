@@ -22,7 +22,7 @@ namespace Shrimp.Module.TimeUtil
         /// </summary>
         /// <param name="tweetSource">時間計る元のツイート時間</param>
         /// <returns>表示</returns>
-        public static string agoToString(DateTime tweetSource)
+        public static string AgoToString(DateTime tweetSource)
         {
             string result = "";
             TimeSpan t = DateTime.Now - tweetSource;
