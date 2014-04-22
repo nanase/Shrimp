@@ -12,11 +12,9 @@ namespace Shrimp.Module.TimeUtil
         public static string AbsoluteTimeToString ( DateTime tweetSource )
         {
             //isEnableAbsoluteTime
-            decimal t = DateTime.Now.Year - tweetSource.Year;
-            if ( t != 0 )
-                return tweetSource.ToString ( "yyyy年MM月dd日(ddd) HH時mm分ss秒" );
-            else
-                return tweetSource.ToString ( "MM月dd日(ddd) HH時mm分ss秒" );
+            return tweetSource.ToString ( (DateTime.Now.Year == tweetSource.Year) ?
+                "yyyy年MM月dd日(ddd) HH時mm分ss秒" :
+                "MM月dd日(ddd) HH時mm分ss秒" );
         }
 
         /// <summary>
