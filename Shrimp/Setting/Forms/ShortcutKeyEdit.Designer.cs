@@ -90,6 +90,7 @@
             "ユーザのタイムラインを開く",
             "ユーザ情報を開く",
             "ユーザのお気に入りタイムラインを開く",
+            "ユーザの会話タイムラインを開く",
             "ツイート入力欄にフォーカスを移す"});
             this.actionBox.Location = new System.Drawing.Point(12, 123);
             this.actionBox.Name = "actionBox";

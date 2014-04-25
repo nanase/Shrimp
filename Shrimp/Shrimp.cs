@@ -42,12 +42,6 @@ using Shrimp.Update;
 using Shrimp.Win32API;
 using System.Linq;
 using System.Collections;
-using System.ComponentModel;
-using Shrimp.ControlParts.Toolstrip;
-using Shrimp.Twitter.Entities;
-using Shrimp.Test;
-using System.Drawing;
-using Shrimp.Plugin.RegistFunc;
 
 namespace Shrimp
 {
@@ -70,10 +64,10 @@ namespace Shrimp
         ShrimpSpeed shrimpSpeed = null;
         DBControl db;
         private List<TwitterStatus> queueStatuses = new List<TwitterStatus>();
+        private int queueStatusesCount = 0;
         private decimal ReceivedStatuses = 0;
         private object queueLockObject = new object();
         private object queueLockObject2 = new object();
-		private ShrimpHandler shrimpHandler;
         /// <summary>
         /// ローカルタイマー
         /// </summary>
@@ -88,7 +82,10 @@ namespace Shrimp
         private bool isDisposedShrimp = false;
         private bool BootingUpdater = false;
         private int tweetBoxHeight = 0;
-        private bool isExitByTaskTray = false;
+
+        //  通知の重複避け
+        private Stack<TwitterNotifyStatus> notifyStacks;
+
         #region デリゲート
         public delegate void CallPlugin(string function, object[] args);
         public delegate void OnCreatedTweetDelegate(OnCreatedTweetHook hook);
@@ -150,6 +147,7 @@ namespace Shrimp
             this.boxHeight = tweetBox.Height;
             this.tweetBox.EnableControls = false;
             this.userControl.isLoadingFinished = true;
+            this.notifyStacks = new Stack<TwitterNotifyStatus> ();
         }
 
         /// <summary>
@@ -184,7 +182,6 @@ namespace Shrimp
         private void OnTabAligneChanged(TabAlignment alignment)
         {
             this.TimelineTabControl.Alignment = alignment;
-            this.TimelineTabControl.Multiline = Setting.Timeline.isTabMultiline;
         }
 
         /// <summary>
@@ -197,40 +194,6 @@ namespace Shrimp
             if (accountManager.SelectedAccount == null)
                 return null;
 
-            if ( type == ActionType.UserConversation )
-            {
-                detail = ((string)detail).TrimStart('@');
-                detail = "from:" + detail + " OR @" + detail + "";
-                this.ChangeAnyDatasStart ();
-                var tab = TimelineTabControl.NewTab(true, false, "\"" + detail + "\"の検索結果",
-                    new TimelineCategory(TimelineCategories.SearchTimeline, detail, false),
-                    (TabControls.OnReloadDelegate)delegate(TabControls tabData)
-                {
-                    searchAPI.searchTweet(accountManager.SelectedAccount,
-                    (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
-                    {
-                        List<TwitterStatus> tmp = (List<TwitterStatus>)data;
-                        TimelineTabControl.InsertTweetRange(tabData, tmp);
-
-                        if (db != null)
-                        {
-                            db.InsertTweetRange(tmp);
-                            db.InsertUserRange(tmp.ConvertAll((t) => t.user));
-                        }
-                        tabData.SetFinishedLoading();
-                        tabData.SetFirstView(true);
-                    }, (Twitter.REST.TwitterWorker.TwitterErrorProcessDelegate)delegate(TwitterCompletedEventArgs data)
-                    {
-                        tabData.SetFinishedLoading();
-                    }, (string)detail);
-                }, tabID);
-
-                this.ChangeAnyDatasEnd();
-                if (Setting.Timeline.SelectTabWhenCreatedTab && !isBootingUp)
-                    TimelineTabControl.SelectedTab = tab;
-                return tab;
-            }
-                
             if (type == ActionType.UserTimeline)
             {
                 this.ChangeAnyDatasStart();
@@ -414,9 +377,8 @@ namespace Shrimp
             base.Dispose();
         }
 
-        protected override void  OnLoad(EventArgs e)
-		{
-			base.OnLoad(e);
+        private void Shrimp_Load(object sender, EventArgs e)
+        {
             Setting.Timeline.initialize();
             Setting.BombDetect.initialize();
             Setting.Colors.initialize();
@@ -435,7 +397,8 @@ namespace Shrimp
             {
                 this.Width = 640;
                 this.Height = 480;
-            } else if (Setting.FormSetting.Bounds.Width <= 0 || Setting.FormSetting.Bounds.Height <= 0)
+            }
+            if (Setting.FormSetting.Bounds.Width == 0 || Setting.FormSetting.Bounds.Height == 0)
             {
                 this.Width = 640;
                 this.Height = 480;
@@ -468,13 +431,11 @@ namespace Shrimp
             catch (Exception)
             {
                 //  DLLがないかもな
-                MessageBox.Show("LuaDLLの読み込みに失敗しました。\nDLLがないか、お使いのコンピュータには、Visual Studio 2012の再頒布可能パッケージがインストールされていない可能性があります。プログラムをインストールしてから、もう一度お試しください。");
+                MessageBox.Show("お使いのコンピュータには、Visual Studio 2012の再頒布可能パッケージがインストールされていない可能性があります。プログラムをインストールしてから、もう一度お試しください。");
                 Process.Start("http://www.microsoft.com/ja-jp/download/details.aspx?id=30679");
                 System.Environment.Exit(0);
             }
-
-			this.shrimpHandler = new ShrimpHandler();
-            this.plugins.LoadPlugins(this.TimelineObject_OnUseTwitterAPI, this.shrimpHandler);
+            this.plugins.LoadPlugins();
             this.tweetBox.AddRangeRegistTweetBoxMenuHook(this.plugins.OnRegistTweetBoxMenuHook());
 
 
@@ -517,33 +478,33 @@ namespace Shrimp
                 }
             }
 
-            if ( !this.TimelineTabControl.LoadTabs ( userControl_TabControlUserInformationHandler ) )
+            if (!this.TimelineTabControl.LoadTabs(userControl_TabControlUserInformationHandler))
             {
                 //  デフォルトタブを作成する
-                TabControls new_tab = TimelineTabControl.NewTab ( true, true, "ホームタイムライン",
-                    new TimelineCategory ( TimelineCategories.HomeTimeline, null, true ) );
-                new_tab.tabDelivery.AddDelivery ( new TabDelivery ( new TimelineCategory ( TimelineCategories.NotifyTimeline, null, true ), null ) );
-                new_tab.SetFinishedLoading ();
+                TabControls new_tab = TimelineTabControl.NewTab(true, true, "ホームタイムライン",
+                    new TimelineCategory(TimelineCategories.HomeTimeline, null, true));
+                new_tab.tabDelivery.AddDelivery(new TabDelivery(new TimelineCategory(TimelineCategories.NotifyTimeline, null, true), null));
+                new_tab.SetFinishedLoading();
 
-                TimelineTabControl.NewTab ( true, true, "返信",
-                    new TimelineCategory ( TimelineCategories.MentionTimeline, null, true ) ).SetFinishedLoading ();
-                TimelineTabControl.NewTab ( true, true, "ダイレクトメッセージ",
-                    new TimelineCategory ( TimelineCategories.DirectMessageTimeline, null, true ) ).SetFinishedLoading ();
-                TimelineTabControl.NewTab ( true, true, "通知",
-                    new TimelineCategory ( TimelineCategories.NotifyTimeline, null, true ) ).SetFinishedLoading ();
-                TimelineTabControl.NewTab ( true, true, "ブックマーク",
-                    new TimelineCategory ( TimelineCategories.BookmarkTimeline, null, true ) ).SetFinishedLoading ();
+                TimelineTabControl.NewTab(true, true, "返信",
+                    new TimelineCategory(TimelineCategories.MentionTimeline, null, true)).SetFinishedLoading();
+                TimelineTabControl.NewTab(true, true, "ダイレクトメッセージ",
+                    new TimelineCategory(TimelineCategories.DirectMessageTimeline, null, true)).SetFinishedLoading();
+                TimelineTabControl.NewTab(true, true, "通知",
+                    new TimelineCategory(TimelineCategories.NotifyTimeline, null, true)).SetFinishedLoading();
+                TimelineTabControl.NewTab(true, true, "ブックマーク",
+                    new TimelineCategory(TimelineCategories.BookmarkTimeline, null, true)).SetFinishedLoading();
             }
-            if ( this.TimelineTabControl.TabCount != 0 )
-                TimelineTabControl.SelectTab ( 0 );
+            if (this.TimelineTabControl.TabCount != 0)
+                TimelineTabControl.SelectTab(0);
 
-            //LogViewer v = new LogViewer();
+            LogViewer v = new LogViewer();
             //v.Show ();
 
             //  イベントハンドラーの設定
             timelines.loadCompletedEvent += new TwitterWorker.loadCompletedEventHandler(timelines_loadCompletedEvent);
             statuses.loadCompletedEvent += new TwitterWorker.loadCompletedEventHandler(statuses_loadCompletedEvent);
-            //userAPI.loadCompletedEvent += new TwitterWorker.loadCompletedEventHandler(userAPI_loadCompletedEvent);
+            userAPI.loadCompletedEvent += new TwitterWorker.loadCompletedEventHandler(userAPI_loadCompletedEvent);
 
             //  ユーザーストリーム
             us = new UserStreaming();
@@ -551,7 +512,6 @@ namespace Shrimp
             us.disconnectHandler += new UserStreaming.UserStreamingconnectStatusEventDelegate(us_userstream_status_event);
             us.notifyHandler += new UserStreaming.NotifyEventDelegate(us_notifyHandler);
 
-            //  タイマー設定
             this.iconDownloadTimer.Interval = 500;
             this.iconDownloadTimer.Tick += new EventHandler(iconDownloadTimer_Tick);
             this.iconDownloadTimer.Start();
@@ -567,19 +527,29 @@ namespace Shrimp
             this.ShowUserInformation(Setting.Timeline.isShowUserInformation);
             this.tweetBox.EnableControls = true;
 
+            var task = Task.Factory.StartNew(() =>
+            {
+                HelpAPI.configuration(accountManager.SelectedAccount,
+                    (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
+                    {
+                        ConfigStatus status = data as ConfigStatus;
+                        this.tweetBox.tConfigStatus = (ConfigStatus)status.Clone();
+                    }, null
+                );
+                { }
+            });
             LoadUserInformation();
             if (Setting.UserStream.isEnableUserstream)
                 this.ConnectUserStream();
             if (Setting.Update.isUpdateEnable && !Setting.Update.isIgnoreUpdate)
                 CheckUpdate.CheckUpdateSync(OnCreatingUpdateForm);
 
-			this.shrimpHandler.DoHandler();
+			//Form1 fmm = new Form1();
+			//fmm.Show();
+
+            notifyLabel.Text = "Tweets: " + db.GetDatabasesTweets ( "tweet" ) +"";
         }
 
-        /// <summary>
-        /// アップデートフォームが作成されたときに呼び出されます
-        /// </summary>
-        /// <param name="log"></param>
         private void OnCreatingUpdateForm(string log)
         {
             UpdateForm upd = new UpdateForm();
@@ -607,8 +577,21 @@ namespace Shrimp
             foreach (TwitterInfo t in accountManager.accounts)
             {
                 var twIn = t;
-                TimelineTabControl.Crolling ( twIn, timelines, directMessage, listAPI, crollingCounter );
-                //tsk.Wait ();
+                TimelineTabControl.Crolling(twIn, timelines, directMessage, listAPI, crollingCounter);
+                /*
+                if ( crollingCounter % 60 == 0 )
+                {
+                    Task.Factory.StartNew ( () =>
+                    {
+                        timelines.UserTimeline ( t,
+                         (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate ( object data )
+                         {
+                             List<TwitterStatus> tmp = (List<TwitterStatus>)data;
+                             t.SetUserTimeline ( tmp );
+                         }, null, t.screen_name, 0 );
+                    } );
+                }
+                */
             }
             crollingCounter++;
         }
@@ -721,19 +704,19 @@ namespace Shrimp
         {
             var selected = accountManager.SelectedAccount;
             var time = DateTime.Now - selected.ShrimpBeamLatestDate;
-            if ( time.TotalMinutes < 30.0 )
+            if ( time.TotalHours < 1.0 )
             {
-                MessageBoxEX.ShowErrorMessageBox ( "大変申し訳ありませんが、エビビームは清楚故30分に1回のみのご利用となります。ご了承ください。" );
+                MessageBoxEX.ShowErrorMessageBox ( "大変申し訳ありませんが、エビビームは清楚故1時間に1回のみのご利用となります。ご了承ください。" );
                 return;
             }
             else
             {
-                selected.ShrimpBeam ++;
                 if ( selected.ShrimpBeam < decimal.MaxValue )
                     selected.ShrimpBeam++;
                 else
                     selected.ShrimpBeam = 0m;
-                statuses.Update ( selected, null, null, "エビビーム！ﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞｗｗｗｗｗ ("+ selected.ShrimpBeam +"回目・長さ "+ ( 3.0 + Math.Log( (double)selected.ShrimpBeam ) ).ToString ( "G3" ) +"cm)", 0 );
+
+                statuses.Update ( selected, null, null, "エビビーム！ﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞﾋﾞｗｗｗｗｗ ("+ selected.ShrimpBeam +"回目)", 0 );
             }
             selected.ShrimpBeamLatestDate = DateTime.Now;
         }
@@ -743,18 +726,7 @@ namespace Shrimp
         /// </summary>
         public void LoadUserInformation()
         {
-			Task.Factory.StartNew(() =>
-			{
-				HelpAPI.configuration(accountManager.SelectedAccount,
-					(Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
-					{
-						ConfigStatus status = data as ConfigStatus;
-						this.tweetBox.tmpConfigStatus = (ConfigStatus)status.Clone();
-					}, null
-				);
-			});
-
-            Task.Factory.StartNew(() =>
+            var task = Task.Factory.StartNew(() =>
             {
                 foreach (TwitterInfo t in accountManager.accounts)
                 {
@@ -765,7 +737,6 @@ namespace Shrimp
                         ImageCache.AutoCache(user.profile_image_url, true);
                         twIn.IconUrl = user.profile_image_url;
                     }, null, null, t.UserId);
-
                     //  リスト取得
                     listAPI.list(twIn, (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
                     {
@@ -926,46 +897,16 @@ namespace Shrimp
             get { return this.shrimpSpringLabel.Text; }
             set
             {
-                Task.Factory.StartNew ( () =>
+                try
                 {
-                    if ( this.IsHandleCreated )
-                    {
-                        this.BeginInvoke ( (MethodInvoker)delegate ()
-                        {
-                            this.shrimpSpringLabel.AddText ( value, null );
-                            //this.shrimpSpringLabel.Text = value;
-                        } );
-                    }
-                    else
+                    this.Invoke ( (MethodInvoker)delegate ()
                     {
                         this.shrimpSpringLabel.AddText ( value, null );
-                    }
-                } );
-            }
-        }
-
-        /// <summary>
-        /// ShrimpSpringLabelのテキスト
-        /// </summary>
-        public ToolStripStatusLabelText ShrimpSpringLabel
-        {
-            set
-            {
-                Task.Factory.StartNew ( () =>
-                {
-                    if ( this.IsHandleCreated )
-                    {
-                        this.Invoke ( (MethodInvoker)delegate ()
-                        {
-                            this.shrimpSpringLabel.AddLabel ( value );
-                            //this.shrimpSpringLabel.Text = value;
-                        } );
-                    }
-                    else
-                    {
-                        this.shrimpSpringLabel.AddLabel ( value );
-                    }
-                } );
+                        //this.shrimpSpringLabel.Text = value;
+                    } );
+                }
+                catch ( Exception )
+                { }
             }
         }
 
@@ -977,21 +918,16 @@ namespace Shrimp
             get { return this.APIStatusLabel.Text; }
             set
             {
-                Task.Factory.StartNew ( () =>
+                try
                 {
-                    if ( this.IsHandleCreated )
-                    {
-                        this.Invoke ( (MethodInvoker)delegate ()
-                        {
-                            this.APIStatusLabel.Text = value;
-                        } );
-                    }
-                    else
+                    this.Invoke ( (MethodInvoker)delegate ()
                     {
                         this.APIStatusLabel.Text = value;
-                    }
-                } );
-
+                    } );
+                }
+                catch ( Exception )
+                {
+                }
             }
         }
 
@@ -1008,7 +944,7 @@ namespace Shrimp
             }
             if (e.ClickedItem.Name == "OpenSettingMenu")
             {
-                var SettingForm = new SettingForms(this.accountManager, false, this, plugins, OnTabAligneChanged, OnDeletingUserInformation, OnAddingUserInformation);
+                var SettingForm = new SettingForms(this.accountManager, false, this, OnTabAligneChanged, OnDeletingUserInformation, OnAddingUserInformation);
                 SettingForm.ShowDialog();
             }
             if (e.ClickedItem.Name == "LineTweetModeMenu")
@@ -1027,7 +963,7 @@ namespace Shrimp
             {
                 if (e.ClickedItem.Name == "" + t.UserId + "")
                 {
-                    this.accountManager.SelectedNumber = i;
+                    this.accountManager.selNum = i;
                 }
                 i++;
             }
@@ -1075,31 +1011,17 @@ namespace Shrimp
             var apiI = APIIntroduction.retTwitterAPIIntro(e.raw_data.Uri.AbsoluteUri);
             if (e.error_code == HttpStatusCode.OK)
             {
-                if ( e.data is TwitterStatus )
+                List<TwitterStatus> data = e.data as List<TwitterStatus>;
+                List<TwitterUserStatus> users = new List<TwitterUserStatus>(data.Count);
+                foreach (TwitterStatus tmpTweet in data)
                 {
-                    TwitterStatus data = e.data as TwitterStatus;
-                    TwitterUserStatus user = data.user ;
-
-                    TwitterStatusChecker.SetIsReply (this.accountManager.accounts, data );
-
-                    db.InsertTweet ( data );
-                    db.InsertUser ( user );
-                    //this.ShrimpSpringLabelText = "@" + e.account_source.ScreenName + "の" + apiI + "しました(" + data.Count + "件)";
+                    TwitterStatusChecker.SetIsReply(this.accountManager.accounts, tmpTweet);
+                    users.Add(tmpTweet.user);
                 }
-                else
-                {
-                    List<TwitterStatus> data = e.data as List<TwitterStatus>;
-                    List<TwitterUserStatus> users = new List<TwitterUserStatus> ( data.Count );
-                    foreach ( TwitterStatus tmpTweet in data )
-                    {
-                        TwitterStatusChecker.SetIsReply ( this.accountManager.accounts, tmpTweet );
-                        users.Add ( tmpTweet.user );
-                    }
 
-                    db.InsertTweetRange ( data );
-                    db.InsertUserRange ( users );
-                    this.ShrimpSpringLabelText = "@" + e.account_source.ScreenName + "の" + apiI + "しました(" + data.Count + "件)";
-                }
+                db.InsertTweetRange(data);
+                db.InsertUserRange(users);
+                this.ShrimpSpringLabelText = "@" + e.account_source.ScreenName + "の" + apiI + "しました(" + data.Count + "件)";
             }
             else
             {
@@ -1147,37 +1069,24 @@ namespace Shrimp
                         }
                     }
                 }
-
-                TwitterStatusChecker.SetIsRetweeted ( this.accountManager.accounts, tmpTweet );
+                
+                TwitterStatusChecker.SetIsRetweeted(this.accountManager.accounts, tmpTweet);
 
                 //db.InsertTweet ( tmpTweet );
                 ReceivedStatuses++;
-                this.shrimpSpeed.IncreaseSpeedCount ();
+                this.shrimpSpeed.IncreaseSpeedCount();
 
-                db.InsertUser ( tmpTweet.user );
-                if ( tmpTweet.NotifyStatus != null )
+                db.InsertUser(tmpTweet.user);
+                if (tmpTweet.NotifyStatus != null)
                 {
-                    var notifyText = APIIntroduction.retNotifyIntro ( tmpTweet.NotifyStatus );
-                    if ( notifyText != null )
-                        ShrimpSpringLabel = notifyText;
-                    this.TimelineTabControl.InsertTweet ( e.account_source, tmpTweet, TimelineCategories.NotifyTimeline );
+                    this.TimelineTabControl.InsertTweet(e.account_source, tmpTweet, TimelineCategories.NotifyTimeline);
                 }
                 else
                 {
-                    this.TimelineTabControl.InsertTweet ( e.account_source, tmpTweet, ( tmpTweet.isDirectMessage ? TimelineCategories.DirectMessageTimeline : TimelineCategories.HomeTimeline ) );
+                    this.TimelineTabControl.InsertTweet(e.account_source, tmpTweet, (tmpTweet.isDirectMessage ? TimelineCategories.DirectMessageTimeline : TimelineCategories.HomeTimeline));
                 }
-                if ( tmpTweet.DynamicTweet.isReply )
-                    this.TimelineTabControl.InsertTweet ( e.account_source, tmpTweet, TimelineCategories.MentionTimeline );
-
-                if ( db != null )
-                    db.InsertTweet ( tmpTweet );
-
-                //  プラグインの動作
-                Task.Factory.StartNew ( () =>
-                {
-                    plugins.OnStreamTweet ( new OnCreatedTweetHook ( tmpTweet ) );
-                } );
-                /*
+                if (tmpTweet.DynamicTweet.isReply)
+                    this.TimelineTabControl.InsertTweet(e.account_source, tmpTweet, TimelineCategories.MentionTimeline);
                 //  一括でいれる
                 lock (this.queueLockObject)
                 {
@@ -1190,7 +1099,6 @@ namespace Shrimp
                         queueStatusesCount = 0;
                     }
                 }
-                */
             }
         }
 
@@ -1201,42 +1109,43 @@ namespace Shrimp
         /// <param name="e"></param>
         void us_notifyHandler(object sender, TwitterCompletedEventArgs e)
         {
+            
             if (e != null && e.data != null)
             {
                 var notify = e.data as TwitterNotifyStatus;
-                var tweet = new TwitterStatus ( notify );
                 if ( Setting.UserStream.isMuteWithoutFriends )
                 {
                     var tmpData = notify.target_object;
                     if ( e.friends != null && tmpData != null && tmpData is TwitterStatus )
                     {
                         var tmpTweet = tmpData as TwitterStatus;
-						if (accountManager.accounts.Exists((ac) => ac.UserId == tmpTweet.user.id))
-						{
-							if (notify.source != null && notify.source is TwitterUserStatus)
-							{
-								var tmpTweet2 = notify.source as TwitterUserStatus;
-								if (!e.friends.Exists((t) => tmpTweet2.id == t))
-								{
-									//  ミュート
-									return;
-								}
-							}
-						}
+                        if ( !e.friends.Exists ( ( t ) => tmpTweet.user.id == t ) )
+                        {
+                            //  ミュート
+                            return;
+                        }
                     }
                 }
 
-                TwitterStatusChecker.SetNotify ( this.accountManager.accounts, (TwitterNotifyStatus)e.data );
+                lock ( ( (System.Collections.ICollection)this.notifyStacks ).SyncRoot )
+                {
+                    if ( this.notifyStacks.Any ( ( notifyChk ) =>
+                        ( !notifyChk.isOwnFav && !notifyChk.isOwnUnFav ) &&
+                        ( notifyChk.notify_event == notify.notify_event ) &&
+                        ( notifyChk.source.id == notify.source.id ) &&
+                        ( notifyChk.target.id == notify.target.id ) &&
+                        ( notifyChk.isFollowsCategory ? true :
+                        ( notifyChk.target_object != null ? ( (TwitterStatus)notifyChk.target_object ).id == ( (TwitterStatus)( notify.target_object ) ).id : false ) ) ) )
+                        return;
+
+                    this.notifyStacks.Push ( notify );
+                }
+
+                TwitterStatusChecker.SetNotify(this.accountManager.accounts, (TwitterNotifyStatus)e.data);
                 var notifyText = APIIntroduction.retNotifyIntro ( (TwitterNotifyStatus)e.data );
                 if ( notifyText != null )
-                    ShrimpSpringLabel = notifyText;
-                this.TimelineTabControl.InsertTweet ( e.account_source, tweet, TimelineCategories.NotifyTimeline );
-
-                //  プラグインの動作
-                Task.Factory.StartNew ( () =>
-                {
-                    plugins.OnStreamTweet ( new OnCreatedTweetHook ( tweet ) );
-                } );
+                    ShrimpSpringLabelText = notifyText;
+                this.TimelineTabControl.InsertTweet ( e.account_source, new TwitterStatus ( notify ), TimelineCategories.NotifyTimeline );
             }
         }
 
@@ -1253,17 +1162,13 @@ namespace Shrimp
                 {
                     //  接続成功
                     StreamState.setUserStream = true;
-					if (e.account_source != null)
-						e.account_source.isStreamingEnable = true;
-                    this.ShrimpSpringLabelText = "@"+ e.account_source.ScreenName +"のUserStreamへ接続しました";
+                    this.ShrimpSpringLabelText = "UserStreamへ接続しました";
                 }
                 else if (e.error_code == HttpStatusCode.RequestTimeout)
                 {
                     //  切断かな？
                     StreamState.setUserStream = false;
                     this.us.CheckStopped();
-					if (e.account_source != null)
-						e.account_source.isStreamingEnable = false;
                     if (this.us.isStartedStreaming)
                     {
                         this.ShrimpSpringLabelText = "@" + e.account_source.ScreenName + "のUserStreamが停止されました";
@@ -1277,15 +1182,13 @@ namespace Shrimp
                 {
                     //  切断かな？
                     StreamState.setUserStream = false;
-					if ( e.account_source != null )
-						e.account_source.isStreamingEnable = false;
                     this.ShrimpSpringLabelText = "UserStreamが切断されました。再接続処理待ちです。";
                 }
                 else if (e.error_code == HttpStatusCode.Unused)
                 {
                     //  接続初期化待ちだな？
                     StreamState.setUserStream = true;
-                    //this.ShrimpSpringLabelText = "UserStreamの初期化待ちです...";
+                    this.ShrimpSpringLabelText = "UserStreamの初期化待ちです...";
                 }
                 this.StatusLabelText = StreamState.getStatusString();
             }
@@ -1315,36 +1218,14 @@ namespace Shrimp
                 this.prevTweet.in_reply_to_status_id = (this.prevTweet.isDirectMessage ? tweet.user.id : tweet.DynamicTweet.id);
                 this.tweetBox.SelectTweetBox();
                 this.tweetBox.Tweet = "";
-                if ( !this.prevTweet.isDirectMessage )
-                {
-                    string scr = "";
-                    if ( tweet.DynamicTweet.entities.user_mentions != null )
-                    {
-                        foreach ( TwitterEntitiesUserMentions mention in tweet.DynamicTweet.entities.user_mentions )
-                        {
-                            if ( mention.screen_name.Length <= 1 || accountManager.accounts.Any ( ( ac ) => "@" + ac.ScreenName == mention.screen_name ) )
-                                continue;
-                            scr += "" + mention.screen_name + " ";
-                        }
-                    }
-                    this.tweetBox.Tweet = "@" + tweet.DynamicTweet.user.screen_name + " " + scr + "";
-                }
+                if (!this.prevTweet.isDirectMessage)
+                    this.tweetBox.Tweet = "@" + tweet.DynamicTweet.user.screen_name + " ";
                 this.tweetBox.SelectTweetBoxStart();
             }
             else
             {
                 this.tweetBox.SelectTweetBox();
-                string scr = "";
-                if ( tweet.DynamicTweet.entities.user_mentions != null )
-                {
-                    foreach ( TwitterEntitiesUserMentions mention in tweet.DynamicTweet.entities.user_mentions )
-                    {
-                        if ( mention.screen_name.Length <= 1 || accountManager.accounts.Any ( (ac)=>"@" + ac.ScreenName == mention.screen_name ) )
-                            continue;
-                        scr += "" + mention.screen_name + " ";
-                    }
-                }
-                this.tweetBox.Tweet = "@" + tweet.DynamicTweet.user.screen_name + " " + scr + "" + this.tweetBox.Tweet + "";
+                this.tweetBox.Tweet = "@" + tweet.DynamicTweet.user.screen_name + " " + this.tweetBox.Tweet + "";
                 this.tweetBox.SelectTweetBoxStart();
             }
         }
@@ -1511,19 +1392,16 @@ namespace Shrimp
         /// <param name="tweet"></param>
         void timeline_OnChangeTweet(TwitterStatus tweet)
         {
-            if ( Setting.Timeline.isShowUserInformation )
+            if (this.userInfo.InvokeRequired)
             {
-                if ( this.userInfo.InvokeRequired )
+                this.userInfo.Invoke((MethodInvoker)delegate()
                 {
-                    this.userInfo.Invoke ( (MethodInvoker)delegate ()
-                    {
-                        this.userControl.ChangeUserStatus ( tweet.DynamicTweet.user );
-                    } );
-                }
-                else
-                {
-                    this.userControl.ChangeUserStatus ( tweet.DynamicTweet.user );
-                }
+                    this.userControl.ChangeUserStatus(tweet.DynamicTweet.user);
+                });
+            }
+            else
+            {
+                this.userControl.ChangeUserStatus(tweet.DynamicTweet.user);
             }
         }
 
@@ -1538,26 +1416,11 @@ namespace Shrimp
 
             if ( type == ActionType.UserDBTimeline )
             {
-				Task.Factory.StartNew(() =>
-				{
-					var tweets = db.GetTweetByUserID(TwitterStatus.GetUserTweets(id), 0, 1000);
-                    if ( sender.IsHandleCreated )
-                    {
-                        sender.BeginInvoke ( (MethodInvoker)delegate ()
-                        {
-                            //sender.initialize ();
-                            sender.InsertTimelineRange ( tweets );
-                            sender.SetSQL ();
-                            sender.isLoadingFinished = true;
-                        } );
-                    }
-                    else
-                    {
-                        sender.InsertTimelineRange ( tweets );
-                        sender.SetSQL ();
-                        sender.isLoadingFinished = true;
-                    }
-				});
+                sender.BeginInvoke ( (MethodInvoker)delegate ()
+                {
+                    //sender.initialize ();
+                    sender.InsertTimelineRange ( db.GetTweetByUserID ( TwitterStatus.GetUserTweets ( id ), 0, 1000 ) );
+                } );
             }
 
             if (type == ActionType.UserFavoriteTimeline)
@@ -1566,22 +1429,11 @@ namespace Shrimp
                 (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
                 {
                     List<TwitterStatus> tmp = (List<TwitterStatus>)data;
-                    if ( sender.IsHandleCreated )
+                    sender.BeginInvoke((MethodInvoker)delegate()
                     {
-                        sender.BeginInvoke ( (MethodInvoker)delegate ()
-                        {
-                            //sender.initialize ();
-                            sender.InsertTimelineRange ( tmp );
-                            sender.SetSQL ();
-                            sender.isLoadingFinished = true;
-                        } );
-                    }
-                    else
-                    {
-                        sender.InsertTimelineRange ( tmp );
-                        sender.SetSQL ();
-                        sender.isLoadingFinished = true;
-                    }
+                        //sender.initialize ();
+                        sender.InsertTimelineRange(tmp);
+                    });
                 }, null, screen_name, 0);
             }
 
@@ -1591,22 +1443,11 @@ namespace Shrimp
                 (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
                 {
                     List<TwitterStatus> tmp = (List<TwitterStatus>)data;
-                    if ( sender.IsHandleCreated )
+                    sender.BeginInvoke ( (MethodInvoker)delegate ()
                     {
-                        sender.BeginInvoke ( (MethodInvoker)delegate ()
-                        {
-                            //sender.initialize ();
-                            sender.InsertTimelineRange ( tmp );
-                            sender.SetSQL ();
-                            sender.isLoadingFinished = true;
-                        } );
-                    }
-                    else
-                    {
-                        sender.InsertTimelineRange ( tmp );
-                        sender.SetSQL ();
-                        sender.isLoadingFinished = true;
-                    }
+                        //sender.initialize ();
+                        sender.InsertTimelineRange(tmp);
+                    });
                 }, null, screen_name, 0);
             }
 
@@ -1616,22 +1457,11 @@ namespace Shrimp
                 (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
                 {
                     List<TwitterStatus> tmp = (List<TwitterStatus>)data;
-                    if ( sender.IsHandleCreated )
+                    sender.BeginInvoke ( (MethodInvoker)delegate ()
                     {
-                        sender.BeginInvoke ( (MethodInvoker)delegate ()
-                        {
-                            //sender.initialize ();
-                            sender.InsertTimelineRange ( tmp );
-                            sender.SetSQL ();
-                            sender.isLoadingFinished = true;
-                        } );
-                    }
-                    else
-                    {
-                        sender.InsertTimelineRange ( tmp );
-                        sender.SetSQL ();
-                        sender.isLoadingFinished = true;
-                    }
+                        //sender.initialize ();
+                        sender.InsertTimelineRange(tmp);
+                    });
                 }, null, "from:" + screen_name + " OR @" + screen_name + "");
             }
         }
@@ -1645,10 +1475,7 @@ namespace Shrimp
         {
             string category = (string)arg[0];
             TwitterInfo user = (arg[2] == null ? null : arg[2] as TwitterInfo);
-            this.Invoke ( (MethodInvoker)delegate () { 
-                var tabdata = this.TimelineTabControl.SelectedTabControls;
-            } );
-            
+            var tabdata = this.TimelineTabControl.SelectedTabControls;
             TwitterInfo useAccount = accountManager.SelectedAccount;
             //  アカウント選択で行う
             if (user != null)
@@ -1673,15 +1500,9 @@ namespace Shrimp
                 timelines.TweetShow(useAccount, (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
                 {
                     TwitterStatus state = (TwitterStatus)data;
-					sender_1.InsertConversationTweet(state);
+                    sender_1.InsertTimeline(state);
                     //tabdata.InsertTweet ( user );
                 }, null, (decimal)arg[1]);
-            }
-            else if ( category == "tweet" )
-            {
-                object[] arg_tweet = (object[])arg[1];
-
-                statuses.Update ( useAccount, null, null, (string)arg_tweet[0], (decimal)arg_tweet[1] );
             }
             else if (category == "delete")
             {
@@ -1695,61 +1516,41 @@ namespace Shrimp
                         statuses.Delete(info, null, null, t.id);
                 }
             }
-            else if ( category == "update_profile" )
-            {
-                object[] arg_tweet = (object[])arg[1];
-                userAPI.ProfileUpdate ( useAccount, null, null, (string)arg_tweet[0], (string)arg_tweet[1],
-                    (string)arg_tweet[2], (string)arg_tweet[3] );
-            }
-            else if ( category == "search" )
+            else if (category == "search")
             {
                 var sender_1 = sender as TabControls;
-                searchAPI.searchTweet ( useAccount,
-                (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate ( object data )
+                searchAPI.searchTweet(useAccount,
+                (Twitter.REST.TwitterWorker.TwitterCompletedProcessDelegate)delegate(object data)
                 {
                     List<TwitterStatus> tmp = (List<TwitterStatus>)data;
-                    TimelineTabControl.InsertTweetRange ( sender_1, tmp );
-                }, null, (string)arg[1] );
+                    TimelineTabControl.InsertTweetRange(sender_1, tmp);
+                }, null, (string)arg[1]);
             }
-            else if ( category == "follow" )
+            else if (category == "follow")
             {
-                if ( MessageBox.Show ( "@" + arg[1] + "をフォローします。よろしいですか？", "確認", MessageBoxButtons.YesNo ) == DialogResult.No )
+                if (MessageBox.Show("@" + arg[1] + "をフォローします。よろしいですか？", "確認", MessageBoxButtons.YesNo) == DialogResult.No)
                     return;
                 var sender_1 = sender as TabControls;
-                userAPI.FollowUser ( useAccount, null, null, (string)arg[1], 0 );
+                userAPI.FollowUser(useAccount, null, null, (string)arg[1], 0);
             }
-            else if ( category == "block" )
+            else if (category == "block")
             {
-                if ( MessageBox.Show ( "@" + arg[1] + "をブロックします。よろしいですか？", "確認", MessageBoxButtons.YesNo ) == DialogResult.No )
+                if (MessageBox.Show("@" + arg[1] + "をブロックします。よろしいですか？", "確認", MessageBoxButtons.YesNo) == DialogResult.No)
                     return;
                 var sender_1 = sender as TabControls;
-                userAPI.BlockUser ( useAccount, null, null, (string)arg[1], 0 );
+                userAPI.BlockUser(useAccount, null, null, (string)arg[1], 0);
             }
-            else if ( category == "spam" )
+            else if (category == "spam")
             {
                 var sender_1 = sender as TabControls;
-                if ( MessageBox.Show ( "@" + arg[1] + "をスパム報告します。よろしいですか？", "確認", MessageBoxButtons.YesNo ) == DialogResult.No )
+                if (MessageBox.Show("@" + arg[1] + "をスパム報告します。よろしいですか？", "確認", MessageBoxButtons.YesNo) == DialogResult.No)
                     return;
-                userAPI.ReportSpam ( useAccount, null, null, (string)arg[1], 0 );
+                userAPI.ReportSpam(useAccount, null, null, (string)arg[1], 0);
             }
         }
 
-		/// <summary>
-		/// 閉じる
-		/// </summary>
-		/// <param name="e"></param>
-        protected override void OnClosing(CancelEventArgs e)
-		{
- 			base.OnClosing(e);
-
-			//	閉じるボタンを押したとき、タスクトレイに戻す
-            if ( Setting.FormSetting.isInsertTaskTrayWhenClosing && !isExitByTaskTray )
-			{
-				e.Cancel = true;
-				this.Hide();
-				return;
-			}
-
+        private void Shrimp_FormClosing(object sender, FormClosingEventArgs e)
+        {
             if ( !this.isDisposedShrimp )
             {
                 this.Hide ();
@@ -1798,7 +1599,7 @@ namespace Shrimp
 
             foreach (TwitterInfo t in this.accountManager.accounts)
             {
-                p.InsertAccountName(t, this.accountManager.SelectedNumber == i);
+                p.InsertAccountName(t, this.accountManager.selNum == i);
                 i++;
             }
             p.Show(System.Windows.Forms.Cursor.Position);
@@ -1844,7 +1645,6 @@ namespace Shrimp
 
         private void ExitShrimpMenu_Click ( object sender, EventArgs e )
         {
-            this.isExitByTaskTray = true;
             this.Close ();
         }
 

@@ -49,12 +49,6 @@
             this.DoubleBuffered = true;
             this.Name = "TimelineControl";
             this.Size = new System.Drawing.Size(10, 10);
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.TimelineControl_Paint);
-            this.Enter += new System.EventHandler(this.TimelineControl_Enter);
-            this.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.TimelineControl_MouseDoubleClick);
-            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TimelineControl_MouseDown);
-            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TimelineControl_MouseMove);
-            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TimelineControl_MouseUp);
             this.ResumeLayout(false);
 
         }

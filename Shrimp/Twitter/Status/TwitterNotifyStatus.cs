@@ -31,7 +31,7 @@ namespace Shrimp.Twitter.Status
                                         raw_data.created_at,
                                         "ddd MMM dd HH:mm:ss K yyyy",
                                         System.Globalization.DateTimeFormatInfo.InvariantInfo);
-            this.SetParameter ( srv );
+            this.SetParameter ( srv, null );
         }
 
         /// <summary>
@@ -83,45 +83,50 @@ namespace Shrimp.Twitter.Status
         /// パラメータを設定するコマンド
         /// </summary>
         /// <param name="srv"></param>
-        public void SetParameter ( TwitterInfo srv )
+        public bool SetParameter ( TwitterInfo srv, List<TwitterInfo> srvs )
         {
             //  TwitterInfoを元に、パラメータをセットする
-            if ( this.source.id == srv.UserId )
+            bool res = false;
+            if ( (srv != null && this.source.id == srv.UserId) || (srvs != null &&
+                srvs.Find ( (sv)=> sv.UserId == this.source.id ) != null ) )
             {
                 //
                 if ( this.isFavoriteCategory )
-                    this.isOwnFav = true;
+                    res = this.isOwnFav = true;
                 if ( this.isUnfavoriteCategory )
-                    this.isOwnUnFav = true;
+                    res = this.isOwnUnFav = true;
                 if ( this.isFollowCategory )
-                    this.isOwnFollow = true;
+                    res = this.isOwnFollow = true;
                 if ( this.isUnFollowCategory )
-                    this.isOwnUnFollow = true;
+                    res = this.isOwnUnFollow = true;
 
-            } else if ( this.target.id == srv.UserId )
+            }
+            else if ( ( srv != null && this.target.id == srv.UserId ) || ( srvs != null &&
+              srvs.Find ( ( sv ) => sv.UserId == this.target.id ) != null ) )
             {
                 //
                 if ( this.isFavoriteCategory )
-                    this.isFavToMe = true;
+                    res = this.isFavToMe = true;
                 if ( this.isUnfavoriteCategory )
-                    this.isUnFavToMe = true;
+                    res = this.isUnFavToMe = true;
                 if ( this.isFollowCategory )
-                    this.isFollowToMe = true;
+                    res = this.isFollowToMe = true;
                 if ( this.isUnFollowCategory )
-                    this.isUnFollowToMe = true;
+                    res = this.isUnFollowToMe = true;
             }
             else
             {
                 //
                 if ( this.isFavoriteCategory )
-                    this.isFav = true;
+                    res = this.isFav = true;
                 if ( this.isUnfavoriteCategory )
-                    this.isUnFav = true;
+                    res = this.isUnFav = true;
                 if ( this.isFollowCategory )
-                    this.isFollow = true;
+                    res = this.isFollow = true;
                 if ( this.isUnFollowCategory )
-                    this.isUnFollow = true;
+                    res = this.isUnFollow = true;
             }
+            return res;
         }
 
         /// <summary>
@@ -130,10 +135,7 @@ namespace Shrimp.Twitter.Status
         /// <param name="srvs"></param>
         public void SetParameters ( List<TwitterInfo> srvs )
         {
-            foreach ( TwitterInfo srv in srvs )
-            {
-                this.SetParameter ( srv );
-            }
+            this.SetParameter ( null, srvs );
         }
 
         /// <summary>

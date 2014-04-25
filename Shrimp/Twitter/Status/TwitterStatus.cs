@@ -139,12 +139,17 @@ namespace Shrimp.Twitter.Status
             this.entities = new TwitterEntities(this.text);
         }
 
-        private void GenerateDummyTwitterStatus()
+        public void GenerateDummyTwitterStatus()
         {
             this.created_at = DateTime.Now;
             this.id = System.DateTime.Now.Ticks;
             this.source = "ShrimpMan";
             this.source_url = "http://www.twitter.com";
+            this.text = "";
+            this.user = new TwitterUserStatus ();
+            this.user.screen_name = "Shrimp";
+            this.user.name = "Shrimp";
+            this.entities = new TwitterEntities ( "" );
         }
 
         /// <summary>
@@ -180,18 +185,20 @@ namespace Shrimp.Twitter.Status
                 GenerateDummyTwitterStatus();
                 var s = status.source as TwitterUserStatus;
                 var t = status.target as TwitterUserStatus;
-                this.user = s;
+                this.user = t;
                 if ( status.isOwnFollow || status.isOwnUnFollow )
                 {
-                    this.text = "【フォロー通知】\n@" + t.screen_name + "(" + t.name + ")を" + ( status.isOwnFollow ? "フォロー" : "アンフォロー" ) + "しました";
+                    this.user = s;
+                    this.text = "【フォロー通知】\nあなたが@" + t.screen_name + "(" + t.name + ")を" + ( status.isOwnFollow ? "フォロー" : "アンフォロー" ) + "しました。\n" + t.description + "";
                 }
                 else if ( status.isFollowToMe || status.isUnFollowToMe )
                 {
-                    this.text = "【フォロー通知】\n@" + t.screen_name + "(" + t.name + ")に" + ( status.isFollowToMe ? "フォロー" : "アンフォロー" ) + "されました";
+                    this.text = "【フォロー通知】\n@" + s.screen_name + "(" + s.name + ")に" + ( status.isFollowToMe ? "フォロー" : "アンフォロー" ) + "されました。\n" + s.description + "";
                 }
                 else if ( status.isFollow || status.isUnFollow )
                 {
-                    this.text = "【フォロー通知】\n@" + t.screen_name + "(" + t.name + ")を" + ( status.isFollow ? "フォロー" : "アンフォロー" ) + "しました";
+                    this.user = s;
+                    this.text = "【フォロー通知】\n@" + t.screen_name + "(" + t.name + ")を" + ( status.isFollow ? "フォロー" : "アンフォロー" ) + "しました。\n" + t.description + "";
                 }
                 this.entities = new TwitterEntities(this.text);
             }
@@ -231,6 +238,25 @@ namespace Shrimp.Twitter.Status
                 else
                 {
                     return (this.retweeted_status != null ? this.retweeted_status : this);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 通知かどうかを考慮せずに、ツイートを拾える(リツイートではなく、生Status)
+        /// </summary>
+        public virtual TwitterStatus DynamicNotifyWithoutReTweet
+        {
+            get
+            {
+                if ( this.NotifyStatus != null && this.NotifyStatus.target_object != null && this.NotifyStatus.target_object is TwitterStatus )
+                {
+                    var tweet = this.NotifyStatus.target_object as TwitterStatus;
+                    return tweet;
+                }
+                else
+                {
+                    return this;
                 }
             }
         }

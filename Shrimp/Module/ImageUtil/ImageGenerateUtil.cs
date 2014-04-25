@@ -95,8 +95,17 @@ namespace Shrimp.Module.ImageUtil
 
             // 影部分をレンダリングする
             BitmapData destBmpData = destBmp.LockBits(new Rectangle(0, 0, destRect.Width, destRect.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            if ( srcBmp.PixelFormat != PixelFormat.Format32bppArgb )
+            {
+                Bitmap clone = new Bitmap ( srcBmp.Width, srcBmp.Height, PixelFormat.Format32bppArgb );
+                using ( Graphics gr = Graphics.FromImage ( clone ) )
+                {
+                    gr.DrawImage ( srcBmp, new Rectangle ( 0, 0, clone.Width, clone.Height ) );
+                }
+                srcBmp = clone;
+            }
             //  イメージによって例外が発生するのでPixelFormat.Format32bppArgb->srcBmp.PixelFormatへ変更
-            BitmapData srcBmpData = srcBmp.LockBits(srcRect, ImageLockMode.ReadWrite, srcBmp.PixelFormat );
+            BitmapData srcBmpData = srcBmp.LockBits ( srcRect, ImageLockMode.ReadWrite, srcBmp.PixelFormat );
 
             unsafe
             {

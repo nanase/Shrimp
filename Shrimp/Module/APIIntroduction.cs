@@ -1,24 +1,33 @@
 ﻿
 using Shrimp.Twitter.Status;
+using Shrimp.ControlParts.Toolstrip;
+using System.Drawing;
 namespace Shrimp.Module
 {
     class APIIntroduction
     {
-        public static string retNotifyIntro ( TwitterNotifyStatus notify )
+        public static ToolStripStatusLabelText retNotifyIntro ( TwitterNotifyStatus notify )
         {
             if ( notify == null )
                 return null;
             if ( notify.isFavToMe )
             {
-                return "@" + notify.source.screen_name + "にお気に入り追加されました";
+                var tweet = notify.target_object as TwitterStatus;
+                return new ToolStripStatusLabelText ( "@" + notify.source.screen_name + "にお気に入り追加されました 「"+ tweet.DynamicTweet.text +"」", (Bitmap)Setting.ResourceImages.Fav.hover );
             }
             else if ( notify.isUnFavToMe )
             {
-                return "@" + notify.source.screen_name + "にお気に入り削除されました";
+                var tweet = notify.target_object as TwitterStatus;
+                return new ToolStripStatusLabelText ( "@" + notify.source.screen_name + "にお気に入り削除されました 「" + tweet.DynamicTweet.text + "」", (Bitmap)Setting.ResourceImages.UnFav.hover );
             }
             else if ( notify.isFollowToMe )
             {
-                return "@" + notify.source.screen_name + "にフォローされました";
+                return new ToolStripStatusLabelText ( "@" + notify.source.screen_name + "にフォローされました", (Bitmap)Setting.ResourceImages.UserImage );
+            }
+            else if ( notify.isRetweetedCategory )
+            {
+                var tweet = notify.target_object as TwitterStatus;
+                return new ToolStripStatusLabelText ( "@" + notify.source.screen_name + "にリツイートされました 「" + tweet.DynamicTweet.text + "」", (Bitmap)Setting.ResourceImages.Retweet.hover );
             }
             return null;
         }

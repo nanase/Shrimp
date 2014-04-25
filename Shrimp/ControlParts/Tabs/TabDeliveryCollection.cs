@@ -127,6 +127,7 @@ namespace Shrimp.ControlParts.Tabs
         /// <returns></returns>
         public bool isMatch(decimal user_id, TimelineCategories destCategory, object checkObject)
         {
+            /*
             if ( checkObject is TwitterNotifyStatus )
             {
                 //  ふぁぼだったら、全部に配る
@@ -136,6 +137,7 @@ namespace Shrimp.ControlParts.Tabs
                     return true;
                 }
             }
+            */
 
             if ( checkObject is TwitterStatus )
             {
@@ -149,11 +151,23 @@ namespace Shrimp.ControlParts.Tabs
                 }
             }
 
-            if ((destCategory != TimelineCategories.ListTimeline && destCategory != TimelineCategories.BookmarkTimeline) && this.deliveries.FindIndex((tabs) => tabs.Category.isAllUserAccept) < 0)
+            //  ユーザの振り分け
+            if ((destCategory != TimelineCategories.ListTimeline && destCategory != TimelineCategories.BookmarkTimeline) && 
+                this.deliveries.FindIndex((tabs) => tabs.Category.category == destCategory && tabs.Category.isAllUserAccept) < 0)
             {
-                var isMatchID = this.deliveries.FindIndex((tabs) =>
-                                tabs.DeliveryFromUsers.FindIndex((tmpID) => tmpID == user_id) >= 0) >= 0;
-                if (!isMatchID)
+                bool isSuccess = false;
+                foreach ( TabDelivery tb in this.deliveries )
+                {
+                    if ( tb.Category.category == destCategory )
+                    {
+                        if ( tb.DeliveryFromUsers.FindIndex ( ( tmpID ) => tmpID == user_id ) >= 0 )
+                        {
+                            isSuccess = true;
+                            break;
+                        }
+                    }
+                }
+                if ( !isSuccess )
                     return false;
             }
             if (this.deliveries.FindIndex((tabs) => tabs.Category.category == destCategory) < 0)

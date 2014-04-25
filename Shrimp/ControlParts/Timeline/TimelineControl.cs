@@ -15,6 +15,8 @@ using Shrimp.ControlParts.Timeline.Select;
 using Shrimp.Module.Parts;
 using Shrimp.Twitter;
 using Shrimp.Twitter.Status;
+using Shrimp.Module.ImageUtil;
+using Shrimp.ControlParts.ToolTips;
 
 namespace Shrimp.ControlParts.Timeline
 {
@@ -34,6 +36,7 @@ namespace Shrimp.ControlParts.Timeline
         private SelTweetContextMenu selTweetContextMenu;
         private SelUserContextMenu selUserContextMenu;
         private TweetDraw tweetDraw;
+        private TimelineTooltips tooltips;
         //  クリック位置
         private ClickCells clickCells = new ClickCells();
         //  ツイート
@@ -45,6 +48,7 @@ namespace Shrimp.ControlParts.Timeline
         private TweetInsertAnimation insert_anime;
         private TweetNotifyAnimation notify_anime;
         private TabChangeAnimation tabchange_anime;
+		private DrawImageViewer imageViewer_anime;
 
         private int drawNum = 0;
         private Brush originBackGroundColor = new SolidBrush(SystemColors.Control);
@@ -74,15 +78,10 @@ namespace Shrimp.ControlParts.Timeline
         private Point HoverLocation;
 
         /// <summary>
-        /// 取得漏れしたらしきツイート数
-        /// </summary>
-        private int DelayTweetNum = 0;
-        private int DelayPercentage = 0;
-
-        /// <summary>
         /// 凍結中かどうか
         /// </summary>
         private bool isSuspended = false;
+        private TwitterStatus dummyStatus;
         #endregion
 
         #region イベント
@@ -90,7 +89,6 @@ namespace Shrimp.ControlParts.Timeline
         public event OnChangedTweetHandler OnChangeTweet;
         //  ツイートの取得漏れ率
         public delegate void OnChangedTweetDelayPercentageHandler(int Percentage);
-        public event OnChangedTweetDelayPercentageHandler OnChangedTweetDelayPercentage;
         /// <summary>
         /// TimelineControlからTwitterAPIを操作するときに使うデリゲート
         /// </summary>
@@ -125,7 +123,7 @@ namespace Shrimp.ControlParts.Timeline
         /// Shrimpをリロードするときにつかおう
         /// </summary>
         public delegate void OnReloadShrimp();
-        public delegate void ReplyTweetDelegate(decimal id, bool isDM);
+        public delegate void ReplyTweetDelegate(TwitterStatus tweet, bool isDM);
         public delegate TwitterStatus SearchTweetDelegate(decimal id);
         public delegate void OnNotifyClickedDelegate(decimal id);
         private int ConversationNum = 0;
@@ -151,6 +149,9 @@ namespace Shrimp.ControlParts.Timeline
         // SQLによる追加時、一番上の表示を示すフラグとしてtrueになる
         private bool isSetFirstViewBySQL = false;
         private bool isDisposedShrimp = false;
+        private Image bufferBackgroundImage = null;
+        private string bufferBackgroundImagePath;
+        private bool isResized = false;
         #endregion
 
         #region コンストラクタ
@@ -165,8 +166,6 @@ namespace Shrimp.ControlParts.Timeline
                         ControlStyles.AllPaintingInWmPaint,
                         true);
             SetStyle(ControlStyles.ResizeRedraw, true);
-
-            this.MouseWheel += new MouseEventHandler(TimelineControl_MouseWheel);
 
             this.timeline = new Timeline();
             this.attachTweetTimer = new System.Windows.Forms.Timer();
@@ -197,8 +196,12 @@ namespace Shrimp.ControlParts.Timeline
             this.insert_anime = new TweetInsertAnimation();
             this.notify_anime = new TweetNotifyAnimation();
             this.tabchange_anime = new TabChangeAnimation();
-            this.anicon = new AnimationControl(this.RedrawControl, this.notify_anime.FrameExecute, 16,
-                                            this.insert_anime.FrameExecute, 16, this.tabchange_anime.FrameExecute, 16);
+			this.imageViewer_anime = new DrawImageViewer();
+            this.tooltips = new TimelineTooltips();
+            this.anicon = new AnimationControl
+				(this.RedrawControl, this.notify_anime.FrameExecute, 16,
+                                            this.insert_anime.FrameExecute, 16, this.tabchange_anime.FrameExecute, 16,
+											this.imageViewer_anime.FrameExecute, 16);
 
             this.loadingTimer = new System.Windows.Forms.Timer();
             this.loadingTimer.Tick += new EventHandler(loadingTimer_Tick);
@@ -206,6 +209,9 @@ namespace Shrimp.ControlParts.Timeline
             this.loadingTimer.Start();
             loadingBox.Image = (Image)Properties.Resources.loadingAnime.Clone();
             loadingBox.Dock = DockStyle.Fill;
+
+            this.dummyStatus = new TwitterStatus ();
+            this.dummyStatus.GenerateDummyTwitterStatus ();
         }
 
         void loadingTimer_Tick(object sender, EventArgs e)
@@ -221,12 +227,7 @@ namespace Shrimp.ControlParts.Timeline
             else
             {
                 this.Controls.Remove(loadingBox);
-                //this.loadingBox.Dispose ();
-                //this.loadingBox = null;
                 this.loadingTimer.Stop();
-                //this.loadingTimer.Tick -= new EventHandler ( loadingTimer_Tick );
-                //this.loadingTimer.Dispose ();
-                //this.loadingTimer = null;
             }
         }
 
@@ -269,7 +270,6 @@ namespace Shrimp.ControlParts.Timeline
                 this.selTweetContextMenu.Dispose(); this.selTweetContextMenu = null;
                 this.selTextContextMenu.Dispose(); this.selTextContextMenu = null;
                 this.selUserContextMenu.Dispose(); this.selUserContextMenu = null;
-                this.MouseWheel -= new MouseEventHandler(TimelineControl_MouseWheel);
 
                 this.selectControl.Dispose(); this.selectControl = null;
                 this.tweetDraw.Dispose(); this.tweetDraw = null;
@@ -298,12 +298,15 @@ namespace Shrimp.ControlParts.Timeline
 
         public void initialize()
         {
-            this.timeline.PopAllTweet();
-            this.tweets.Clear();
-            this.isLoadingFinished = false;
-            SetFirstView();
-            this.loadingTimer.Start();
-            this.RedrawControl();
+            if (!isDisposedShrimp)
+            {
+                this.timeline.PopAllTweet();
+                this.tweets.Clear();
+                this.isLoadingFinished = false;
+                SetFirstView();
+                this.loadingTimer.Start();
+                this.RedrawControl();
+            }
         }
 
 
@@ -318,6 +321,18 @@ namespace Shrimp.ControlParts.Timeline
                 return false;
             return this.timeline.PushTweet(t);
         }
+
+		/// <summary>
+		/// タイムラインに返信ツイートを追加する
+		/// </summary>
+		/// <param name="t">ツイート</param>
+		/// <returns>成功した場合true、失敗したらfalse</returns>
+		public bool InsertConversationTweet(TwitterStatus t)
+		{
+			if (timeline == null || t == null)
+				return false;
+			return this.timeline.AddReply(t);
+		}
 
         /// <summary>
         /// タイムラインを一度に大量に入れる
@@ -335,16 +350,19 @@ namespace Shrimp.ControlParts.Timeline
         /// </summary>
         public void SetFirstView()
         {
-            this.Invoke((MethodInvoker)delegate()
+            if ( this.IsHandleCreated )
             {
-                this.vsc.Value = 0;
-                this.StartTweetShowPosition = 0;
-                if (this.tweets.Count != 0)
-                    this.SelectTweetID = this.tweets[0].id;
-                else
-                    this.SelectTweetID = -1;
-                this.RedrawControl();
-            });
+                this.Invoke ( (MethodInvoker)delegate ()
+                {
+                    this.vsc.Value = 0;
+                    this.StartTweetShowPosition = 0;
+                    if ( this.tweets.Count != 0 )
+                        this.SelectTweetID = this.tweets[0].id;
+                    else
+                        this.SelectTweetID = -1;
+                    this.RedrawControl ();
+                } );
+            }
         }
 
         /// <summary>
@@ -352,10 +370,17 @@ namespace Shrimp.ControlParts.Timeline
         /// </summary>
         public void SetSQL()
         {
-            this.Invoke((MethodInvoker)delegate()
+            if ( this.IsHandleCreated )
+            {
+                this.Invoke ( (MethodInvoker)delegate ()
+                {
+                    isSetFirstViewBySQL = true;
+                } );
+            }
+            else
             {
                 isSetFirstViewBySQL = true;
-            });
+            }
         }
 
         /// <summary>
@@ -413,6 +438,8 @@ namespace Shrimp.ControlParts.Timeline
             if (this.tweetDraw.cacheWaitingURLs.Count != 0)
             {
                 anicon.SetRedrawQueue();
+                this.tweetDraw.cacheWaitingURLs.Clear ();
+                this.tweetDraw.cacheWaitingURLs.Capacity = 0;
             }
         }
 
@@ -421,12 +448,11 @@ namespace Shrimp.ControlParts.Timeline
         /// </summary>
         /// <param name="tweetID"></param>
         /// <param name="isDirectMessage"></param>
-        public void ReplySelectedTweet(decimal tweetID, bool isDirectMessage)
+        public void ReplySelectedTweet(TwitterStatus tweet, bool isDirectMessage)
         {
-            if (tweetID >= 0)
+            if (tweet!= null)
             {
-                var tweet = tweets.Find((t) => t.DynamicTweet.id == tweetID);
-                if (tweet != null && OnCreatedReplyData != null)
+                if (OnCreatedReplyData != null)
                 {
                     OnCreatedReplyData.Invoke(tweet, tweet.isDirectMessage | isDirectMessage);
                 }
@@ -504,28 +530,20 @@ namespace Shrimp.ControlParts.Timeline
                 if (e.ClickedItem.Name == "RetweetMenu" || (e.ClickedItem.OwnerItem != null && e.ClickedItem.OwnerItem.Name == "RetweetMenu" && e.ClickedItem.Name == "AccountSelected"))
                 {
                     selTweetContextMenu.MenuClose();
-                    ActionControl.DoAction(ActionType.Retweet, tweet.DynamicTweet.id, selUserContextMenu, ReplySelectedTweet,
-                    (SearchTweetDelegate)delegate(decimal id)
-                    {
-                        return tweets.Find((t) => t.DynamicNotifyTweet.id == id);
-                    }, accountSelectedID);
+                    ActionControl.DoAction ( ActionType.Retweet, tweet.DynamicNotifyTweet, selUserContextMenu, new ReplyTweetDelegate (ReplySelectedTweet), accountSelectedID);
                 }
                 else if (e.ClickedItem.Name == "FavMenu" || (e.ClickedItem.OwnerItem != null && e.ClickedItem.OwnerItem.Name == "FavMenu" && e.ClickedItem.Name == "AccountSelected"))
                 {
                     selTweetContextMenu.MenuClose();
-                    ActionControl.DoAction(ActionType.Favorite, tweet.DynamicTweet.id, selUserContextMenu, ReplySelectedTweet,
-                    (SearchTweetDelegate)delegate(decimal id)
-                    {
-                        return tweets.Find((t) => t.DynamicNotifyTweet.id == id);
-                    }, accountSelectedID);
+                    ActionControl.DoAction ( ActionType.Favorite, tweet.DynamicNotifyTweet, selUserContextMenu, ReplySelectedTweet, accountSelectedID);
                 }
                 else if (e.ClickedItem.Name == "UnFavMenu" || (e.ClickedItem.OwnerItem != null && e.ClickedItem.OwnerItem.Name == "UnFavMenu" && e.ClickedItem.Name == "AccountSelected"))
                 {
-                    OnUseTwitterAPI.Invoke(null, new object[] { "unfav", tweet.id, accountSelectedID });
+                    OnUseTwitterAPI.Invoke ( null, new object[] { "unfav", tweet.DynamicNotifyTweet, accountSelectedID } );
                 }
                 else if (e.ClickedItem.Name == "ReplyMenu" || e.ClickedItem.Name == "ReplyDMMenu")
                 {
-                    ReplySelectedTweet(tweet.DynamicTweet.id, (e.ClickedItem.Name == "ReplyDMMenu"));
+                    ReplySelectedTweet(tweet.DynamicNotifyTweet, (e.ClickedItem.Name == "ReplyDMMenu"));
                 }
                 else if (e.ClickedItem.Name == "RegistBookmarkMenu")
                 {
@@ -534,7 +552,7 @@ namespace Shrimp.ControlParts.Timeline
                 }
                 else if (e.ClickedItem.Name == "DeleteTweetMenu")
                 {
-                    OnUseTwitterAPI.Invoke(null, new object[] { "delete", tweet, null });
+                    OnUseTwitterAPI.Invoke ( null, new object[] { "delete", tweet.DynamicNotifyWithoutReTweet, null } );
                 }
             }
         }
@@ -591,12 +609,19 @@ namespace Shrimp.ControlParts.Timeline
             var countNum = tweets.Count;
             if (countNum >= Setting.Timeline.SavedTimelineTweetNum && !isLastView)
             {
-                tweets.RemoveAt(tweets.Count - 1);
+                if ( countNum - 1 >= 0 )
+                {
+                    var delTweet = tweets[countNum - 1];
+                    timeline.DeleteTimeline ( delTweet.id, delTweet.NotifyStatus );
+                    tweets.RemoveAt ( countNum - 1 );
+                }
             }
 
             if ((this.timeline.isSavingTimeline || this.timeline.isBigTweetReceived)
-                    && !isShowingMenu && !this.ChangingControl && !this.insert_anime.Enable && !this.selectControl.isSelecting)
+                    && !isShowingMenu && !this.ChangingControl && !this.selectControl.isSelecting)
             {
+                if ( Setting.Timeline.isEnableInsertAnimation && this.insert_anime.Enable )
+                    return;
                 //	あった
                 this.attachTweetTimer.Interval = (this.timeline.Count != 1 ? 16 : 500);
                 if (this.timeline.isBigTweetReceived)
@@ -638,12 +663,11 @@ namespace Shrimp.ControlParts.Timeline
                         if ( ( tweet.NotifyStatus.isOwnFav || tweet.NotifyStatus.isOwnUnFav ) )
                         {
                             var notify_tweet = tweet.NotifyStatus.target_object as TwitterStatus;
-                            now_tweet = this.tweets.Find ( ( t ) => t.id == notify_tweet.id );
+                            now_tweet = this.tweets.Find ( ( t ) => t.DynamicNotifyTweet.id == notify_tweet.id );
                             if ( now_tweet != null )
                             {
-                                now_tweet.favorite_count += ( tweet.NotifyStatus.isOwnFav ? 1 : -1 );
-                                now_tweet.favorited = ( tweet.NotifyStatus.isOwnFav ? true : false );
-
+                                now_tweet.DynamicTweet.favorite_count += ( tweet.NotifyStatus.isOwnFav ? 1 : -1 );
+                                now_tweet.DynamicTweet.favorited = ( tweet.NotifyStatus.isOwnFav ? true : false );
                             }
                             else
                             {
@@ -782,8 +806,10 @@ namespace Shrimp.ControlParts.Timeline
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void TimelineControl_MouseWheel(object sender, MouseEventArgs e)
+        protected override void  OnMouseWheel(MouseEventArgs e)
         {
+            base.OnMouseWheel ( e );
+
             int num = 0;
             if (e.Delta < 0)
             {
@@ -918,8 +944,9 @@ namespace Shrimp.ControlParts.Timeline
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TimelineControl_Paint(object sender, PaintEventArgs e)
+        protected override void  OnPaint(PaintEventArgs e)
         {
+            base.OnPaint(e);
             this.ChangingControl = true;
             //  切り替えアニメ
             if (this.tabchange_anime.Enable)
@@ -928,12 +955,39 @@ namespace Shrimp.ControlParts.Timeline
                 this.ChangingControl = false;
                 return;
             }
+
             //  セル描画しなおしだから、初期化
             tweetDraw.initialize();
             //  クリック位置初期化
             clickCells.initialize();
             //  背景
             e.Graphics.FillRectangle(originBackGroundColor, e.ClipRectangle);
+            //  背景画像
+            if ( !string.IsNullOrEmpty ( Setting.BackgroundImage.BackgroundImagePath ) )
+            {
+                if ( Setting.BackgroundImage.BackgroundImageData != null )
+                {
+                    if ( this.bufferBackgroundImage == null || this.bufferBackgroundImagePath != Setting.BackgroundImage.BackgroundImagePath || this.isResized )
+                    {
+                        this.bufferBackgroundImage = ImageGenerateUtil.ResizeImage ( (Bitmap)Setting.BackgroundImage.BackgroundImageData, e.ClipRectangle.Width, Setting.BackgroundImage.BackgroundImageData.Height );
+                        this.bufferBackgroundImagePath = Setting.BackgroundImage.BackgroundImagePath;
+                        this.isResized = false;
+                    }
+                    var info = this.bufferBackgroundImage.Size;
+                    if ( Setting.BackgroundImage.ImagePos == Setting.ImagePosition.LEFTTOP )
+                        e.Graphics.DrawImage ( this.bufferBackgroundImage, Point.Empty );
+                    if ( Setting.BackgroundImage.ImagePos == Setting.ImagePosition.CENTER )
+                        e.Graphics.DrawImage ( this.bufferBackgroundImage, 
+                            new Rectangle (( e.ClipRectangle.Width - info.Width ) / 2, (e.ClipRectangle.Height - info.Height) / 2,
+                                info.Width, info.Height )
+                                );
+                    if ( Setting.BackgroundImage.ImagePos == Setting.ImagePosition.RIGHTBOTTOM )
+                        e.Graphics.DrawImage ( this.bufferBackgroundImage,
+                            new Rectangle ( ( e.ClipRectangle.Width - info.Width ), ( e.ClipRectangle.Height - info.Height ),
+                                info.Width, info.Height )
+                                );
+                }
+            }
             drawNum = 0;
             decimal next_reply_num = -1;
             int next_reply_tweet_num = -1;
@@ -949,8 +1003,10 @@ namespace Shrimp.ControlParts.Timeline
             //  たとえば、ツイートの表示位置の上に選択されていて尚且つツイートがあったばあい、そこをオフセットにして表示する
             bool isBakoffTweetSelected = false;
             int setOffsetStartPosition = 0;
+            bool isConversationed = false; // 一度でも会話を表示するツイートがあって、表示した後、その続きが亡くなった場合（ロード中かどうか
             ConversationNum = 0;
             UseConversationBack = false;
+            //  会話
             if (this.OpenConversation && SelectTweetID >= 0)
             {
                 //  選択されたツイートの位置を取得
@@ -1012,37 +1068,40 @@ namespace Shrimp.ControlParts.Timeline
                 TwitterStatus tweet = tweets[i];
                 int maxWidth_new = this.WidthWithoutScrollBar;
                 var isConversation = false;
-                if (next_reply_num > 0)
+                if ( next_reply_num > 0 )
                 {
                     isConversation = true;
-                    next_reply_tweet_num = tweets.FindIndex((status) => status.DynamicTweet.id == next_reply_num);
-                    if (next_reply_tweet_num >= 0 && this.OpenConversation)
+                    next_reply_tweet_num = tweets.FindIndex ( ( status ) => status.DynamicTweet.id == next_reply_num );
+                    if ( next_reply_tweet_num >= 0 && this.OpenConversation )
                     {
                         offset_start_x = 30;
                         tweet = tweets[next_reply_tweet_num];
-                        e.Graphics.DrawImage(Setting.ResourceImages.In_Reply_To_Status_ID_Arrow, new Rectangle(0, tweetDraw.NextStartPositionOffsetY,
-                            30, 30));
-                        next_reply_num = (tweet.DynamicTweet.in_reply_to_status_id > 0 ? tweet.DynamicTweet.in_reply_to_status_id : -1);
-                        if (next_reply_num < 0 && isBakoffTweetSelected)
+                        e.Graphics.DrawImage ( Setting.ResourceImages.In_Reply_To_Status_ID_Arrow, new Rectangle ( 0, tweetDraw.NextStartPositionOffsetY,
+                            30, 30 ) );
+                        next_reply_num = ( tweet.DynamicTweet.in_reply_to_status_id > 0 ? tweet.DynamicTweet.in_reply_to_status_id : -1 );
+                        if ( next_reply_num < 0 && isBakoffTweetSelected )
                         {
                             i -= ConversationNum;
                         }
+                        isConversationed = true;
                     }
                     else
                     {
-                        //if ( tweets.Find ( ( t ) => t.DynamicTweet.id == next_reply_num ) == null )
-                        //{
-                        //    //  ツイートないから、さがしてくるか
-                        //    OnUseTwitterAPI.Invoke ( this, new object[] { "loadNewTweet", next_reply_num, next_reply_num } );
-                        //}
+                        //  ツイートないから、さがしてくるか
+                        OnUseTwitterAPI.Invoke ( this, new object[] { "loadNewTweet", next_reply_num, next_reply_num } );
                         next_reply_num = -1;
                         i++;
-                        if (i >= tweets.Count - 1)
+                        if ( i >= tweets.Count - 1 )
                             i = tweets.Count - 1;
                         tweet = tweets[i];
                         isConversation = false;
                     }
 
+                }
+                else
+                {
+                    isConversationed = false;
+                    isConversation = false;
                 }
 
                 tweetDraw.isSelected = (SelectTweetID == tweet.id);
@@ -1072,30 +1131,44 @@ namespace Shrimp.ControlParts.Timeline
                     }
                     tweetDraw.NextStartPositionOffsetY = this.insert_anime.StartPositionOffset;
                 }
-
-                tweetDraw.DrawTweet(e.Graphics, tweet, isConversation, offset_start_x, this.WidthWithoutScrollBar,
-                                                clickCells.SetClickLink, selectControl, this.PointToClient(MousePosition));
+                if ( !isConversation && isConversationed )
+                {
+                    tweetDraw.DrawBackgroundOnly ( e.Graphics, this.dummyStatus, isConversation, 30, this.WidthWithoutScrollBar, null );
+                    isConversationed = false;
+                    continue;
+                }
+                else
+                {
+                    tweetDraw.DrawTweet ( e.Graphics, tweet, isConversation, offset_start_x, this.WidthWithoutScrollBar,
+                                                clickCells.SetClickLink, selectControl, this.PointToClient ( MousePosition ) );
+                }
                 if (next_reply_num < 0)
                     i++;
             }
 
-            if (this.notify_anime.Enable)
+            //  通知アニメーション
+            if ( Setting.Timeline.isEnableNotifyAnimation )
             {
-                int num = 0;
-                if (StartTweetShowPosition >= 0 && tweets.Count - 1 >= StartTweetShowPosition)
+                if ( this.notify_anime.Enable )
                 {
-                    if (this.notify_anime.offsetTweetID <= tweets[StartTweetShowPosition].id)
-                        this.notify_anime.offsetTweetID = tweets[StartTweetShowPosition].id;
+                    int num = 0;
+                    if ( StartTweetShowPosition >= 0 && tweets.Count - 1 >= StartTweetShowPosition )
+                    {
+                        if ( this.notify_anime.offsetTweetID <= tweets[StartTweetShowPosition].id )
+                            this.notify_anime.offsetTweetID = tweets[StartTweetShowPosition].id;
+                    }
+                    foreach ( TwitterStatus t in tweets )
+                    {
+                        if ( t.id == this.notify_anime.offsetTweetID )
+                            break;
+                        num++;
+                    }
+                    notify_anime.notifyText = "新着ツイート: " + num + "件\n@" + tweets[0].user.screen_name + ":" + tweets[0].text.Replace ( "\r", "" ).Replace ( "\n", "" ) + "";
                 }
-                foreach (TwitterStatus t in tweets)
-                {
-                    if (t.id == this.notify_anime.offsetTweetID)
-                        break;
-                    num++;
-                }
-                notify_anime.notifyText = "新着ツイート: " + num + "件\n@" + tweets[0].user.screen_name + ":" + tweets[0].text.Replace("\r", "").Replace("\n", "") + "";
+                notify_anime.Draw ( e.Graphics, this.WidthWithoutScrollBar, e.ClipRectangle, clickCells.SetClickLink, null );
             }
-            notify_anime.Draw(e.Graphics, this.WidthWithoutScrollBar, e.ClipRectangle, clickCells.SetClickLink, null);
+
+			imageViewer_anime.Draw(e.Graphics, this.WidthWithoutScrollBar, e.ClipRectangle, clickCells.SetClickLink, null);
             this.ChangingControl = false;
         }
 
@@ -1104,8 +1177,9 @@ namespace Shrimp.ControlParts.Timeline
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TimelineControl_MouseDown(object sender, MouseEventArgs e)
+        protected override void OnMouseDown(MouseEventArgs e)
         {
+            base.OnMouseDown(e);
             if (tweets.Count == 0)
                 return;
             int sel = 0;
@@ -1170,8 +1244,10 @@ namespace Shrimp.ControlParts.Timeline
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TimelineControl_MouseUp(object sender, MouseEventArgs e)
+        protected override void OnMouseUp(MouseEventArgs e)
         {
+ 	         base.OnMouseUp(e);
+
             if (tweets.Count == 0)
                 return;
 
@@ -1199,12 +1275,33 @@ namespace Shrimp.ControlParts.Timeline
                     ClickCellsData clickData = clickCells.getClickLink(e.Location);
                     if (clickData != null && !isFirstClickDown && !selTweetContextMenu.isClosed && !selTextContextMenu.isClosed)
                     {
-                        ActionControl.DoAction(ActionControl.ConvertType(clickData.type), clickData.source,
-                            selUserContextMenu, ReplySelectedTweet,
-                                (SearchTweetDelegate)delegate(decimal id)
-                        {
-                            return tweets.Find((t) => t.DynamicNotifyTweet.id == id);
-                        }, null, this.OnNotifyClicked);
+                        decimal id;
+                        object dest = clickData.source;
+                        var typeConv = ActionControl.ConvertType ( clickData.type );
+						if (typeConv != ActionType.None)
+						{
+							if (typeConv != ActionType.Notify && decimal.TryParse((string)clickData.source, out id))
+							{
+								var tweet = tweets.Find((t) => t.id == id || t.DynamicTweet.id == id);
+								if (tweet != null)
+								{
+									dest = tweet.DynamicNotifyTweet;
+								}
+							}
+							ActionControl.DoAction(typeConv, dest,
+								 selUserContextMenu, ReplySelectedTweet, null, this.OnNotifyClicked);
+						}
+						else
+						{
+							if (clickData.type == "inlineImage")
+							{
+								//	ビューア
+								if ( this.imageViewer_anime.Enable )
+									this.imageViewer_anime.StopAnimation();
+								else
+									this.imageViewer_anime.StartAnimation(null);
+							}
+						}
                     }
                     selTweetContextMenu.isClosed = false;
                     selTextContextMenu.isClosed = false;
@@ -1238,8 +1335,9 @@ namespace Shrimp.ControlParts.Timeline
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TimelineControl_MouseMove(object sender, MouseEventArgs e)
+        protected override void OnMouseMove(MouseEventArgs e)
         {
+ 	        base.OnMouseMove(e);
             if (selectControl.isMouseDown)
             {
                 selectControl.SelectNow(e.Location);
@@ -1261,6 +1359,14 @@ namespace Shrimp.ControlParts.Timeline
                             SelectTweetID = HoverTweetID;
                         }
 
+                        /*
+                        this.tooltips.Hide(this);
+                        this.tooltips.ShowAlways = false;
+                        this.tooltips.RemoveAll();
+                        this.tooltips.SetImage((Bitmap)TweetDraw.drawOnlyTweet(selt, this.WidthWithoutScrollBar));
+                        
+                        this.tooltips.Show("hoge", this, new Point ( 0, e.Location.Y ));
+                        */
                         this.anicon.SetRedrawQueue();
                     }
                 }
@@ -1296,8 +1402,9 @@ namespace Shrimp.ControlParts.Timeline
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TimelineControl_MouseDoubleClick(object sender, MouseEventArgs e)
+        protected override void OnMouseDoubleClick(MouseEventArgs e)
         {
+ 	        base.OnMouseDoubleClick(e);
             int sel = 0;
 
             if (Setting.ShortcutKeys.Shortcuts != null)
@@ -1305,15 +1412,11 @@ namespace Shrimp.ControlParts.Timeline
                 Actions action = Setting.ShortcutKeys.Shortcuts.DoubleClicked();
                 if (action != Actions.None)
                 {
-                    var tweet = tweets.Find((t) => t.DynamicTweet.id == SelectTweetID);
+                    var tweet = tweets.Find((t) => t.id == SelectTweetID);
                     if (tweet != null)
                     {
-                        ActionControl.OnShortcutAction(action, SelectTweetID, tweet.DynamicTweet.user.screen_name,
-                            selUserContextMenu, ReplySelectedTweet,
-                            (SearchTweetDelegate)delegate(decimal id)
-                        {
-                            return tweets.Find((t) => t.DynamicNotifyTweet.id == id);
-                        });
+                        ActionControl.OnShortcutAction ( action, tweet.DynamicNotifyTweet,
+                            selUserContextMenu, ReplySelectedTweet );
                     }
                 }
             }
@@ -1328,6 +1431,12 @@ namespace Shrimp.ControlParts.Timeline
 
         }
 
+        protected override void OnResize ( EventArgs e )
+        {
+            base.OnResize ( e );
+            this.isResized = true;
+        }
+
         /// <summary>
         /// ウィンドウを再描画します
         /// falseが返されたときは、現在描画ができない状態なので、再度試してください
@@ -1337,18 +1446,11 @@ namespace Shrimp.ControlParts.Timeline
             this.ChangingControl = true;
             if (this.InvokeRequired)
             {
-                if (!this.IsDisposed)
+                this.Invoke ( (MethodInvoker)delegate ()
                 {
-                    this.BeginInvoke ( (MethodInvoker)delegate ()
-                    {
-                        if ( !this.IsDisposed )
-                        {
-                            this.Invalidate ();
-                            this.Update ();
-                        }
-
-                    } );
-                }
+                    this.Invalidate ();
+                    this.Update ();
+                } );
             }
             else
             {
@@ -1367,8 +1469,9 @@ namespace Shrimp.ControlParts.Timeline
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public void TimelineControl_KeyDown(object sender, KeyEventArgs e)
+        protected override void OnKeyDown(KeyEventArgs e)
         {
+ 	        base.OnKeyDown(e);
             if (e.Control && e.KeyCode == Keys.C)
             {
                 //
@@ -1397,12 +1500,8 @@ namespace Shrimp.ControlParts.Timeline
                     var tweet = tweets.Find((t) => t.id == SelectTweetID);
                     if (tweet != null)
                     {
-                        ActionControl.OnShortcutAction(action, tweet.DynamicTweet.id, tweet.DynamicTweet.user.screen_name,
-                                                            selUserContextMenu, ReplySelectedTweet,
-                                (SearchTweetDelegate)delegate(decimal id)
-                        {
-                            return tweets.Find((t) => t.DynamicNotifyTweet.id == id);
-                        });
+                        ActionControl.OnShortcutAction(action, tweet.DynamicNotifyTweet,
+                                                            selUserContextMenu, ReplySelectedTweet);
                     }
 
                 }
@@ -1414,10 +1513,16 @@ namespace Shrimp.ControlParts.Timeline
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void TimelineControl_Enter(object sender, EventArgs e)
+        protected override void OnEnter(EventArgs e)
         {
+            base.OnEnter(e);
             this.ActiveControl = this.Controls[0];
             this.Focus();
+        }
+
+        public void PreviewOnKeyDown ( KeyEventArgs e )
+        {
+            this.OnKeyDown ( e );
         }
 
         /// <summary>

@@ -8,7 +8,6 @@ namespace Shrimp.Setting.Forms
     public partial class ShrimpInfo : UserControl
     {
         int num = 0;
-        bool flg = false;
         private Dictionary<string, bool> updateSetting;
         public ShrimpInfo()
         {

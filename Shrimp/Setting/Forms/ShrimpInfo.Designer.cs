@@ -109,7 +109,7 @@
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(325, 30);
             this.label2.TabIndex = 1;
-            this.label2.Text = "Version 1.11(PreFairy)";
+            this.label2.Text = "Version 1.2(Fairy)";
             this.label2.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // label1

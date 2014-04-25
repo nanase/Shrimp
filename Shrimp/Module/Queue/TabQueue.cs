@@ -16,7 +16,7 @@ namespace Shrimp.Module.Queue
         public TabQueue()
         {
             this.queueCheckTimer = new System.Timers.Timer();
-            this.queueCheckTimer.Interval = 50;
+            this.queueCheckTimer.Interval = 10;
             this.queueCheckTimer.Elapsed += new ElapsedEventHandler(queueCheckTimer_Elapsed);
             this.queueCheckTimer.Start();
         }
@@ -30,7 +30,7 @@ namespace Shrimp.Module.Queue
 
         private void StopQueue()
         {
-            if (this.Enabled)
+            if (!this.Enabled)
                 return;
             this.queueCheckTimer.Stop();
         }
@@ -74,18 +74,21 @@ namespace Shrimp.Module.Queue
         public void Wait()
         {
             this.isStopRequest = true;
-            while (true)
+            this.StopQueue ();
+            lock ( ( (ICollection)this ).SyncRoot )
             {
-                lock (((ICollection)this).SyncRoot)
+                for ( ; ; )
                 {
-                    if (this.Count == 0)
+                    if ( this.Count != 0 )
                     {
-                        // 
-                        this.StopQueue();
-                        return;
+                        var tmp = base.Dequeue ();
+                        tmp.ActionData.BeginInvoke ( null, null );
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
-                Thread.Sleep(1);
             }
         }
 

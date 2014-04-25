@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Timers;
+using System.Threading.Tasks;
 
 namespace Shrimp.ControlParts.Timeline.Animation
 {
@@ -29,7 +30,7 @@ namespace Shrimp.ControlParts.Timeline.Animation
 
         #region コンストラクタ
         public AnimationControl(RedrawControlDelegate redraw, FrameExecuteDelegate notify, int interval, FrameExecuteDelegate insert, int interval2,
-                                    FrameExecuteDelegate tab, int interval3)
+									FrameExecuteDelegate tab, int interval3, FrameExecuteDelegate imageviewer, int interval4)
         {
             timer.Interval = 16;
             timer.Elapsed += new ElapsedEventHandler(timer_Elapsed);
@@ -41,6 +42,8 @@ namespace Shrimp.ControlParts.Timeline.Animation
                 delegateControl.Add(new AnimationDelegate() { frame_deleage = insert, Interval = interval2 });
             if (tab != null)
                 delegateControl.Add(new AnimationDelegate() { frame_deleage = tab, Interval = interval3 });
+			if (imageviewer != null)
+				delegateControl.Add(new AnimationDelegate() { frame_deleage = imageviewer, Interval = interval4 });
         }
         #endregion
 
@@ -53,8 +56,11 @@ namespace Shrimp.ControlParts.Timeline.Animation
             this.timer.Stop();
             this.timer.Close();
             this.timer.Dispose();
-            delegateControl.Clear();
-            delegateControl = null;
+            lock (lockObj)
+            {
+                delegateControl.Clear();
+                delegateControl = null;
+            }
             this.redrawControl = null;
             timer.Elapsed -= new ElapsedEventHandler(timer_Elapsed);
             timer = null;
@@ -123,7 +129,7 @@ namespace Shrimp.ControlParts.Timeline.Animation
                 {
                     if (redrawControl != null)
                     {
-                        redrawControl.BeginInvoke(null, null);
+                        redrawControl.Invoke();
                         this.RedrawFlg = false;
                     }
                 }

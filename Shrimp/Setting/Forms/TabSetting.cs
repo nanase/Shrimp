@@ -23,7 +23,7 @@ namespace Shrimp.Setting.Forms
             this.TabAlignmentSelect.SelectedIndex = (int)this.settings["ShrimpTabAlignment"];
             this.TabAnimationSelect.SelectedIndex = (int)this.settings["TabChangeAnimation"];
             this.TabSettingCheckedListBox.SetItemChecked(0, (bool)this.settings["SelectTabWhenCreatedTab"]);
-
+            this.TabSettingCheckedListBox.SetItemChecked ( 1, (bool)this.settings["isTabMultiline"] );
         }
 
         public void SaveReflection()
@@ -46,7 +46,10 @@ namespace Shrimp.Setting.Forms
         {
             if (e.Index == 0)
                 this.settings["SelectTabWhenCreatedTab"] = (e.NewValue == CheckState.Checked ? true : false);
+            if ( e.Index == 1 )
+                this.settings["isTabMultiline"] = ( e.NewValue == CheckState.Checked ? true : false );
             this.SaveReflection();
+            OnTabAlignChanged.Invoke ( (TabAlignment)this.TabAlignmentSelect.SelectedIndex );
         }
     }
 }

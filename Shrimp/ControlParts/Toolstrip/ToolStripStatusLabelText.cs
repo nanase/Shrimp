@@ -6,14 +6,14 @@ using System.Drawing;
 
 namespace Shrimp.ControlParts.Toolstrip
 {
-    class ToolStripStatusLabelText
+    public class ToolStripStatusLabelText
     {
         private readonly string _text;
         private readonly Bitmap _image;
 
         public ToolStripStatusLabelText ( string text, Bitmap image )
         {
-            this._text = text;
+            this._text = ( text != null ? text.Replace ( "\r", "" ).Replace ( "\n", "" ) : "" );
             this._image = image;
         }
 

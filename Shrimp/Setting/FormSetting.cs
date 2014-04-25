@@ -32,6 +32,8 @@ namespace Shrimp.Setting
                 BoundsConverted = (string)obj["Bounds"];
             if (obj.ContainsKey("WindowState"))
                 WindowStateConverted = (string)obj["WindowState"];
+			if (obj.ContainsKey("isInsertTaskTrayWhenClosing"))
+				isInsertTaskTrayWhenClosing = (bool)obj["isInsertTaskTrayWhenClosing"];
         }
 
         public static Dictionary<string, object> save()
@@ -40,6 +42,7 @@ namespace Shrimp.Setting
             dest["TimelineSplitterDistance"] = (int)TimelineSplitterDistance;
             dest["Bounds"] = (string)BoundsConverted;
             dest["WindowState"] = (string)WindowStateConverted;
+			dest["isInsertTaskTrayWhenClosing"] = isInsertTaskTrayWhenClosing;
             return dest;
         }
 
@@ -93,5 +96,14 @@ namespace Shrimp.Setting
             get;
             set;
         }
+
+		/// <summary>
+		/// 閉じたときに終了せずタスクトレイにいれる
+		/// </summary>
+		public static bool isInsertTaskTrayWhenClosing
+		{
+			get;
+			set;
+		}
     }
 }

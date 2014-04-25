@@ -278,8 +278,6 @@ namespace Shrimp
             this.Name = "Shrimp";
             this.Text = "Shrimp";
             this.Activated += new System.EventHandler(this.Shrimp_Activated);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Shrimp_FormClosing);
-            this.Load += new System.EventHandler(this.Shrimp_Load);
             this.Move += new System.EventHandler(this.Shrimp_Move);
             this.statusBar.ResumeLayout(false);
             this.statusBar.PerformLayout();

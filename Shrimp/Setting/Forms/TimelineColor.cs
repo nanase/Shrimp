@@ -19,14 +19,16 @@ namespace Shrimp.Setting.Forms
         public TimelineColor()
         {
             InitializeComponent();
-            GetColors();
-            this.ColorComboBox.SelectedIndex = 0;
+
+            this.ColorComboBox.SelectedIndex = GetColors (); ;
             tlcolors = Setting.Colors.save();
             SettingReflection();
         }
 
-        private void GetColors()
+        private int GetColors()
         {
+            int res = -1;
+            int i = 0;
             //  読み込み
             this.colorPaths = Directory.GetFiles(ShrimpSettings.ColorsDirectory, "*.shc");
             if (this.colorPaths.Length == 0)
@@ -38,7 +40,11 @@ namespace Shrimp.Setting.Forms
             foreach (string colord in colorPaths)
             {
                 this.ColorComboBox.Items.Add(Path.GetFileNameWithoutExtension(colord));
+                if ( Path.GetFileNameWithoutExtension ( colord ) == Setting.Colors.ProfileName )
+                    res = i;
+                i++;
             }
+            return res;
         }
 
         public void SettingReflection()

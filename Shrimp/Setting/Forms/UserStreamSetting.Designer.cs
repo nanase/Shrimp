@@ -53,7 +53,8 @@
             this.UserStreamCheckedBox.Items.AddRange(new object[] {
             "フォローユーザーのお気に入りやフォロー状況を取得する",
             "すべてのリプライを取得する",
-            "フォロー外からのリプライ・通知を受信しない"});
+            "フォロー外からのリプライ・通知を受信しない",
+            "ストリーム受信にGZIPを利用する（遅延する可能性があります）"});
             this.UserStreamCheckedBox.Location = new System.Drawing.Point(6, 18);
             this.UserStreamCheckedBox.Name = "UserStreamCheckedBox";
             this.UserStreamCheckedBox.Size = new System.Drawing.Size(423, 56);

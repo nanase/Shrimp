@@ -48,6 +48,10 @@ namespace Shrimp.Setting
             isConfirmFav = true;
             isConfirmRT = true;
             isEnableAbsoluteTime = false;
+            isTabMultiline = true;
+            isIgnoreAnyRetweeted = false;
+			isEnableIcon = true;
+			isEnableInlineView = true;
         }
 
         public static void load(Dictionary<string, object> obj)
@@ -94,6 +98,14 @@ namespace Shrimp.Setting
                 isReplyBold = (bool)obj["isReplyBold"];
             if ( obj.ContainsKey ( "isEnableAbsoluteTime" ) )
                 isEnableAbsoluteTime = (bool)obj["isEnableAbsoluteTime"];
+            if ( obj.ContainsKey ( "isIgnoreAnyRetweeted" ) )
+                isIgnoreAnyRetweeted = (bool)obj["isIgnoreAnyRetweeted"];
+            if ( obj.ContainsKey ( "isTabMultiline" ) )
+                isTabMultiline = (bool)obj["isTabMultiline"];
+			if (obj.ContainsKey("isEnableIcon"))
+				isEnableIcon = (bool)obj["isEnableIcon"];
+			if (obj.ContainsKey("isEnableInlineView"))
+				isEnableInlineView = (bool)obj["isEnableInlineView"];
         }
 
         public static Dictionary<string, object> save()
@@ -119,6 +131,10 @@ namespace Shrimp.Setting
             dest["isRetweetBold"] = isRetweetBold;
             dest["isReplyBold"] = isReplyBold;
             dest["isEnableAbsoluteTime"] = isEnableAbsoluteTime;
+            dest["isIgnoreAnyRetweeted"] = isIgnoreAnyRetweeted;
+            dest["isTabMultiline"] = isTabMultiline;
+			dest["isEnableIcon"] = isEnableIcon;
+			dest["isEnableInlineView"] = isEnableInlineView;
             return dest;
         }
 
@@ -132,6 +148,25 @@ namespace Shrimp.Setting
             get { return (_refTimeline <= 0 ? 1 : _refTimeline); }
             set { _refTimeline = value; }
         }
+
+		/// <summary>
+		/// インラインビューを有効にするかどうか
+		/// </summary>
+		public static bool isEnableInlineView
+		{
+			get;
+			set;
+		}
+
+
+		/// <summary>
+		/// アイコンを有効化するかどうか
+		/// </summary>
+		public static bool isEnableIcon
+		{
+			get;
+			set;
+		}
 
         /// <summary>
         /// 挿入アニメーションを有効化するかどうか
@@ -147,6 +182,15 @@ namespace Shrimp.Setting
         /// 通知アニメーションを有効化するかどうか
         /// </summary>
         public static bool isEnableNotifyAnimation
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// タブを複数行にする
+        /// </summary>
+        public static bool isTabMultiline
         {
             get;
             set;
@@ -348,6 +392,15 @@ namespace Shrimp.Setting
         /// タブ作成時、そっちに選択するかどうか
         /// </summary>
         public static bool SelectTabWhenCreatedTab
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 同じリツイートを表示しない
+        /// </summary>
+        public static bool isIgnoreAnyRetweeted
         {
             get;
             set;

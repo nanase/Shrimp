@@ -76,6 +76,8 @@ namespace Shrimp.ControlParts.Timeline.Click
                 return "ユーザの情報を開く";
             if (this.action == Actions.ShowUserTimeline)
                 return "ユーザのタイムラインを開く";
+            if ( this.action == Actions.ShowUserConversation )
+                return "ユーザの会話タイムラインを開く";
             if (this.action == Actions.SetFocusInput)
                 return "入力欄にフォーカスを移動する";
             return "Unknown";

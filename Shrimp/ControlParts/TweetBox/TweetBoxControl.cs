@@ -11,6 +11,8 @@ using Shrimp.Module.ImageUtil;
 using Shrimp.Plugin.Ref;
 using Shrimp.Twitter.REST.Help;
 using Shrimp.Twitter.Status;
+using Shrimp.Module;
+using System.Text.RegularExpressions;
 
 namespace Shrimp.ControlParts.TweetBox
 {
@@ -34,7 +36,7 @@ namespace Shrimp.ControlParts.TweetBox
         private int ImageURLIncrease = 0;
         private bool isImageEnable = false;
         private string AttachImagePath = "";
-        private ConfigStatus tmpConfigStatus = null;
+        private ConfigStatus _tmpConfigStatus = null;
         private int _BoxHeight = 0;
         //  AutoCompleteBox
         //private AutoCompleteWindow completeWindow = new AutoCompleteWindow ();
@@ -310,27 +312,11 @@ namespace Shrimp.ControlParts.TweetBox
         /// <param name="tweet"></param>
         public void DrawReplySourcePanel(TwitterStatus tweet)
         {
-            draw.initialize();
-            draw.StartLayout(tweet, false, 0, this.replyImage.Width);
-            draw.EndLayout();
-            var height = draw.get(0).CellSizeWithoutPadding;
-            if (replyImage.Image == null)
-            {
-                var bmp = new Bitmap(this.replyImage.Width, height);
-                replyImage.Image = bmp;
-            }
-            else
-            {
-                replyImage.Image.Dispose();
-                var bmp = new Bitmap(this.replyImage.Width, height);
-                replyImage.Image = bmp;
-            }
-
             this.replyStatus = tweet;
-            g = Graphics.FromImage(replyImage.Image);
-            draw.initialize();
-            draw.DrawTweet(g, this.replyStatus, false, 0, this.replyImage.Width, null, null, new Point());
-            g.Dispose();
+            var res = TweetDraw.drawOnlyTweet(tweet, this.replyImage.Width);
+            if (replyImage.Image != null)
+                replyImage.Image.Dispose();
+            replyImage.Image = res;
         }
 
         public void DisableSourcePanel()
@@ -455,7 +441,7 @@ namespace Shrimp.ControlParts.TweetBox
                 using (Image img = ImageGenerateUtil.byteArrayToImage(this.GetImageArrayByte))
                 {
                     if (img.Width > 3000 || img.Height > 3000 ||
-                        this.tConfigStatus != null && this.GetImageArrayByte.Length > this.tConfigStatus.photo_size_limit)
+                        this.tmpConfigStatus != null && this.GetImageArrayByte.Length > this.tmpConfigStatus.photo_size_limit)
                     {
                         //  半分くらいにリサイズでいいんじゃね
                         var destImage = (Image)ImageGenerateUtil.ResizeImage(new Bitmap(img), (double)(img.Width / 2), (double)(img.Height / 2));
@@ -510,7 +496,7 @@ namespace Shrimp.ControlParts.TweetBox
 
         private void TweetBox_TextChanged(object sender, EventArgs e)
         {
-            var num = (this.isWaitingBox ? 140 - ImageURLIncrease : (140 - this.Tweet.Length - ImageURLIncrease));
+            var num = (this.isWaitingBox ? 140 - ImageURLIncrease : (140 - this.FixedTweetLength - ImageURLIncrease));
             this.TweetSendButton.Enabled = !(Tweet.Length == 0 || num < 0 || this.isWaitingBox);
             if (this.isImageEnable)
                 this.TweetSendButton.Enabled = true;
@@ -570,6 +556,32 @@ namespace Shrimp.ControlParts.TweetBox
             //this.SelectTweetBox ();
         }
 
+        /// <summary>
+        /// URLの短縮URL分の文字数を修正された文字数を返します
+        /// </summary>
+        public int FixedTweetLength
+        {
+            get
+            {
+                var res = Tweet.Length;
+                if (tmpConfigStatus == null)
+                    return res;
+                MatchCollection collect = RegexUtil.ParseURL(Tweet);
+                if (collect != null && collect.Count != 0)
+                {
+                    foreach (Match t in collect)
+                    {
+                        res -= t.Value.Length;
+                        if (t.Value.Contains("https:"))
+                            res += tmpConfigStatus.short_url_length_https;
+                        else
+                            res += tmpConfigStatus.short_url_length;
+                    }
+                }
+                return res;
+            }
+        }
+
         public string GetAttachImagePath
         {
             get
@@ -578,11 +590,11 @@ namespace Shrimp.ControlParts.TweetBox
             }
         }
 
-        public ConfigStatus tConfigStatus
+        public ConfigStatus tmpConfigStatus
         {
             get
             {
-                return this.tmpConfigStatus;
+                return this._tmpConfigStatus;
             }
             set
             {
@@ -590,8 +602,8 @@ namespace Shrimp.ControlParts.TweetBox
                 {
                     this.BeginInvoke ( (MethodInvoker)delegate ()
                     {
-                        this.tmpConfigStatus = value;
-                        this.SelectImage ( !String.IsNullOrEmpty ( this.AttachImagePath ), this.tmpConfigStatus );
+                        this._tmpConfigStatus = value;
+                        this.SelectImage ( !String.IsNullOrEmpty ( this.AttachImagePath ), this._tmpConfigStatus );
                     } );
                 }
             }

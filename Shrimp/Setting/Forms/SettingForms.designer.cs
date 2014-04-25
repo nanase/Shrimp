@@ -32,23 +32,25 @@
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("タブ色");
             System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("タブの設定", new System.Windows.Forms.TreeNode[] {
             treeNode2});
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("ツイート色");
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("フォント");
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("タイムライン", new System.Windows.Forms.TreeNode[] {
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("背景");
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("ツイート色");
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("フォント");
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("タイムライン", new System.Windows.Forms.TreeNode[] {
             treeNode4,
-            treeNode5});
-            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("ユーザーストリーム");
-            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("一般設定", new System.Windows.Forms.TreeNode[] {
+            treeNode5,
+            treeNode6});
+            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("ユーザーストリーム");
+            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("一般設定", new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode3,
-            treeNode6,
-            treeNode7});
-            System.Windows.Forms.TreeNode treeNode9 = new System.Windows.Forms.TreeNode("グローバルミュート");
-            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("ショートカットキーの設定");
-            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("プラグイン");
-            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("ひみつのあいことば");
-            System.Windows.Forms.TreeNode treeNode13 = new System.Windows.Forms.TreeNode("Shrimpの情報", new System.Windows.Forms.TreeNode[] {
-            treeNode12});
+            treeNode7,
+            treeNode8});
+            System.Windows.Forms.TreeNode treeNode10 = new System.Windows.Forms.TreeNode("グローバルミュート");
+            System.Windows.Forms.TreeNode treeNode11 = new System.Windows.Forms.TreeNode("ショートカットキーの設定");
+            System.Windows.Forms.TreeNode treeNode12 = new System.Windows.Forms.TreeNode("プラグイン");
+            System.Windows.Forms.TreeNode treeNode13 = new System.Windows.Forms.TreeNode("ひみつのあいことば");
+            System.Windows.Forms.TreeNode treeNode14 = new System.Windows.Forms.TreeNode("Shrimpの情報", new System.Windows.Forms.TreeNode[] {
+            treeNode13});
             this.MainSplit = new System.Windows.Forms.SplitContainer();
             this.SettingListView = new System.Windows.Forms.TreeView();
             ((System.ComponentModel.ISupportInitialize)(this.MainSplit)).BeginInit();
@@ -80,35 +82,37 @@
             treeNode2.Text = "タブ色";
             treeNode3.Name = "TabMenuSetting";
             treeNode3.Text = "タブの設定";
-            treeNode4.Name = "TimelineColorSetting";
-            treeNode4.Text = "ツイート色";
-            treeNode5.Name = "FontNode";
-            treeNode5.Text = "フォント";
-            treeNode6.Name = "TimelineSetting";
-            treeNode6.Text = "タイムライン";
-            treeNode7.Name = "UserStreamMenuSetting";
-            treeNode7.Text = "ユーザーストリーム";
-            treeNode8.Name = "ShrimpSetting";
-            treeNode8.Text = "一般設定";
-            treeNode9.Name = "GlobalMuteMenu";
-            treeNode9.Text = "グローバルミュート";
-            treeNode10.Name = "ShortcutKeySetting";
-            treeNode10.Text = "ショートカットキーの設定";
-            treeNode11.Name = "PluginNode";
-            treeNode11.Text = "プラグイン";
-            treeNode12.Name = "PrivateFunctionMenu";
-            treeNode12.Text = "ひみつのあいことば";
-            treeNode13.Name = "ShrimpInfo";
-            treeNode13.Text = "Shrimpの情報";
+            treeNode4.Name = "BackgroundImageNode";
+            treeNode4.Text = "背景";
+            treeNode5.Name = "TimelineColorSetting";
+            treeNode5.Text = "ツイート色";
+            treeNode6.Name = "FontNode";
+            treeNode6.Text = "フォント";
+            treeNode7.Name = "TimelineSetting";
+            treeNode7.Text = "タイムライン";
+            treeNode8.Name = "UserStreamMenuSetting";
+            treeNode8.Text = "ユーザーストリーム";
+            treeNode9.Name = "ShrimpSetting";
+            treeNode9.Text = "一般設定";
+            treeNode10.Name = "GlobalMuteMenu";
+            treeNode10.Text = "グローバルミュート";
+            treeNode11.Name = "ShortcutKeySetting";
+            treeNode11.Text = "ショートカットキーの設定";
+            treeNode12.Name = "PluginNode";
+            treeNode12.Text = "プラグイン";
+            treeNode13.Name = "PrivateFunctionMenu";
+            treeNode13.Text = "ひみつのあいことば";
+            treeNode14.Name = "ShrimpInfo";
+            treeNode14.Text = "Shrimpの情報";
             this.SettingListView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode8,
             treeNode9,
             treeNode10,
             treeNode11,
-            treeNode13});
+            treeNode12,
+            treeNode14});
             this.SettingListView.Size = new System.Drawing.Size(145, 441);
             this.SettingListView.TabIndex = 0;
-            this.SettingListView.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.SettingListView_NodeMouseClick);
+            this.SettingListView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.SettingListView_AfterSelect);
             // 
             // SettingForms
             // 

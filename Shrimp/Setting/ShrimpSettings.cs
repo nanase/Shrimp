@@ -87,5 +87,16 @@ namespace Shrimp.Setting
                 return SettingDirectory + "\\database.db";
             }
         }
+
+		/// <summary>
+		/// 画像キャッシュデータベースパス
+		/// </summary>
+		public static string ImageDatabasePath
+		{
+			get
+			{
+				return SettingDirectory + "\\images.db";
+			}
+		}
     }
 }

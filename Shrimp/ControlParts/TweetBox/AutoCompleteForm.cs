@@ -116,7 +116,25 @@ namespace Shrimp.ControlParts.TweetBox
             if (isScreenName)
             {
                 var item = this.screen_name.FindAll((word) => word.TrimStart('@').IndexOf(text.TrimStart('@'), StringComparison.OrdinalIgnoreCase) >= 0);
-                if (item != null)
+                if ( item != null && item.Count != 0 )
+                {
+                    this.acfBox.Items.Clear ();
+                    this.acfBox.Items.AddRange ( item.ToArray () );
+                    if ( selNum < 0 )
+                        selNum = 0;
+                    if ( selNum >= this.acfBox.Items.Count - 1 )
+                        selNum = this.acfBox.Items.Count - 1;
+                    this.acfBox.SelectedIndex = selNum;
+                }
+                else
+                {
+                    this.acfBox.Items.Clear ();
+                }
+            }
+            else
+            {
+                var item = this.hashtags.FindAll((word) => word.IndexOf(text) >= 0);
+                if (item != null && item.Count != 0)
                 {
                     this.acfBox.Items.Clear();
                     this.acfBox.Items.AddRange(item.ToArray());
@@ -126,19 +144,9 @@ namespace Shrimp.ControlParts.TweetBox
                         selNum = this.acfBox.Items.Count - 1;
                     this.acfBox.SelectedIndex = selNum;
                 }
-            }
-            else
-            {
-                var item = this.hashtags.FindAll((word) => word.IndexOf(text) >= 0);
-                if (item != null)
+                else
                 {
-                    this.acfBox.Items.Clear();
-                    this.acfBox.Items.AddRange(item.ToArray());
-                    if (selNum < 0)
-                        selNum = 0;
-                    if (selNum >= this.acfBox.Items.Count - 1)
-                        selNum = this.acfBox.Items.Count - 1;
-                    this.acfBox.SelectedIndex = selNum;
+                    this.acfBox.Items.Clear ();
                 }
             }
             return this.acfBox.Items.Count;

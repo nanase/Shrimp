@@ -19,45 +19,45 @@ namespace Shrimp.ControlParts.User
         {
             if (users == null)
                 return;
-            this.icon = new Cell(new Point(5, 5), icon.Size, null);
+            this.icon = new Cell(new Point(5, 5), icon.Size, null, null, null);
             this.name = new Cell(new Point(this.icon.Rect.Width + 5, this.icon.Position.Y),
                                     DrawTextUtil.GetDrawTextSize(users.name, Setting.Fonts.NameFont, maxWidth, false, true),
-                                    users.name);
+                                    users.name, Setting.Fonts.NameFont, Setting.Colors.NameColor);
             this.screen_name = new Cell(new Point(this.name.Position.X, this.name.Rect.Bottom + 5),
                                     DrawTextUtil.GetDrawTextSize("@" + users.screen_name, Setting.Fonts.TweetFont, maxWidth, false, true),
-                                    "@" + users.screen_name);
+                                    "@" + users.screen_name, Setting.Fonts.TweetFont, Setting.Colors.TweetColor);
 
             this.tweet_count = new Cell(new Point(this.icon.Position.X, this.screen_name.Rect.Bottom + 5),
                                     DrawTextUtil.GetDrawTextSize("ツイート数:" + users.statuses_count + "", Setting.Fonts.NameFont, maxWidth, false, true),
-                                    "ツイート数:" + users.statuses_count + "");
+                                    "ツイート数:" + users.statuses_count + "", Setting.Fonts.NameFont, Setting.Colors.TweetColor);
 
             this.following_count = new Cell(new Point(this.icon.Position.X, this.tweet_count.Rect.Bottom),
                                     DrawTextUtil.GetDrawTextSize("フォロー数:" + users.friends_count + "", Setting.Fonts.NameFont, maxWidth, false, true),
-                                    "フォロー数:" + users.friends_count + "");
+                                    "フォロー数:" + users.friends_count + "", Setting.Fonts.NameFont, Setting.Colors.TweetColor );
 
             this.follower_count = new Cell(new Point(this.icon.Position.X, this.following_count.Rect.Bottom),
                                     DrawTextUtil.GetDrawTextSize("フォロワー数:" + users.followers_count + "", Setting.Fonts.NameFont, maxWidth, false, true),
-                                    "フォロワー数:" + users.followers_count + "");
+                                    "フォロワー数:" + users.followers_count + "", Setting.Fonts.NameFont, Setting.Colors.TweetColor );
 
             this.favorites_count = new Cell(new Point(this.icon.Position.X, this.follower_count.Rect.Bottom),
                                     DrawTextUtil.GetDrawTextSize("ふぁぼ数:" + users.favourites_count + "", Setting.Fonts.NameFont, maxWidth, false, true),
-                                    "ふぁぼ数:" + users.favourites_count + "");
+                                    "ふぁぼ数:" + users.favourites_count + "", Setting.Fonts.NameFont, Setting.Colors.TweetColor );
 
             this.listed_count = new Cell(new Point(this.icon.Position.X, this.favorites_count.Rect.Bottom),
                         DrawTextUtil.GetDrawTextSize("リスト数:" + users.listed_count + "", Setting.Fonts.NameFont, maxWidth, false, true),
-                        "リスト数:" + users.listed_count + "");
+                        "リスト数:" + users.listed_count + "", Setting.Fonts.NameFont, Setting.Colors.TweetColor );
 
             this.AboutUser = new Cell(new Point(this.icon.Position.X, this.listed_count.Rect.Bottom),
                         DrawTextUtil.GetDrawTextSize("このユーザについて", Setting.Fonts.NameFont, maxWidth, false, true),
-                        "このユーザについて");
+                        "このユーザについて", Setting.Fonts.NameFont, Setting.Colors.TweetColor );
 
             this.bio = new Cell(new Point(this.icon.Position.X, this.AboutUser.Rect.Bottom + 5),
                                     DrawTextUtil.GetOwnerDrawTextSize(users.description, Setting.Fonts.RetweetNotify, this.icon.Position.X, maxWidth),
-                                    users.description);
+                                    users.description, Setting.Fonts.RetweetNotify, Setting.Colors.TweetColor );
 
             this.created_at = new Cell(new Point(this.icon.Position.X, this.bio.Rect.Bottom + 5),
                         DrawTextUtil.GetDrawTextSize("Twitter開始時期:" + users.created_at.ToLongDateString() + "", Setting.Fonts.NameFont, maxWidth, false, true),
-                        "Twitter開始時期:" + users.created_at.ToLongDateString() + "");
+                        "Twitter開始時期:" + users.created_at.ToLongDateString () + "", Setting.Fonts.NameFont, Setting.Colors.TweetColor );
         }
 
     }

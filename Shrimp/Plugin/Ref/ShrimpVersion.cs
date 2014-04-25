@@ -11,8 +11,8 @@ namespace Shrimp.Plugin.Ref
 
         public ShrimpVersion()
         {
-            this.version = 111;
-            this.version_str = 1.11;
+            this.version = 120;
+            this.version_str = 1.20;
         }
     }
 }

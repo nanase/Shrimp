@@ -48,24 +48,26 @@ namespace Shrimp.ControlParts
             OnRequiredAccountInfo = _OnRequiredAccountInfo;
         }
 
-        public static void OnShortcutAction(Actions action, decimal id, string screen_name, SelUserContextMenu selUserContextMenu = null,
-           TimelineControl.ReplyTweetDelegate ReplyTweet = null, TimelineControl.SearchTweetDelegate tweetSearchAction = null, TwitterInfo ControlAccountID = null,
+        public static void OnShortcutAction(Actions action, TwitterStatus tweet, SelUserContextMenu selUserContextMenu = null,
+           TimelineControl.ReplyTweetDelegate ReplyTweet = null, TwitterInfo ControlAccountID = null,
             TimelineControl.OnNotifyClickedDelegate OnNotifyClicked = null)
         {
             if (action == Actions.Fav)
-                DoAction(ActionType.Favorite, id, selUserContextMenu, ReplyTweet, tweetSearchAction, ControlAccountID, OnNotifyClicked);
+                DoAction(ActionType.Favorite, tweet, selUserContextMenu, ReplyTweet, ControlAccountID, OnNotifyClicked);
             if (action == Actions.Reply)
-                DoAction(ActionType.Reply, id, selUserContextMenu, ReplyTweet, tweetSearchAction, ControlAccountID, OnNotifyClicked);
+                DoAction ( ActionType.Reply, tweet, selUserContextMenu, ReplyTweet, ControlAccountID, OnNotifyClicked );
             if (action == Actions.Retweet)
-                DoAction(ActionType.Retweet, id, selUserContextMenu, ReplyTweet, tweetSearchAction, ControlAccountID, OnNotifyClicked);
+                DoAction ( ActionType.Retweet, tweet, selUserContextMenu, ReplyTweet, ControlAccountID, OnNotifyClicked );
             if (action == Actions.ShowUserFavoriteTimeline)
-                DoAction(ActionType.UserFavoriteTimeline, screen_name, selUserContextMenu, ReplyTweet, tweetSearchAction, ControlAccountID, OnNotifyClicked);
+                DoAction ( ActionType.UserFavoriteTimeline, tweet.DynamicTweet.user.screen_name, selUserContextMenu, ReplyTweet, ControlAccountID, OnNotifyClicked );
             if (action == Actions.ShowUserTimeline)
-                DoAction(ActionType.UserTimeline, screen_name, selUserContextMenu, ReplyTweet, tweetSearchAction, ControlAccountID, OnNotifyClicked);
+                DoAction ( ActionType.UserTimeline, tweet.DynamicTweet.user.screen_name, selUserContextMenu, ReplyTweet, ControlAccountID, OnNotifyClicked );
             if (action == Actions.ShowUserInformation)
-                DoAction(ActionType.Mention, screen_name, selUserContextMenu, ReplyTweet, tweetSearchAction, ControlAccountID, OnNotifyClicked);
+                DoAction ( ActionType.Mention, tweet.DynamicTweet.user.screen_name, selUserContextMenu, ReplyTweet, ControlAccountID, OnNotifyClicked );
+            if ( action == Actions.ShowUserConversation )
+                DoAction ( ActionType.UserConversation, tweet.DynamicTweet.user.screen_name, selUserContextMenu, ReplyTweet, ControlAccountID, OnNotifyClicked );
             if (action == Actions.SetFocusInput)
-                DoAction(ActionType.Focus, null, selUserContextMenu, ReplyTweet, tweetSearchAction, ControlAccountID, OnNotifyClicked);
+                DoAction(ActionType.Focus, null, selUserContextMenu, ReplyTweet, ControlAccountID, OnNotifyClicked);
         }
 
         /// <summary>
@@ -75,7 +77,7 @@ namespace Shrimp.ControlParts
         /// <param name="source">ソース</param>
         /// <param name="ControlAccountID">実行もとアカウント（nullの場合、現在選択されているアカウントが使われます)</param>
         public static void DoAction(ActionType type, object source, SelUserContextMenu selUserContextMenu = null,
-           TimelineControl.ReplyTweetDelegate ReplyTweet = null, TimelineControl.SearchTweetDelegate tweetSearchAction = null, TwitterInfo ControlAccountID = null,
+           TimelineControl.ReplyTweetDelegate ReplyTweet = null, TwitterInfo ControlAccountID = null,
             TimelineControl.OnNotifyClickedDelegate OnNotifyClicked = null)
         {
             if (type == ActionType.URL || type == ActionType.Media)
@@ -97,7 +99,7 @@ namespace Shrimp.ControlParts
                 }
             }
 
-            if (type == ActionType.UserFavoriteTimeline || type == ActionType.UserTimeline)
+            if (type == ActionType.UserFavoriteTimeline || type == ActionType.UserTimeline || type == ActionType.UserConversation)
             {
                 if (TabControlOperatingHandler != null)
                     TabControlOperatingHandler.Invoke(type, ((string)source).TrimStart('@'));
@@ -105,7 +107,15 @@ namespace Shrimp.ControlParts
 
             if (type == ActionType.Notify)
             {
-                decimal repID = Decimal.Parse((string)source);
+                decimal repID = 0;
+                if ( source is string )
+                {
+                    repID = Decimal.Parse ( (string)source );
+                }
+                else if ( source is TwitterStatus )
+                {
+                    repID = ( (TwitterStatus)source ).id;
+                }
                 if (OnNotifyClicked != null)
                     OnNotifyClicked.Invoke(repID);
             }
@@ -118,32 +128,17 @@ namespace Shrimp.ControlParts
 
             if (type == ActionType.Reply)
             {
-                decimal id = 0;
-                if (source is decimal)
-                    id = (decimal)source;
-                else
-                    id = Decimal.Parse((string)source);
-                ReplyTweet.Invoke(id, false);
+                ReplyTweet.Invoke((TwitterStatus)source, false);
             }
 
             if (type == ActionType.Favorite || type == ActionType.Retweet)
             {
                 if (OnUseTwitterAPI == null || OnRequiredAccountInfo == null)
                     return;
-                decimal id = 0;
-                if (source is decimal)
-                    id = (decimal)source;
-                else
-                    id = Decimal.Parse((string)source);
 
-                TwitterStatus tweet = null;
-                if (tweetSearchAction != null)
-                {
-                    tweet = tweetSearchAction.Invoke(id);
-                }
-                if (tweet == null)
+                if ( source == null || !(source is TwitterStatus) )
                     return;
-
+                TwitterStatus tweet = source as TwitterStatus;
                 TwitterInfo selectedInfo = null;
                 if (ControlAccountID == null)
                     selectedInfo = OnRequiredAccountInfo.Invoke().SelectedAccount;
@@ -159,7 +154,7 @@ namespace Shrimp.ControlParts
                             + "==============================\n " + tweet.DynamicTweet.text + "", "確認", MessageBoxButtons.YesNo) == DialogResult.No)
                             return;
                     }
-                    OnUseTwitterAPI.Invoke(null, new object[] { (tweet.favorited ? "unfav" : "fav"), id, selectedInfo });
+                    OnUseTwitterAPI.Invoke(null, new object[] { (tweet.favorited ? "unfav" : "fav"), tweet.DynamicTweet.id, selectedInfo });
                 }
 
                 if (type == ActionType.Retweet)
@@ -171,7 +166,7 @@ namespace Shrimp.ControlParts
                             + "==============================\n " + tweet.DynamicTweet.text + "", "確認", MessageBoxButtons.YesNo) == DialogResult.No)
                             return;
                     }
-                    OnUseTwitterAPI.Invoke(null, new object[] { "retweet", id, selectedInfo });
+                    OnUseTwitterAPI.Invoke ( null, new object[] { "retweet", tweet.DynamicTweet.id, selectedInfo } );
                 }
             }
 
@@ -183,7 +178,7 @@ namespace Shrimp.ControlParts
                 else
                     selectedInfo = ControlAccountID;
 
-                OnUseTwitterAPI.Invoke(null, new object[] { "follow", source, selectedInfo });
+                OnUseTwitterAPI.Invoke ( null, new object[] { "follow", source, selectedInfo } );
             }
 
             if (type == ActionType.Block)

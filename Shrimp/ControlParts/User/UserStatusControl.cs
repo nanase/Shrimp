@@ -14,9 +14,7 @@ namespace Shrimp.ControlParts.User
 
         private TimelineControl.OnRequiredAccountInfoDeleagate OnRequiredAccountInfo;
         private TimelineControl.OnRequiredShrimpData OnRequiredShrimpData;
-        private TimelineControl.OnChangedTweetHandler OnChangedTweetHandler;
         private TimelineControl.OnUseTwitterAPIDelegate OnUserTwitterAPI;
-        private TimelineControl.OnChangedTweetDelayPercentageHandler OnChangedTweetDelay;
         private TimelineControl.OnCreatedReplyDataDelegate OnCreatedReplyData;
         private TimelineControl.TabControlOperationgDelegate TabControlOperationHandler;
         private TimelineControl.OnReloadShrimp OnReloadShrimp;
@@ -64,10 +62,6 @@ namespace Shrimp.ControlParts.User
 
         public void SetTimelineControlHander(TimelineControl obj)
         {
-            if (OnChangedTweetDelay != null)
-                obj.OnChangedTweetDelayPercentage += OnChangedTweetDelay;
-            if (OnChangedTweetHandler != null)
-                obj.OnChangeTweet += OnChangedTweetHandler;
             if (OnUserTwitterAPI != null)
                 obj.OnUseTwitterAPI += OnUserTwitterAPI;
             if (OnRequiredAccountInfo != null)
@@ -147,6 +141,10 @@ namespace Shrimp.ControlParts.User
             this.userconversation.initialize();
             this.BeginInvoke((MethodInvoker)delegate()
             {
+                isUser = false;
+                isTimeline = false;
+                isFavoriteTimeline = false;
+                isConversationTimeline = false;
                 this.UserInfoControl.SelectedIndex = 0;
                 this.UserInfoControl_SelectedIndexChanged ( this.UserInfoControl, null );
             });
@@ -186,7 +184,7 @@ namespace Shrimp.ControlParts.User
                 this.usertimeline.Suspend ();
                 this.userfavoritetimeline.Suspend ();
                 this.userconversation.Suspend ();
-                ( (TimelineControl)tab.Tag ).Focus ();
+                //( (TimelineControl)tab.Tag ).Focus ();
             }
 
             if (tab.Name == "UserTimelinePage")
@@ -198,7 +196,7 @@ namespace Shrimp.ControlParts.User
                 this.usertimeline.Resume();
                 this.userfavoritetimeline.Suspend();
                 this.userconversation.Suspend();
-                ((TimelineControl)tab.Tag).Focus();
+                //((TimelineControl)tab.Tag).Focus();
             }
             if (tab.Name == "UserFavoritePage")
             {
@@ -209,7 +207,7 @@ namespace Shrimp.ControlParts.User
                 this.usertimeline.Suspend();
                 this.userfavoritetimeline.Resume();
                 this.userconversation.Suspend();
-                ((TimelineControl)tab.Tag).Focus();
+                //((TimelineControl)tab.Tag).Focus();
             }
             if (tab.Name == "ConversationPage")
             {
@@ -221,7 +219,7 @@ namespace Shrimp.ControlParts.User
                 this.usertimeline.Suspend();
                 this.userfavoritetimeline.Suspend();
                 this.userconversation.Resume();
-                ((TimelineControl)tab.Tag).Focus();
+                //((TimelineControl)tab.Tag).Focus();
             }
         }
 
@@ -231,7 +229,7 @@ namespace Shrimp.ControlParts.User
             TabPage tab = obj.SelectedTab;
             if ( tab.Tag != null )
             {
-                ( (TimelineControl)tab.Tag ).TimelineControl_KeyDown ( sender, e );
+                ( (TimelineControl)tab.Tag ).PreviewOnKeyDown ( e );
             }
         }
     }

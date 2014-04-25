@@ -22,11 +22,13 @@ namespace Shrimp.Module.Parts
             this.Detail = String.Empty;
         }
 
-        public Cell(Point point, Size size, string detail)
+        public Cell(Point point, Size size, string detail, Font fnt, Brush color)
         {
             this.Position = point;
             this.Size = size;
             this.Detail = detail;
+            this.TextFont = fnt;
+            this.TextBrush = color;
         }
 
         /// <summary>
@@ -62,6 +64,24 @@ namespace Shrimp.Module.Parts
         /// セルの文字とか、そういうの。
         /// </summary>
         public string Detail
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 描画に使われるフォント
+        /// </summary>
+        public Font TextFont
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 描画に使われるブラシ
+        /// </summary>
+        public Brush TextBrush
         {
             get;
             set;

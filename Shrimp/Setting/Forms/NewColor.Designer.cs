@@ -42,6 +42,7 @@
             this.colorName.Name = "colorName";
             this.colorName.Size = new System.Drawing.Size(260, 19);
             this.colorName.TabIndex = 0;
+            this.colorName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.colorName_KeyDown);
             // 
             // label1
             // 

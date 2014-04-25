@@ -62,18 +62,55 @@ namespace Shrimp.ControlParts.Timeline.Animation
             sf.FormatFlags = StringFormatFlags.NoWrap;
             g.TextRenderingHint = TextRenderingHint.SystemDefault;
             Font fnt = obj as Font;
+            SizeF size;
             if ( this.Text == null )
             {
                 g.DrawString ( "Welcome to Shrimp!!", fnt, Brushes.Black, clipRectangle, sf );
             }
             else
             {
-                SizeF size = g.MeasureString ( this.Text.text, SystemFonts.DefaultFont, clipRectangle.Width );
-                g.DrawString ( this.Text.text, fnt, Brushes.Black, new Rectangle ( clipRectangle.X, ( clipRectangle.Y + StartDrawOffset ) - (int)size.Height, clipRectangle.Width, clipRectangle.Height ), sf );
-                if ( this.beforeText != null )
-                    g.DrawString ( this.beforeText.text, fnt, Brushes.Black, new Rectangle ( clipRectangle.X, clipRectangle.Y + StartDrawOffset, clipRectangle.Width, clipRectangle.Height ), sf );
+                size = g.MeasureString ( this.Text.text, SystemFonts.DefaultFont, clipRectangle.Width );
+                if ( this._Enable )
+                {
+                    this.DrawBar ( g, maxWidth, StartDrawOffset - (int)size.Height, clipRectangle, this.Text, fnt );
+                    if ( this.beforeText != null )
+                        this.DrawBar ( g, maxWidth, StartDrawOffset, clipRectangle, this.beforeText, fnt );
+                    //g.DrawString ( this.Text.text, fnt, Brushes.Black, new Rectangle ( clipRectangle.X, ( clipRectangle.Y + StartDrawOffset ) - (int)size.Height, clipRectangle.Width, clipRectangle.Height ), sf );
+                    //if ( this.beforeText != null )
+                    //    g.DrawString ( this.beforeText.text, fnt, Brushes.Black, new Rectangle ( clipRectangle.X, clipRectangle.Y + StartDrawOffset, clipRectangle.Width, clipRectangle.Height ), sf );
+                }
+                else
+                {
+                    this.DrawBar ( g, maxWidth, 0, clipRectangle, this.Text, fnt );
+                }
             }
 
+        }
+
+        private void DrawBar ( Graphics g, int maxWidth, int offsetY, Rectangle clipRectangle, ToolStripStatusLabelText text, Font fnt )
+        {
+            SizeF size;
+            StringFormat sf = new StringFormat ();
+            //文字を真ん中に表示
+            sf.FormatFlags = StringFormatFlags.NoWrap;
+            sf.Trimming = StringTrimming.EllipsisCharacter;
+            size = g.MeasureString ( text.text, fnt, clipRectangle.Width, sf );
+            if ( text.image != null )
+            {
+                size.Width += size.Height;
+            }
+            var rect = new Rectangle ( (clipRectangle.Width - (int)size.Width) / 2, (clipRectangle.Height - (int)size.Height) / 2, (int)size.Width, (int)size.Height );
+            if ( rect.X < 0 )
+                rect.X = 0;
+            if ( text.image != null )
+            {
+                g.DrawImage ( text.image, new Rectangle ( rect.X, rect.Y + offsetY, (int)size.Height, (int)size.Height ) );
+                g.DrawString ( text.text, fnt, Brushes.Black, new Rectangle ( rect.X + (int)size.Height, rect.Y + offsetY + 1, clipRectangle.Width, clipRectangle.Height ) );
+            }
+            else
+            {
+                g.DrawString ( text.text, fnt, Brushes.Black, new Rectangle ( rect.X, rect.Y + offsetY + 1, clipRectangle.Width, clipRectangle.Height ), sf );
+            }
         }
 
         /// <summary>

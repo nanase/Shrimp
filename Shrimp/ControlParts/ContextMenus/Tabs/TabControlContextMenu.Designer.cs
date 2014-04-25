@@ -37,6 +37,7 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.SelectedThisTabMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.ChangeTabNameMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.LockTabMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.DestroyThisTabMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.DestroyAllTabWithoutThisTabMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
@@ -44,7 +45,7 @@
             this.TabSettingMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.SearchMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this.LockTabMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.NewTweetSoundSetting = new System.Windows.Forms.ToolStripMenuItem();
             this.Menu.SuspendLayout();
             this.CustomMenuStrip.SuspendLayout();
             // 
@@ -61,11 +62,12 @@
             this.DestroyAllTabWithoutThisTabMenu,
             this.toolStripSeparator3,
             this.FlashTabMenu,
+            this.NewTweetSoundSetting,
             this.TabSettingMenu,
             this.toolStripSeparator2,
             this.SearchMenu});
             this.Menu.Name = "Menu";
-            this.Menu.Size = new System.Drawing.Size(265, 242);
+            this.Menu.Size = new System.Drawing.Size(265, 264);
             // 
             // AddNewTabMenu
             // 
@@ -113,6 +115,12 @@
             this.ChangeTabNameMenu.Size = new System.Drawing.Size(264, 22);
             this.ChangeTabNameMenu.Text = "タブ名を変更する(&N)";
             // 
+            // LockTabMenu
+            // 
+            this.LockTabMenu.Name = "LockTabMenu";
+            this.LockTabMenu.Size = new System.Drawing.Size(264, 22);
+            this.LockTabMenu.Text = "タブロックする(&L)";
+            // 
             // DestroyThisTabMenu
             // 
             this.DestroyThisTabMenu.Name = "DestroyThisTabMenu";
@@ -154,11 +162,11 @@
             this.SearchMenu.Size = new System.Drawing.Size(264, 22);
             this.SearchMenu.Text = "検索ボックスを開く(&T)";
             // 
-            // LockTabMenu
+            // NewTweetSoundSetting
             // 
-            this.LockTabMenu.Name = "LockTabMenu";
-            this.LockTabMenu.Size = new System.Drawing.Size(264, 22);
-            this.LockTabMenu.Text = "タブロックする(&L)";
+            this.NewTweetSoundSetting.Name = "NewTweetSoundSetting";
+            this.NewTweetSoundSetting.Size = new System.Drawing.Size(264, 22);
+            this.NewTweetSoundSetting.Text = "タブの通知音の設定(&T)";
             this.Menu.ResumeLayout(false);
             this.CustomMenuStrip.ResumeLayout(false);
 
@@ -182,5 +190,6 @@
         private System.Windows.Forms.ToolStripMenuItem FlashTabMenu;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem LockTabMenu;
+        private System.Windows.Forms.ToolStripMenuItem NewTweetSoundSetting;
     }
 }

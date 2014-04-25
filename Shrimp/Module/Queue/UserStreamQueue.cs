@@ -19,7 +19,7 @@ namespace Shrimp.Module.Queue
         {
             //this.stopFlag = stopFlag;
             this.queueCheckTimer = new System.Timers.Timer();
-            this.queueCheckTimer.Interval = 50;
+            this.queueCheckTimer.Interval = 10;
             this.queueCheckTimer.Elapsed += new ElapsedEventHandler(queueCheckTimer_Elapsed);
             this.queueCheckTimer.Start();
         }
@@ -34,9 +34,16 @@ namespace Shrimp.Module.Queue
 
         private void StopQueue()
         {
-            if (this.Enabled)
+            if (!this.Enabled)
                 return;
             this.queueCheckTimer.Stop();
+        }
+
+        public void StartQueue ()
+        {
+            if ( this.Enabled )
+                return;
+            this.queueCheckTimer.Start ();
         }
 
         public bool Enabled
@@ -87,7 +94,7 @@ namespace Shrimp.Module.Queue
         /// <summary>
         /// デキュー(lockなし)
         /// </summary>
-        public new UserStreamQueueData DequeueWithoutSync ()
+        public UserStreamQueueData DequeueWithoutSync ()
         {
             return base.Dequeue ();
         }
@@ -95,18 +102,21 @@ namespace Shrimp.Module.Queue
 
         public void Wait()
         {
-            while (true)
+            this.StopQueue ();
+            lock ( ( (ICollection)this ).SyncRoot )
             {
-                lock (((ICollection)this).SyncRoot)
+                for ( ; ; )
                 {
-                    if (this.Count == 0)
+                    if ( this.Count != 0 )
                     {
                         // 
-                        this.StopQueue();
-                        return;
+                        this.executeQueue ();
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
-                Thread.Sleep(1);
             }
         }
 
@@ -116,29 +126,34 @@ namespace Shrimp.Module.Queue
             {
                 if (this.Count != 0)
                 {
-                    var tmp = this.DequeueWithoutSync ();
-                    if ( this.stopFlag )
-                        return;
-                    Task.Factory.StartNew ( () =>
-                    {
-                        if ( tmp.EventHandler is UserStreaming.TweetEventDelegate )
-                        {
-                            UserStreaming.TweetEventDelegate obj = tmp.EventHandler as UserStreaming.TweetEventDelegate;
-                            obj.BeginInvoke ( tmp.sender, tmp.args, null, null );
-                        }
-                        if ( tmp.EventHandler is UserStreaming.NotifyEventDelegate )
-                        {
-                            UserStreaming.NotifyEventDelegate obj = tmp.EventHandler as UserStreaming.NotifyEventDelegate;
-                            obj.BeginInvoke ( tmp.sender, tmp.args, null, null );
-                        }
-                        if ( tmp.EventHandler is UserStreaming.UserStreamingconnectStatusEventDelegate )
-                        {
-                            UserStreaming.UserStreamingconnectStatusEventDelegate obj = tmp.EventHandler as UserStreaming.UserStreamingconnectStatusEventDelegate;
-                            obj.BeginInvoke ( tmp.sender, tmp.args, null, null );
-                        }
-                    } );
+                    executeQueue ();
                 }
             }
+        }
+
+        private void executeQueue ()
+        {
+            var tmp = this.DequeueWithoutSync ();
+            if ( this.stopFlag )
+                return;
+            Task.Factory.StartNew ( () =>
+            {
+                if ( tmp.EventHandler is UserStreaming.TweetEventDelegate )
+                {
+                    UserStreaming.TweetEventDelegate obj = tmp.EventHandler as UserStreaming.TweetEventDelegate;
+                    obj.BeginInvoke ( tmp.sender, tmp.args, null, null );
+                }
+                if ( tmp.EventHandler is UserStreaming.NotifyEventDelegate )
+                {
+                    UserStreaming.NotifyEventDelegate obj = tmp.EventHandler as UserStreaming.NotifyEventDelegate;
+                    obj.BeginInvoke ( tmp.sender, tmp.args, null, null );
+                }
+                if ( tmp.EventHandler is UserStreaming.UserStreamingconnectStatusEventDelegate )
+                {
+                    UserStreaming.UserStreamingconnectStatusEventDelegate obj = tmp.EventHandler as UserStreaming.UserStreamingconnectStatusEventDelegate;
+                    obj.BeginInvoke ( tmp.sender, tmp.args, null, null );
+                }
+            } );
         }
     }
 }

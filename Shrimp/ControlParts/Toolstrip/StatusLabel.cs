@@ -79,6 +79,19 @@ namespace Shrimp.ControlParts.Toolstrip
         }
 
         /// <summary>
+        /// テキストを追加します
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="image"></param>
+        public void AddLabel ( ToolStripStatusLabelText Label )
+        {
+            lock ( ( (ICollection)this.queue ).SyncRoot )
+            {
+                this.queue.Enqueue ( Label );
+            }
+        }
+
+        /// <summary>
         /// オーナードロー
         /// </summary>
         /// <param name="e"></param>

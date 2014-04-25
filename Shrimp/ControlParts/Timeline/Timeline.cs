@@ -16,11 +16,12 @@ namespace Shrimp.ControlParts.Timeline
 
         private Stack<TwitterStatus> tweetStack;
         private Stack<TwitterStatus> tweetStackRange;
+		private List<TwitterStatus> replyStack; // リプライスタックをためる
         /// <summary>
         /// いままでのツイートID
         /// </summary>
-        private Stack<decimal> tweetStacks;
-        private Stack<TwitterNotifyStatus> notifyStacks;
+        private List<decimal> tweetStacks;
+        private List<TwitterNotifyStatus> notifyStacks;
         private Timer bombDetect;
         /// <summary>
         /// タイマーが動くまでに拾ったツイート数
@@ -37,6 +38,7 @@ namespace Shrimp.ControlParts.Timeline
         private object lockObj = new object();
         private object lockRangeObj = new object();
         private object lockStacks = new object();
+		private bool _isNewConversation = false;
         #endregion
 
         #region コンストラクタ
@@ -45,8 +47,9 @@ namespace Shrimp.ControlParts.Timeline
         {
             this.tweetStack = new Stack<TwitterStatus>();
             this.tweetStackRange = new Stack<TwitterStatus>();
-            this.tweetStacks = new Stack<decimal>();
-            this.notifyStacks = new Stack<TwitterNotifyStatus>();
+			this.replyStack = new List<TwitterStatus>();
+			this.tweetStacks = new List<decimal>();
+            this.notifyStacks = new List<TwitterNotifyStatus> ();
             this.bombDetect = new Timer();
             this.bombDetectTweetNum = 0;
             this.setting_bombDetectTweetNum = Setting.BombDetect.bombDetectTweetNum;
@@ -63,6 +66,8 @@ namespace Shrimp.ControlParts.Timeline
             this.tweetStack = null;
             this.tweetStacks.Clear();
             this.tweetStacks = null;
+			this.replyStack.Clear();
+			this.replyStack = null;
             this.bombDetect.Stop();
             this.bombDetect.Elapsed -= new ElapsedEventHandler(bombDetect_Elapsed);
             this.bombDetect = null;
@@ -106,6 +111,11 @@ namespace Shrimp.ControlParts.Timeline
             {
                 lock (lockStacks)
                 {
+                    if ( Setting.Timeline.isIgnoreAnyRetweeted )
+                    {
+                        if ( this.tweetStacks.Any ( ( twit ) => twit == tweet.DynamicTweet.id ) )
+                            return false;
+                    }
                     if (this.tweetStacks.Any((twit) => twit == tweet.id))
                         return false;
                     if (tweet.isNotify)
@@ -133,9 +143,18 @@ namespace Shrimp.ControlParts.Timeline
                 this.tweetStack.Push(tweet);
                 lock (lockStacks)
                 {
-                    this.tweetStacks.Push(tweet.id);
-                    if (tweet.isNotify)
-                        this.notifyStacks.Push(tweet.NotifyStatus);
+                    this.tweetStacks.Add ( tweet.id );
+                    if ( Setting.Timeline.isIgnoreAnyRetweeted && tweet.retweeted_status != null )
+                    {
+                        //  リツイートも保存
+                        this.tweetStacks.Add ( tweet.DynamicTweet.id );
+                    }
+                    if (tweet.isNotify && (!tweet.NotifyStatus.isOwnFav && !tweet.NotifyStatus.isOwnUnFav))
+                        this.notifyStacks.Add(tweet.NotifyStatus);
+                    if ( tweetStacks.Count > Setting.Timeline.SavedTimelineTweetNum )
+                        tweetStacks.RemoveAt ( 0 );
+                    if ( notifyStacks.Count > Setting.Timeline.SavedTimelineTweetNum )
+                        notifyStacks.RemoveAt ( 0 );
                 }
 
                 //  検知用タイマーのフラグは折る
@@ -157,9 +176,14 @@ namespace Shrimp.ControlParts.Timeline
                 {
                     lock (lockStacks)
                     {
+                        if ( Setting.Timeline.isIgnoreAnyRetweeted )
+                        {
+                            if ( this.tweetStacks.Any ( ( twit ) => twit == t.DynamicTweet.id ) )
+                                continue;
+                        }
                         if (this.tweetStacks.Any((twit) => twit == t.id))
                             continue;
-                        this.tweetStacks.Push(t.id);
+                        this.tweetStacks.Add(t.id);
                     }
                     num++;
                     this.tweetStackRange.Push(t);
@@ -240,9 +264,52 @@ namespace Shrimp.ControlParts.Timeline
         /// タイムラインからツイートを削除
         /// </summary>
         /// <param name="id">tweetのid</param>
-        public void DeleteTimeline(decimal id)
+        public void DeleteTimeline(decimal id, TwitterNotifyStatus isNotify)
         {
+            lock ( lockStacks )
+            {
+                if ( isNotify != null )
+                    this.notifyStacks.Remove ( isNotify );
+                else
+                    this.tweetStacks.Remove ( id );
+            }
         }
+
+		/// <summary>
+		/// 会話リプライとしてツイートを追加する
+		/// </summary>
+		/// <param name="tweet"></param>
+		public bool AddReply(TwitterStatus tweet)
+		{
+			lock (lockStacks)
+			{
+				if (replyStack.Contains(tweet))
+					return false;
+				replyStack.Add(tweet);
+				this._isNewConversation = true;
+				return true;
+			}
+		}
+
+		public bool isNewConversation
+		{
+			get { return this._isNewConversation; }
+		}
+
+		/// <summary>
+		/// リプライを取得
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public TwitterStatus ShowReply(decimal id)
+		{
+			lock (lockStacks)
+			{
+				var res = replyStack.Find((tweet) => tweet.id == id);
+				return res;
+			}
+		}
+
 
         /// <summary>
         /// 爆撃検知用タイマー

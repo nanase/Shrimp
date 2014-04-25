@@ -95,7 +95,7 @@ namespace Shrimp.ControlParts.TweetBox
             }
 
             //  @から候補が始まる
-            if (e.KeyChar == '@' || e.KeyChar == '#')
+            if (e.KeyChar == '@')
             {
                 this.listShow = true;
                 this.isScreenName = (e.KeyChar == '@' ? true : false);

@@ -18,7 +18,7 @@ namespace Shrimp.Module
             retweet_text = null;
             if (src.retweeted_status != null)
             {
-                retweet_text = "" + src.user.name + "さんがリツイートしました";
+                retweet_text = "" + src.user.name + "(@"+ src.user.screen_name +")さんがリツイートしました";
                 return src.retweeted_status;
             }
             else

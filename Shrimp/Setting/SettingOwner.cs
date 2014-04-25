@@ -17,7 +17,7 @@ namespace Shrimp.Setting
         [DataMember]
         public Dictionary<string, TabColorManager> TabColorsData;
         [DataMember]
-        public Dictionary<string, object> TimelineData, FormSettingData;
+        public Dictionary<string, object> TimelineData, FormSettingData, BackgroundImageData;
         [DataMember]
         public Dictionary<string, bool> SearchData, UserStreamData, UpdateData;
         [DataMember]
@@ -32,6 +32,7 @@ namespace Shrimp.Setting
         /// </summary>
         public void SaveAll()
         {
+            this.BackgroundImageData = BackgroundImage.save ();
             this.ColorsData = Colors.save();
             this.TabColorsData = TabColors.save();
             this.TimelineData = Timeline.save();
@@ -49,6 +50,7 @@ namespace Shrimp.Setting
         /// </summary>
         public void LoadAll()
         {
+            BackgroundImage.load ( this.BackgroundImageData );
             Colors.load(this.ColorsData);
             TabColors.load(this.TabColorsData);
             Timeline.load(this.TimelineData);

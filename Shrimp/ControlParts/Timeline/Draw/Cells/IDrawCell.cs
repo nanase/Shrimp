@@ -34,8 +34,8 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
         /// <summary>
         /// テキストを描画
         /// </summary>
-        void DrawText(TwitterEntities entities, int[] selTextPosition, bool isTextBold);
-        void DrawNormalText();
+        void DrawText(TwitterEntities entities, int[] selTextPosition, bool isTextBold, bool isTrimIndent, bool isDrawShootingStar);
+        void DrawNormalText ( bool isTrimIndent );
         /// <summary>
         /// イメージ描画
         /// </summary>

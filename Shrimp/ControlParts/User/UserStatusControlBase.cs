@@ -10,6 +10,7 @@ using Shrimp.Module.Parts;
 using Shrimp.Setting;
 using Shrimp.Twitter.Entities;
 using Shrimp.Twitter.Status;
+using Shrimp.ControlParts.Timeline.Draw;
 
 namespace Shrimp.ControlParts.User
 {
@@ -42,7 +43,7 @@ namespace Shrimp.ControlParts.User
             this.user = user;
             //  アニメーション
             this.tabchange_anime = new TabChangeAnimation();
-            this.anicon = new AnimationControl(this.RedrawControl, null, 0, null, 0, tabchange_anime.FrameExecute, 16);
+            this.anicon = new AnimationControl(this.RedrawControl, null, 0, null, 0, tabchange_anime.FrameExecute, 16, null, 16);
 
             this.imageChecker = new System.Timers.Timer();
             this.imageChecker.Interval = 500;
@@ -173,11 +174,11 @@ namespace Shrimp.ControlParts.User
             if (this.user != null || isLoadingFinished)
             {
                 this.Controls.Remove(this.loadingBox);
-                this.loadingBox.Dispose();
-                this.loadingBox = null;
+                //this.loadingBox.Dispose();
+                //this.loadingBox = null;
                 this.loadingTimer.Stop();
-                this.loadingTimer.Tick -= new System.EventHandler(loadingTimer_Tick);
-                this.loadingTimer = null;
+                //this.loadingTimer.Tick -= new System.EventHandler(loadingTimer_Tick);
+                //this.loadingTimer = null;
 
             }
             else
@@ -250,10 +251,13 @@ namespace Shrimp.ControlParts.User
                 this.icon = (Bitmap)tmp.Clone();
                 ReadyIcon = true;
             }
+            this.isSetBox = false;
+            this.loadingTimer.Start ();
 
-            if (this.InvokeRequired)
+
+            if (this.IsHandleCreated)
             {
-                this.Invoke((MethodInvoker)delegate()
+                this.BeginInvoke((MethodInvoker)delegate()
                 {
                     this.Invalidate();
                     this.Update();

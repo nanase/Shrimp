@@ -11,7 +11,7 @@ namespace Shrimp.Setting
     class Colors
     {
         #region 定義
-
+        private static byte _alpha = 255;
         #endregion
 
         #region コンストラクタ
@@ -67,12 +67,16 @@ namespace Shrimp.Setting
                 LinkColor = obj["LinkColor"].Generate;
             if (obj.ContainsKey("DirectMessageBackgroundColor"))
                 DirectMessageBackgroundColor = obj["DirectMessageBackgroundColor"].Generate;
+            if ( obj.ContainsKey ( "ProfileName" ) )
+                Alpha = obj["ProfileName"].Alpha;
+            if ( !string.IsNullOrEmpty ( Setting.BackgroundImage.BackgroundImagePath ) )
+                Alpha = (byte)Setting.BackgroundImage.BackgroundTransparent;
         }
 
         public static Dictionary<string, BrushEX> save()
         {
             var dest = new Dictionary<string, BrushEX>();
-            dest["ProfileName"] = new BrushEX(BackgroundColor) { profileName = (string)ProfileName.Clone() };
+            dest["ProfileName"] = new BrushEX(BackgroundColor) { profileName = (string)ProfileName.Clone(), a = Alpha };
             dest["BackgroundColor"] = new BrushEX(BackgroundColor);
             dest["ReplyBackgroundColor"] = new BrushEX(ReplyBackgroundColor);
             dest["RetweetBackgroundColor"] = new BrushEX(RetweetBackgroundColor);
@@ -91,10 +95,48 @@ namespace Shrimp.Setting
 
         #endregion
 
+        public static bool IsShootingStar
+        {
+            get
+            {
+                return ProfileName == "ShootingStar";
+            }
+        }
+
         public static string ProfileName
         {
             get;
             set;
+        }
+
+
+        public static byte Alpha
+        {
+            get { return _alpha; }
+            set
+            {
+                _alpha = value;
+                DirectMessageBackgroundColor = ChangeAlpha ( DirectMessageBackgroundColor );
+                BackgroundColor = ChangeAlpha ( BackgroundColor );
+                ReplyBackgroundColor = ChangeAlpha ( ReplyBackgroundColor );
+                RetweetBackgroundColor = ChangeAlpha ( RetweetBackgroundColor );
+                OwnTweetBackgroundColor = ChangeAlpha ( OwnTweetBackgroundColor );
+                NotifyTweetBackgroundColor = ChangeAlpha ( NotifyTweetBackgroundColor );
+                SelectBackgroundColor = ChangeAlpha ( SelectBackgroundColor );
+            }
+        }
+
+        public static Brush ChangeAlpha ( Brush b )
+        {
+            if ( b != null )
+            {
+                using ( var pen = new Pen ( b ) )
+                {
+                    var col = pen.Color;
+                    return new SolidBrush ( Color.FromArgb ( Alpha, col ) );
+                }
+            }
+            return null;
         }
 
         public static Brush DirectMessageBackgroundColor

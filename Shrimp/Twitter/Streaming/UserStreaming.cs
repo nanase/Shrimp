@@ -78,7 +78,7 @@ namespace Shrimp.Twitter.Streaming
             {
                 //
                 //Thread.Sleep ( 1 );
-                this.workerThreads[srv.UserId].isStopFlag = true;
+                this.workerThreads[srv.UserId].IsFinishedThread = true;
                 this.workerThreads[srv.UserId].isDestroy = isDestroy;
                 Thread.Sleep(0);
                 if ( isDestroy )
@@ -92,7 +92,7 @@ namespace Shrimp.Twitter.Streaming
 
         public void CheckStopped()
         {
-            if (this.workerThreads.All((d) => d.Value.isFinishedThread == true))
+            if (this.workerThreads.All((d) => d.Value.IsFinishedThread == true))
                 this.isStartedStreaming = false;
         }
 
@@ -148,7 +148,7 @@ namespace Shrimp.Twitter.Streaming
 
                     streamQueue.StartQueue ();
 					//  再接続処理も含めて。
-					while (!sender.isStopFlag)
+					while (!sender.IsStopFlag)
 					{
 						OAuthBase oAuth = new OAuthBase();
 						string nonce = oAuth.GenerateNonce();
@@ -183,12 +183,12 @@ namespace Shrimp.Twitter.Streaming
 							(new UserStreamQueueData(this, new TwitterCompletedEventArgs(srv, HttpStatusCode.Unused, null, null, null), disconnectHandler));
 
 						//	データ取得
-						while (!sender.isStopFlag && !sr.EndOfStream)
+						while (!sender.IsStopFlag && !sr.EndOfStream)
 						{
 							string t = sr.ReadLine();
 
 							//	空白でないのなら、データを振り分ける
-							if (!String.IsNullOrEmpty(t) && !sender.isStopFlag)
+							if (!String.IsNullOrEmpty(t) && !sender.IsStopFlag)
 							{
 								this.RaiseEvents(srv, t, ref friends, streamQueue);
 								ReconnectCount = 0;
@@ -212,8 +212,8 @@ namespace Shrimp.Twitter.Streaming
 				}
 				finally
 				{
-					if (sender.isStopFlag)
-						sender.isFinishedThread = true;
+					if (sender.IsStopFlag)
+						sender.IsFinishedThread = true;
 					if (ReconnectCount < 6)
 						ReconnectCount++;
 
@@ -222,7 +222,7 @@ namespace Shrimp.Twitter.Streaming
 					{
 						streamQueue.Enqueue
 							(new UserStreamQueueData(this,
-								new TwitterCompletedEventArgs(srv, (sender.isStopFlag ? HttpStatusCode.RequestTimeout : HttpStatusCode.Continue),
+								new TwitterCompletedEventArgs(srv, (sender.IsStopFlag ? HttpStatusCode.RequestTimeout : HttpStatusCode.Continue),
 									friends, null, null), disconnectHandler));
 					}
 

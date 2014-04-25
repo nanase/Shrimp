@@ -1,8 +1,11 @@
 ﻿using System;
 using System.IO;
-using NLua;
+using IronPython.Hosting;
+using Microsoft.Scripting.Hosting;
+using Shrimp.ControlParts.Timeline;
 using Shrimp.Log;
 using Shrimp.Plugin.Ref;
+using System.Collections.Generic;
 
 namespace Shrimp.Plugin
 {
@@ -10,15 +13,21 @@ namespace Shrimp.Plugin
     /// Plugin Class
     /// プラグインを読み込むクラス
     /// </summary>
-    public class Plugin : Lua, IPlugin, IDisposable
+    public class Plugin : IPlugin, IDisposable
     {
         #region 定義
+        private ScriptEngine engine;
+        private ScriptScope scope;
+        private ScriptSource source;
+        private dynamic dynExecute;
+		private CompiledCode cc;
 
         private string pluginName;
         private double pluginVersion;
         private string pluginPath;
         private string pluginDeveloper;
         private Object CallLock = new object();
+        private TimelineControl.OnUseTwitterAPIDelegate onUseTwitterAPI;
         #endregion
 
         #region コンストラクタ
@@ -28,6 +37,7 @@ namespace Shrimp.Plugin
         /// </summary>
         public Plugin()
         {
+            this.engine = Python.CreateEngine ();
         }
 
         /// <summary>
@@ -38,34 +48,57 @@ namespace Shrimp.Plugin
             this.Dispose();
         }
 
-        /// <summary>
-        /// Dispose
-        /// </summary>
-        public override void Dispose()
+        public void Dispose ()
         {
-            //  Disposeの内容を記述
-            base.Dispose();
         }
 
         #endregion
+
+        public string PluginName
+        {
+            get { return this.pluginName; }
+        }
+
+        public string PluginDeveloper
+        {
+            get { return this.pluginDeveloper; }
+        }
+
+        public double PluginVersion
+        {
+            get { return this.pluginVersion; }
+        }
 
         /// <summary>
         /// プラグインを読み込む
         /// </summary>
         /// <param name="filePath">ファイルパス</param>
-        public string loadPlugin(string filePath)
+        public string loadPlugin(string filePath, TimelineControl.OnUseTwitterAPIDelegate onuseTwitterAPI,
+			RegistFunc.ShrimpHandler handler)
         {
             //  プラグイン読み込む
             string err = null;
+            this.onUseTwitterAPI = onuseTwitterAPI;
             this.pluginPath = (string)filePath.Clone();
-            this.LoadCLRPackage();
-            this.RegisterFunction("print", this.GetType().GetMethod("lua_print"));
-            this.RegisterFunction ( "tweet", this.GetType ().GetMethod ( "lua_tweet" ) );
-            this.RegisterFunction ( "update_profile", this.GetType ().GetMethod ( "lua_update_profile" ) );
+
+			var test = new RegistFunc.ShrimpHandler();
+            this.scope = this.engine.CreateScope ();
+            this.scope.SetVariable ( "Twitter", new RegistFunc.Twitter ( onuseTwitterAPI ) );
+			this.scope.SetVariable("Shrimp", handler);
+            /*
+            this.RegisterFunction("print", this,  this.GetType().GetMethod("lua_print"));
+            this.RegisterFunction ( "tweet", this, this.GetType ().GetMethod ( "lua_tweet" ) );
+            this.RegisterFunction ( "favorite", this, this.GetType ().GetMethod ( "lua_favorite" ) );
+            this.RegisterFunction ( "unfavorite", this, this.GetType ().GetMethod ( "lua_unfavorite" ) );
+            this.RegisterFunction ( "retweet", this, this.GetType ().GetMethod ( "lua_retweet" ) );
+            this.RegisterFunction ( "update_profile", this, this.GetType ().GetMethod ( "lua_update_profile" ) );
+            */
 
             try
             {
-                this.DoFile(filePath);
+                this.source = this.engine.CreateScriptSourceFromFile (filePath);
+				//this.cc = this.source.Compile();
+                this.dynExecute = this.source.Execute ( this.scope );
             }
             catch (Exception e)
             {
@@ -81,13 +114,11 @@ namespace Shrimp.Plugin
         public bool initializePlugin()
         {
             //  プラグイン初期化
-            var func = this.GetFunction("initialize");
-            if (func == null)
-                return true;
-            object[] ret = null;
+            Dictionary<string, object> ret = null;
+            Func<ShrimpVersion, Dictionary<string, object>> initialize = this.scope.GetVariable<Func<ShrimpVersion, Dictionary<string, object>>> ( "initialize" );
             try
             {
-                ret = func.Call(new ShrimpVersion());
+                ret = initialize.Invoke ( new ShrimpVersion () );
             }
             catch (Exception e)
             {
@@ -97,18 +128,25 @@ namespace Shrimp.Plugin
             //  デフォルトプラグイン名
             this.pluginName = Path.GetFileName(this.pluginPath);
             this.pluginVersion = 100;
-            if (ret.Length == 0)
-                return true;
-            if (ret.Length == 1)
-                return (bool)ret[0];
-            if (ret.Length >= 2)
-                this.pluginName = (string)((string)ret[1]).Clone();
-            if (ret.Length >= 3)
-                this.pluginVersion = (double)ret[2];
-            if (ret.Length >= 4)
-                this.pluginDeveloper = (string)((string)ret[3]).Clone();
 
-            return (bool)ret[0];
+            if (ret == null || ret.Count == 0)
+                return true;
+
+            if ( ret.ContainsKey ( "PluginName" ) )
+                this.pluginName = (string)( (string)ret["PluginName"] ).Clone ();
+
+            //if ( ret.ContainsKey ( "PluginName" ) )
+            //    return (bool)ret[0];
+            if ( ret.ContainsKey ( "PluginVersion" ) )
+                this.pluginVersion = (int)ret["PluginVersion"];
+
+            if ( ret.ContainsKey ( "PluginDeveloper" ) )
+                this.pluginDeveloper = (string)((string)ret["PluginDeveloper"]).Clone();
+
+            if ( ret.ContainsKey ( "isLoadPlugin" ) )
+                return (bool)ret["isLoadPlugin"];
+
+            return true;
         }
 
         /// <summary>
@@ -121,60 +159,18 @@ namespace Shrimp.Plugin
         }
 
         /// <summary>
-        /// Luaでtweetを呼び出すと呼ばれます。
-        /// </summary>
-        /// <param name="str"></param>
-        public void lua_tweet ( string str, decimal in_reply_to_status_id )
-        {
-            //  ツイート処理
-
-        }
-
-
-        /// <summary>
-        /// Luaでupdate_profileを呼び出すと呼ばれます
-        /// </summary>
-        /// <param name="str"></param>
-        public void lua_update_profile ( string name, string url, string location, string description )
-        {
-            //  プロフィール変更
-        }
-
-        /// <summary>
-        /// 関数を呼び出す
-        /// </summary>
-        /// <param name="func"></param>
-        /// <param name="arg"></param>
-        /// <returns></returns>
-        public object[] FunctionCall(string func, object[] arg = null)
-        {
-            lock (this.CallLock)
-            {
-                var f = this.GetFunction(func);
-                if (f != null)
-                {
-                    if (arg == null)
-                        return f.Call();
-                    else
-                        return f.Call(arg);
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
         /// それぞれのメソッドがあるか調べる
         /// </summary>
         /// <returns></returns>
-        public LuaFunction OnTweetSendingReady()
+        public dynamic OnTweetSendingReady()
         {
-            return this.GetFunction("OnTweetSending");
+            return this.dynExecute.OnTweetSending;
         }
 
         /// <summary>
         /// ツイートが送信される直前に呼び出されます
         /// </summary>
-        public void OnTweetSending(LuaFunction func, OnTweetSendingHook hook)
+        public void OnTweetSending(dynamic func, OnTweetSendingHook hook)
         {
             lock (this.CallLock)
             {
@@ -186,20 +182,20 @@ namespace Shrimp.Plugin
         /// ツイートボックス右クリックメニューを追加する宣言をチェックするメソッド
         /// </summary>
         /// <returns></returns>
-        public LuaFunction OnRegistTweetBoxMenuReady()
+        public dynamic OnRegistTweetBoxMenuReady ()
         {
-            return this.GetFunction("OnRegistTweetBoxMenu");
+            return this.dynExecute.OnRegistTweetBoxMenu;
         }
 
         /// <summary>
         /// テキストボックスの、右クリックメニューの追加をするタイミングになったら、とんできます
         /// </summary>
         /// <param name="hook"></param>
-        public void OnRegistTweetBoxMenu(LuaFunction func, OnRegistTweetBoxMenuHook hook)
+        public void OnRegistTweetBoxMenu ( dynamic func, OnRegistTweetBoxMenuHook hook )
         {
             lock (this.CallLock)
             {
-                var ret = func.Call(new object[] { hook });
+                var ret = func(new object[] { hook });
             }
         }
 
@@ -207,20 +203,41 @@ namespace Shrimp.Plugin
         /// ツイートがShrimp内部で処理されたときに呼び出される
         /// </summary>
         /// <returns></returns>
-        public LuaFunction OnCreatedTweetReady()
+        public dynamic OnCreatedTweetReady ()
         {
-            return this.GetFunction("OnCreatedTweet");
+            return this.dynExecute.OnCreatedTweet;
         }
 
         /// <summary>
         /// ツイートがShrimp内部で処理されたときに呼び出される
         /// </summary>
         /// <returns></returns>
-        public void OnCreatedTweet(LuaFunction func, OnCreatedTweetHook hook)
+        public void OnCreatedTweet(dynamic func, OnCreatedTweetHook hook)
         {
             lock (this.CallLock)
             {
-                var ret = func.Call(new object[] { hook });
+                var ret = func(new object[] { hook });
+            }
+        }
+
+        /// <summary>
+        /// ツイートがUserStreamで流れてきたら取得する
+        /// </summary>
+        /// <returns></returns>
+        public dynamic OnStreamTweetReady ()
+        {
+            return this.dynExecute.OnStreamTweet;
+        }
+
+        /// <summary>
+        ///ツイートがUserStreamで流れてきたら取得する
+        /// </summary>
+        /// <returns></returns>
+        public void OnStreamTweet ( dynamic func, OnCreatedTweetHook hook )
+        {
+            lock ( this.CallLock )
+            {
+                var ret = func( new object[] { hook } );
             }
         }
 
@@ -228,18 +245,18 @@ namespace Shrimp.Plugin
         /// プラグインが有効になったら実行される
         /// </summary>
         /// <returns></returns>
-        public LuaFunction OnEnabledPlugin ()
+        public dynamic OnEnabledPlugin ()
         {
-            return this.GetFunction ( "OnEnabledPlugin" );
+            return this.dynExecute.OnEnabledPlugin;
         }
 
         /// <summary>
         /// プラグインが無効になったら実行される
         /// </summary>
         /// <returns></returns>
-        public LuaFunction OnDisabledPlugin ()
+        public dynamic OnDisabledPlugin ()
         {
-            return this.GetFunction ( "OnDisabledPlugin" );
+            return this.dynExecute.OnDisabledPlugin;
         }
 
 
@@ -249,7 +266,7 @@ namespace Shrimp.Plugin
         public void unloadPlugin()
         {
             //  プラグインアンロード
-            this.Close();
+            //this.Close();
         }
     }
 }

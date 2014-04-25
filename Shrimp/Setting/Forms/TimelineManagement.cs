@@ -65,6 +65,10 @@ namespace Shrimp.Setting.Forms
                 tlSetting["isReplyBold"] = (e.NewValue == CheckState.Checked ? true : false);
             if ( e.Index == 6 )
                 tlSetting["isEnableAbsoluteTime"] = ( e.NewValue == CheckState.Checked ? true : false );
+            if ( e.Index == 7 )
+				tlSetting["isEnableIcon"] = (e.NewValue == CheckState.Checked ? true : false);
+			if (e.Index == 8)
+				tlSetting["isEnableInlineView"] = (e.NewValue == CheckState.Checked ? true : false);
             SaveReflection();
         }
 
@@ -94,6 +98,8 @@ namespace Shrimp.Setting.Forms
                 tlSetting["isConfirmFav"] = (e.NewValue == CheckState.Checked ? true : false);
             if (e.Index == 2)
                 tlSetting["isHoverSelectMode"] = (e.NewValue == CheckState.Checked ? true : false);
+			if (e.Index == 3)
+				tlSetting["isIgnoreAnyRetweeted"] = (e.NewValue == CheckState.Checked ? true : false);
             SaveReflection();
         }
 
@@ -102,6 +108,7 @@ namespace Shrimp.Setting.Forms
             this.fTimelineSettingCheckBox.SetItemChecked(0, (bool)tlSetting["isConfirmRT"]);
             this.fTimelineSettingCheckBox.SetItemChecked(1, (bool)tlSetting["isConfirmFav"]);
             this.fTimelineSettingCheckBox.SetItemChecked(2, (bool)tlSetting["isHoverSelectMode"]);
+			this.fTimelineSettingCheckBox.SetItemChecked(3, (bool)tlSetting["isIgnoreAnyRetweeted"]);
 
             this.timelineSettingCheckBox.SetItemChecked(0, (bool)tlSetting["isEnableTimeLink"]);
             this.timelineSettingCheckBox.SetItemChecked(1, (bool)tlSetting["isEnableSourceLink"]);
@@ -110,7 +117,8 @@ namespace Shrimp.Setting.Forms
             this.timelineSettingCheckBox.SetItemChecked(4, (bool)tlSetting["isNotifyBold"]);
             this.timelineSettingCheckBox.SetItemChecked(5, (bool)tlSetting["isReplyBold"]);
             this.timelineSettingCheckBox.SetItemChecked ( 6, (bool)tlSetting["isEnableAbsoluteTime"] );
-            
+			this.timelineSettingCheckBox.SetItemChecked(7, (bool)tlSetting["isEnableIcon"]);
+			this.timelineSettingCheckBox.SetItemChecked(8, (bool)tlSetting["isEnableInlineView"]);
 
             this.SavingTweetNumNumeric.Value = (((int)tlSetting["SavedTimelineTweetNum"]) < this.SavingTweetNumNumeric.Minimum ? this.SavingTweetNumNumeric.Minimum : ((int)tlSetting["SavedTimelineTweetNum"]));
             this.AnimationCheckBox.SetItemChecked(0, (bool)tlSetting["isEnableInsertAnimation"]);

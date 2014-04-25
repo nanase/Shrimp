@@ -35,6 +35,9 @@ namespace Shrimp.Twitter.Status
         /// <returns></returns>
         public bool isHit(TwitterNotifyStatus status)
         {
+            if ( status.isOwnFav || status.isOwnUnFav )
+                return true;
+
             if ( this.OwnFavorited && status.isFavToMe )
                 return true;
             if ( this.OwnUnFavorited && status.isUnFavToMe )

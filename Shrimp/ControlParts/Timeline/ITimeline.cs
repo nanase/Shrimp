@@ -20,7 +20,7 @@ namespace Shrimp.ControlParts.Timeline
         /// <summary>
         /// タイムラインからツイートを削除
         /// </summary>
-        void DeleteTimeline(decimal id);
+        void DeleteTimeline(decimal id, TwitterNotifyStatus isNotify);
         /// <summary>
         /// 設定が変更されたら飛んでくる
         /// </summary>

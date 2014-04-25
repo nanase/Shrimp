@@ -95,37 +95,37 @@ namespace Shrimp.ControlParts.Users
 			this.maxWidth = maxWidth;
 
 			//	アイコンの位置
-			this.icon = new Cell(new Point(5 + offsetX, 5 + offsetY), new Size(48, 48), null);
+			this.icon = new Cell(new Point(5 + offsetX, 5 + offsetY), new Size(48, 48), null, null, null);
 
 			//	名前の位置
 			var tmp = "@"+ user.screen_name +" / "+ user.name +"";
 			this.name = new Cell(new Point(this.icon.Rect.Right + 5, this.icon.Position.Y),
-				DrawTextUtil.GetDrawTextSize(tmp, Setting.Fonts.NameFont, maxWidth), tmp);
+				DrawTextUtil.GetDrawTextSize(tmp, Setting.Fonts.NameFont, maxWidth), tmp, Setting.Fonts.NameFont, Setting.Colors.NameColor);
 
 			//	URLの位置
 			tmp = "URL: "+ user.url;
 			this.url = new Cell(new Point(this.icon.Rect.Right + 5, this.name.Rect.Bottom + 5),
-				DrawTextUtil.GetDrawTextSize(tmp, Setting.Fonts.ViaFont, maxWidth), tmp);
+                DrawTextUtil.GetDrawTextSize ( tmp, Setting.Fonts.ViaFont, maxWidth ), tmp, Setting.Fonts.ViaFont, Setting.Colors.NameColor );
 
 			//	フォローの位置
 			tmp = "フォロー数: "+ user.friends_count;
 			this.follow = new Cell(new Point(this.icon.Rect.Right + 5, this.url.Rect.Bottom + 5),
-				DrawTextUtil.GetDrawTextSize(tmp, Setting.Fonts.ViaFont, maxWidth), tmp);
+                DrawTextUtil.GetDrawTextSize ( tmp, Setting.Fonts.ViaFont, maxWidth ), tmp, Setting.Fonts.ViaFont, Setting.Colors.NameColor );
 
 			//	フォロワーの位置
 			tmp = "フォロワー数: "+ user.followers_count;
 			this.follower = new Cell(new Point(this.follow.Rect.Right + 5, this.follow.Rect.Y),
-				DrawTextUtil.GetDrawTextSize(tmp, Setting.Fonts.ViaFont, maxWidth), tmp);
+                DrawTextUtil.GetDrawTextSize ( tmp, Setting.Fonts.ViaFont, maxWidth ), tmp, Setting.Fonts.ViaFont, Setting.Colors.NameColor );
 
 			//	ふぁぼりての位置
 			tmp = "お気に入り数: "+ user.favourites_count;
 			this.favorites = new Cell(new Point(this.follower.Rect.Right + 5, this.follow.Rect.Y),
-				DrawTextUtil.GetDrawTextSize(tmp, Setting.Fonts.ViaFont, maxWidth), tmp);
+                DrawTextUtil.GetDrawTextSize ( tmp, Setting.Fonts.ViaFont, maxWidth ), tmp, Setting.Fonts.ViaFont, Setting.Colors.NameColor );
 
 			//	詳細の位置
 			tmp = user.description;
 			this.description = new Cell(new Point(this.icon.Rect.Right + 5, this.follow.Rect.Bottom + 5),
-				DrawTextUtil.GetOwnerDrawTextSize(tmp, Setting.Fonts.TweetFont, 0, maxWidth), tmp);
+                DrawTextUtil.GetOwnerDrawTextSize ( tmp, Setting.Fonts.TweetFont, 0, maxWidth ), tmp, Setting.Fonts.TweetFont, Setting.Colors.NameColor );
 
 		}
 	}

@@ -1,4 +1,5 @@
 ﻿
+using Shrimp.ControlParts.Timeline;
 namespace Shrimp.Plugin
 {
     /// <summary>
@@ -8,7 +9,8 @@ namespace Shrimp.Plugin
     interface IPlugin
     {
         //  プラグインが読み込まれる
-        string loadPlugin(string pluginPath);
+        string loadPlugin ( string pluginPath, TimelineControl.OnUseTwitterAPIDelegate onuseTwitterAPI,
+			RegistFunc.ShrimpHandler handler );
         //  プラグインが初期化されたとき
         bool initializePlugin();
         //  プラグインがアンロードされたとき

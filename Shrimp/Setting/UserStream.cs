@@ -13,6 +13,7 @@ namespace Shrimp.Setting
             isIncludeFollowingsActivity = false;
             isEnableUserstream = true;
             isMuteWithoutFriends = false;
+            isUseGZip = false;
         }
 
         public static void load(Dictionary<string, bool> obj)
@@ -27,6 +28,8 @@ namespace Shrimp.Setting
                 isEnableUserstream = obj["isEnableUserstream"];
             if ( obj.ContainsKey ( "isMuteWithoutFriends" ) )
                 isMuteWithoutFriends = obj["isMuteWithoutFriends"];
+            if ( obj.ContainsKey ( "isUseGZip" ) )
+                isUseGZip = obj["isUseGZip"];
         }
 
         public static Dictionary<string, bool> save()
@@ -36,6 +39,7 @@ namespace Shrimp.Setting
             dest["isRepliesAll"] = isRepliesAll;
             dest["isEnableUserstream"] = isEnableUserstream;
             dest["isMuteWithoutFriends"] = isMuteWithoutFriends;
+            dest["isUseGZip"] = isUseGZip;
             return dest;
         }
 
@@ -72,6 +76,15 @@ namespace Shrimp.Setting
         /// フォロー外のリプライを受信しない
         /// </summary>
         public static bool isMuteWithoutFriends
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// GZIPを使うかどうか
+        /// </summary>
+        public static bool isUseGZip
         {
             get;
             set;

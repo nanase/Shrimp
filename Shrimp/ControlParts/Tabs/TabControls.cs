@@ -9,6 +9,7 @@ using Shrimp.ControlParts.User;
 using Shrimp.Query;
 using Shrimp.SQL;
 using Shrimp.Twitter.Status;
+using System.Media;
 
 namespace Shrimp.ControlParts.Tabs
 {
@@ -22,7 +23,8 @@ namespace Shrimp.ControlParts.Tabs
         public bool isDefaultTab = false;
         public bool isLock = false;
         private string sourceTabName = "";
-
+        private string _NewTweetSoundPath = "";
+        private SoundPlayer _NewTweetSoundPlayer;
         private bool _isVisible = false;
         public bool isFlash = false;
         /// ツイートを除外する条件式
@@ -54,6 +56,25 @@ namespace Shrimp.ControlParts.Tabs
         #region コンストラクタ
         public TabControls()
         {
+        }
+
+        /// <summary>
+        /// 新着ツイート時の音声ファイルパス
+        /// </summary>
+        public string NewTweetSoundPath
+        {
+            get { return this._NewTweetSoundPath; }
+            set
+            {
+                if ( this._NewTweetSoundPlayer != null )
+                    this._NewTweetSoundPlayer.Dispose ();
+                this._NewTweetSoundPlayer = null;
+                if ( !string.IsNullOrEmpty ( value ) )
+                {
+                    this._NewTweetSoundPlayer = new SoundPlayer ( value );
+                }
+                this._NewTweetSoundPath = value;
+            }
         }
 
         /// <summary>
@@ -158,7 +179,7 @@ namespace Shrimp.ControlParts.Tabs
                 if (this.timeline is TimelineControl)
                 {
                     var tl = this.timeline as TimelineControl;
-                    tl.TimelineControl_KeyDown(this, ke);
+                    tl.PreviewOnKeyDown ( ke );
                 }
             }
         }
@@ -313,6 +334,7 @@ namespace Shrimp.ControlParts.Tabs
             dest.tabID = (string)this.TabID.Clone();
             dest.isFlash = this.isFlash;
             dest.TabDelivery = (TabDeliveryCollection)this.tabDelivery.Clone();
+            dest.NewTweetSounds = (string)this.NewTweetSoundPath.Clone ();
             if (db != null)
                 this.SetTimelineToDatabase(db);
 
@@ -383,21 +405,22 @@ namespace Shrimp.ControlParts.Tabs
             get { return this.sourceTabName; }
             set
             {
-                Task.Factory.StartNew(() =>
+                if ( value != null )
                 {
-                    if (this.InvokeRequired)
+                    var text = value.Replace ( "\n", "" );
+                    if ( this.IsHandleCreated )
                     {
-                        this.Invoke((MethodInvoker)delegate()
+                        this.BeginInvoke ( (MethodInvoker)delegate ()
                         {
-                            this.Text = value;
-                        });
+                            this.Text = text;
+                        } );
                     }
                     else
                     {
-                        this.Text = value;
+                        this.Text = text;
                     }
-                });
-                this.sourceTabName = value;
+                    this.sourceTabName = text;
+                }
             }
         }
 
@@ -466,6 +489,7 @@ namespace Shrimp.ControlParts.Tabs
             var res = this.timeline as TimelineControl;
             if (res == null)
                 return;
+
             if (!this.isMatchQuery(tweet))
             {
                var isSuccess = res.InsertTimeline(tweet);
@@ -473,26 +497,29 @@ namespace Shrimp.ControlParts.Tabs
                 if ( !isSuccess || (tweet.isNotify && (tweet.NotifyStatus.isOwnFav || tweet.NotifyStatus.isOwnUnFav) ) )
                     return;
 
-                this.unreadNum++;
                 if (this.isFlash)
                 {
                     //  ウィンドウフラッシュ
                     FlashWindow();
                 }
 
-                Task.Factory.StartNew(() =>
+                if ( !isVisible )
                 {
-                    if (!isVisible)
+                    if ( this._NewTweetSoundPlayer != null )
+                        this._NewTweetSoundPlayer.Play ();
+                    this.unreadNum++;
+                    if ( this.IsHandleCreated )
                     {
-                        if ( this.IsHandleCreated )
+                        this.BeginInvoke ( (MethodInvoker)delegate ()
                         {
-                            this.BeginInvoke ( (MethodInvoker)delegate ()
-                            {
-                                this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
-                            } );
-                        }
+                            this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
+                        } );
                     }
-                });
+                    else
+                    {
+                        this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
+                    }
+                }
             }
         }
 
@@ -510,30 +537,29 @@ namespace Shrimp.ControlParts.Tabs
             int newTweetNum = res.InsertTimelineRange(tweet.FindAll((t) => !this.isMatchQuery(t)));
             if (!isSQL)
             {
-                this.unreadNum += newTweetNum;
                 if (this.isFlash)
                 {
                     //  ウィンドウフラッシュ
                     FlashWindow();
                 }
 
-                Task.Factory.StartNew(() =>
+                if ( !isVisible && newTweetNum != 0 )
                 {
-                    if (!isVisible && newTweetNum != 0)
+                    if ( this._NewTweetSoundPlayer != null )
+                        this._NewTweetSoundPlayer.Play ();
+                    this.unreadNum += newTweetNum;
+                    if ( this.IsHandleCreated )
                     {
-                        if (this.InvokeRequired)
-                        {
-                            this.Invoke((MethodInvoker)delegate()
-                            {
-                                this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
-                            });
-                        }
-                        else
+                        this.BeginInvoke ( (MethodInvoker)delegate ()
                         {
                             this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
-                        }
+                        } );
                     }
-                });
+                    else
+                    {
+                        this.Text = "*" + this.sourceTabName + "(" + this.unreadNum + ")";
+                    }
+                }
 
             }
             return newTweetNum;
@@ -614,7 +640,7 @@ namespace Shrimp.ControlParts.Tabs
         public void FlashWindow()
         {
             if (this.FlashWindowHandler != null)
-                this.FlashWindowHandler.Invoke();
+                this.FlashWindowHandler.BeginInvoke(null, null);
         }
     }
 }

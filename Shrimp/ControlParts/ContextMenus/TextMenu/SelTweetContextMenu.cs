@@ -65,7 +65,7 @@ namespace Shrimp.ControlParts.ContextMenus.TextMenu
         /// <param name="p"></param>
         public void ShowMenu(Point p, AccountManager accounts, TwitterStatus status)
         {
-            if (!status.isDirectMessage && !status.isNotify)
+            if (!status.isDirectMessage && !(status.isNotify && status.NotifyStatus.isUpdateProfileCategory))
             {
                 this.DeleteTweetMenu.Text = "ツイートを削除する(&D)";
                 this.FavMenu.Enabled = true;

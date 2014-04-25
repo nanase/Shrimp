@@ -23,5 +23,12 @@ namespace Shrimp.Setting.Forms
                 str = "名無しのカラーさん";
             this.Tag = str;
         }
+
+        private void colorName_KeyDown ( object sender, KeyEventArgs e )
+        {
+            if ( e.KeyCode == Keys.Enter )
+                this.EOKButton_Click ( null, null );
+
+        }
     }
 }

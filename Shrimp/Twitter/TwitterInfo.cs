@@ -169,6 +169,7 @@ namespace Shrimp.Twitter
         #region コンストラクタ
         public TwitterInfo ()
         {
+            // XMLシリアライズのため、このデフォルトコンストラクタは必要
         }
 
         public TwitterInfo(string consumerKey = null,
@@ -289,8 +290,6 @@ namespace Shrimp.Twitter
             sig = OAuthBase.UrlEncode(sig);
             ServicePointManager.DefaultConnectionLimit = 1000;
             string raw_data = null;
-            Stream st = null;
-            StreamReader sr = null;
             HttpStatusCode code = HttpStatusCode.RequestTimeout;
             HttpWebRequest webreq = null;
 
@@ -339,16 +338,10 @@ namespace Shrimp.Twitter
                     //POST送信するデータの長さを指定
                     webreq.ContentLength = startData.Length + endData.Length + media.Length;
 
-                    //データをPOST送信するためのStreamを取得
-                    Stream reqStream = webreq.GetRequestStream();
-
-                    //送信するデータを書き込む
-                    reqStream.Write(startData, 0, startData.Length);
-                    //ファイルの内容を送信
-                    reqStream.Write(media, 0, media.Length);
-
-                    reqStream.Write(endData, 0, endData.Length);
-                    reqStream.Close();
+                    // データをPOST送信するためのStreamを取得
+                    // 順にヘッダ、コンテント、フッタで書き込む
+                    using ( Stream reqStream = webreq.GetRequestStream () )
+                        reqStream.WriteArrays ( startData, media, endData );
                 }
 
                 HttpWebResponse webres = (HttpWebResponse)webreq.GetResponse();
@@ -356,21 +349,11 @@ namespace Shrimp.Twitter
                 //  コードチェック
                 if ((code = webres.StatusCode) == HttpStatusCode.OK)
                 {
-                    st = webres.GetResponseStream();
-
-                    if (webres != null && webres.ContentEncoding.ToLower() == "gzip")
-                    {
-                        //gzip。
-                        GZipStream gzip = new GZipStream(st, CompressionMode.Decompress);
-                        sr = new StreamReader(gzip, Encoding.GetEncoding(932));
-                        gzip.Close();
-                    }
-                    else
-                    {
-                        sr = new StreamReader(st, Encoding.GetEncoding(932));
-                    }
-
-                    raw_data = sr.ReadToEnd();
+                    bool decompress = (webres != null && webres.ContentEncoding.ToLower() == "gzip");
+                        
+                    using (var st = webres.GetResponseStream())
+                    using (StreamReader sr = st.OpenStreamReader(decompress, AdditionalEncoding.ShiftJIS))
+                        raw_data = sr.ReadToEnd();
 
                     if (raw_data == null)
                         raw_data = "";
@@ -388,14 +371,6 @@ namespace Shrimp.Twitter
                         code = err.StatusCode;
                     }
                 }
-            }
-            finally
-            {
-                if (sr != null)
-                    sr.Close();
-
-                if (st != null)
-                    st.Close();
             }
             return new TwitterSocket((webreq != null ? webreq.RequestUri : null), code, raw_data);
         }

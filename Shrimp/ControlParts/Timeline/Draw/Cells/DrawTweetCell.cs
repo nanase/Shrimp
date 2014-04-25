@@ -45,10 +45,13 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
         /// </summary>
         public void DrawIcon(Bitmap image, string screen_name)
         {
-            g.DrawImage(image, this.drawCellSize.Icon.Rect);
-            image.Dispose();
-            if (SetClickLink != null)
-                SetClickLink.Invoke(this.drawCellSize.Icon.Rect, new TwitterEntitiesPosition(screen_name, "mention"));
+			if (image != null)
+			{
+				g.DrawImage(image, this.drawCellSize.Icon.Rect);
+				image.Dispose();
+				if (SetClickLink != null)
+					SetClickLink.Invoke(this.drawCellSize.Icon.Rect, new TwitterEntitiesPosition(screen_name, "mention"));
+			}
         }
 
         /// <summary>
@@ -56,7 +59,7 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
         /// </summary>
         public void DrawName(string screen_name)
         {
-            g.DrawString(this.drawCellSize.Name.Detail, Setting.Fonts.NameFont, Setting.Colors.NameColor, this.drawCellSize.Name.Rect);
+            g.DrawString(this.drawCellSize.Name.Detail, this.drawCellSize.Name.TextFont, this.drawCellSize.Name.TextBrush, this.drawCellSize.Name.Rect);
             if (SetClickLink != null)
                 SetClickLink.Invoke(this.drawCellSize.Name.Rect, new TwitterEntitiesPosition(screen_name, "mention"));
         }
@@ -80,22 +83,20 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
             //  new Point ( maxWidth - p.Time.Size.Width, p.Time.Position.Y )
             if (!useCellInfo)
                 this.drawCellSize.Time.Position = new Point(this.maxWidth - this.drawCellSize.Time.Size.Width, this.drawCellSize.Time.Position.Y);
-            g.DrawString(this.drawCellSize.Time.Detail, Setting.Fonts.NameFont, Setting.Colors.NameColor, this.drawCellSize.Time.Rect);
+            g.DrawString ( this.drawCellSize.Time.Detail, this.drawCellSize.Time.TextFont, this.drawCellSize.Time.TextBrush, this.drawCellSize.Time.Rect );
             if (SetClickLink != null && Setting.Timeline.isEnableTimeLink)
                 SetClickLink.Invoke(this.drawCellSize.Time.Rect, new TwitterEntitiesPosition("https://twitter.com/shrimp/status/" + tweet_id + "", "url"));
 
         }
 
         /// <summary>
-        /// テキスト描画
+        /// テキストを描画します
         /// </summary>
-        /// <param name="g"></param>
-        /// <param name="text"></param>
         /// <param name="entities"></param>
         /// <param name="selTextPosition"></param>
-        /// <param name="cellOffset"></param>
-        /// <param name="maxWidth"></param>
-        public void DrawText(TwitterEntities entities, int[] selTextPosition, bool isBoldText)
+        /// <param name="isBoldText"></param>
+        /// <param name="isTrimIndent"></param>
+        public void DrawText(TwitterEntities entities, int[] selTextPosition, bool isBoldText, bool isTrimIndent, bool isDrawShootingStar)
         {
             //  ツイート描画
             var cellOffset = this.drawCellSize.Tweet.Position;
@@ -104,9 +105,9 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
             Brush cl;
             foreach (char t in this.drawCellSize.Tweet.Detail)
             {
-                var one_size = DrawTextUtil.GetDrawTextSize(t.ToString(), Setting.Fonts.TweetFont, maxWidth, true);
+                var one_size = DrawTextUtil.GetDrawTextSize(t.ToString(), this.drawCellSize.Tweet.TextFont, maxWidth, true);
 
-                cl = Setting.Colors.TweetColor;
+                cl = this.drawCellSize.Tweet.TextBrush;
                 bool isLink = false;
                 if (entities != null)
                 {
@@ -114,7 +115,8 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
                     if (entities_pos != null)
                     {
                         isLink = true;
-                        cl = Setting.Colors.LinkColor;
+                        if ( !isDrawShootingStar && !Setting.Colors.IsShootingStar)
+                            cl = Setting.Colors.LinkColor;
                         if (SetClickLink != null)
                             SetClickLink.Invoke(new Rectangle(new Point(strX, strY), one_size), entities_pos);
                     }
@@ -147,10 +149,13 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
         /// <summary>
         /// 通常描画
         /// </summary>
-        public void DrawNormalText()
+        public void DrawNormalText( bool isTrimIndent )
         {
             var opt = new StringFormat() { Trimming = StringTrimming.EllipsisCharacter };
-            g.DrawString(this.drawCellSize.Tweet.Detail, Setting.Fonts.TweetFont, Setting.Colors.TweetColor, this.drawCellSize.Tweet.Rect, opt);
+            string text = ( this.drawCellSize.Tweet.Detail == null ? "" : this.drawCellSize.Tweet.Detail );
+            if ( isTrimIndent )
+                text = text.Replace ( "\r", " " ).Replace ( "\n", " " );
+            g.DrawString ( text, this.drawCellSize.Tweet.TextFont, this.drawCellSize.Tweet.TextBrush, this.drawCellSize.Tweet.Rect, opt );
         }
 
         /// <summary>
@@ -159,14 +164,17 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
         /// <param name="media"></param>
         public void DrawImage(List<TwitterEntitiesMedia> media)
         {
-            if (media != null)
+			if (media != null && Setting.Timeline.isEnableInlineView)
             {
                 foreach (TwitterEntitiesMedia data in media)
                 {
                     Bitmap inline_pic = ImageCache.AutoCache(data.media_url, false);
                     if (inline_pic != null)
                     {
-                        g.DrawImage(inline_pic, new Rectangle(this.drawCellSize.ImageTotal.Position, inline_pic.Size));
+						var rect = new Rectangle(this.drawCellSize.ImageTotal.Position, inline_pic.Size);
+                        g.DrawImage(inline_pic, rect);
+						if (SetClickLink != null)
+							SetClickLink.Invoke(rect, new TwitterEntitiesPosition ( data.media_url, "inlineImage" ) );
                         inline_pic.Dispose();
                     }
                 }
@@ -181,7 +189,7 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
             if (this.drawCellSize.RetweetNotify.Detail != null)
             {
                 g.DrawImage(ResourceImages.Retweet.normal, new Rectangle(new Point(this.drawCellSize.RetweetNotify.Position.X - Setting.Timeline.RetweetMarkSize, this.drawCellSize.RetweetNotify.Position.Y), new Size(Setting.Timeline.RetweetMarkSize, Setting.Timeline.RetweetMarkSize)));
-                g.DrawString(this.drawCellSize.RetweetNotify.Detail, Setting.Fonts.RetweetNotify, Setting.Colors.NameColor, this.drawCellSize.RetweetNotify.Position);
+                g.DrawString ( this.drawCellSize.RetweetNotify.Detail, this.drawCellSize.RetweetNotify.TextFont, this.drawCellSize.RetweetNotify.TextBrush, this.drawCellSize.RetweetNotify.Position );
                 if (SetClickLink != null && Setting.Timeline.isEnableRetweetLink)
                     SetClickLink.Invoke(this.drawCellSize.RetweetNotify.Rect, new TwitterEntitiesPosition(screen_name, "mention"));
 
@@ -195,7 +203,7 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
         /// <param name="SetClickLink"></param>
         public void DrawSource(string source)
         {
-            g.DrawString(this.drawCellSize.Via.Detail, Setting.Fonts.ViaFont, Setting.Colors.ViaColor, this.drawCellSize.Via.Position);
+            g.DrawString ( this.drawCellSize.Via.Detail, this.drawCellSize.Via.TextFont, this.drawCellSize.Via.TextBrush, this.drawCellSize.Via.Position );
             if (SetClickLink != null && Setting.Timeline.isEnableSourceLink)
                 SetClickLink.Invoke(this.drawCellSize.Via.Rect, new TwitterEntitiesPosition(source, "url"));
         }
@@ -208,14 +216,14 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
                 g.DrawImage(ResourceImages.Retweet.normal, new Rectangle(this.drawCellSize.StatusesMuch.Position, new Size(Setting.Timeline.RetweetMarkSize, Setting.Timeline.RetweetMarkSize)));
                 tmp.X += Setting.Timeline.RetweetMarkSize;
 
-                g.DrawString("" + rt + "", Setting.Fonts.RetweetNotify, Setting.Colors.NameColor, tmp);
+                g.DrawString ( "" + rt + "", this.drawCellSize.StatusesMuch.TextFont, this.drawCellSize.StatusesMuch.TextBrush, tmp );
                 tmp.X += (int)g.MeasureString("" + rt + "", Setting.Fonts.RetweetNotify).Width + 5;
             }
             if (fav != 0)
             {
                 g.DrawImage(ResourceImages.Fav.normal, new Rectangle(tmp, new Size(Setting.Timeline.RetweetMarkSize, Setting.Timeline.RetweetMarkSize)));
                 tmp.X += Setting.Timeline.RetweetMarkSize;
-                g.DrawString("" + fav + "", Setting.Fonts.RetweetNotify, Setting.Colors.NameColor, tmp);
+                g.DrawString ( "" + fav + "", this.drawCellSize.StatusesMuch.TextFont, this.drawCellSize.StatusesMuch.TextBrush, tmp );
             }
         }
 
@@ -229,7 +237,7 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
             Image image = (this.drawCellSize.Buttons.ReplyIconRect.Contains(MouseHoverLocation) ? ResourceImages.Reply.hover : ResourceImages.Reply.normal);
             g.DrawImage(image, this.drawCellSize.Buttons.ReplyIconRect);
             if (SetClickLink != null && CanReply)
-                SetClickLink.Invoke(this.drawCellSize.Buttons.ReplyIconRect, new TwitterEntitiesPosition("" + tweet.id + "", "replyButton"));
+                SetClickLink.Invoke ( this.drawCellSize.Buttons.ReplyIconRect, new TwitterEntitiesPosition ( "" + tweet.id + "", "replyButton" ) );
 
             image = (this.drawCellSize.Buttons.RetweetIconRect.Contains(MouseHoverLocation) || isAlreadyRetweeted ? ResourceImages.Retweet.hover : ResourceImages.Retweet.normal);
             g.DrawImage(image, this.drawCellSize.Buttons.RetweetIconRect);
@@ -239,7 +247,7 @@ namespace Shrimp.ControlParts.Timeline.Draw.Cells
             image = (this.drawCellSize.Buttons.FavIconRect.Contains(MouseHoverLocation) || isAlreadyFaved ? ResourceImages.Fav.hover : ResourceImages.Fav.normal);
             g.DrawImage(image, this.drawCellSize.Buttons.FavIconRect);
             if (SetClickLink != null && CanFavorite)
-                SetClickLink.Invoke(this.drawCellSize.Buttons.FavIconRect, new TwitterEntitiesPosition("" + tweet.id + "", "favButton"));
+                SetClickLink.Invoke ( this.drawCellSize.Buttons.FavIconRect, new TwitterEntitiesPosition ( "" + tweet.id + "", "favButton" ) );
             //SetClickLink.Invoke ( this.drawCellSize.Via.Rect, new TwitterEntitiesPosition ( sou, "url" ) );
         }
     }

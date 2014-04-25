@@ -192,7 +192,7 @@ namespace Shrimp.Module.Parts
         {
             get
             {
-                return Name.Size.Height;
+                return Name.Size.Height + 6;
             }
         }
 

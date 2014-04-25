@@ -12,6 +12,7 @@ namespace Shrimp.ControlParts.Tabs
         public string tabID = "";
         public string ignoreTweet = "";
         public bool isFlash = false;
+        public string NewTweetSounds = "";
         public TabDeliveryCollection TabDelivery;
     }
 }

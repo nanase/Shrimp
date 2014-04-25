@@ -7,6 +7,9 @@ using System.Globalization;
 using Shrimp.Twitter.Status;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Drawing;
+using System.IO;
+using System.Drawing.Imaging;
 
 namespace Shrimp.SQL
 {
@@ -23,6 +26,7 @@ namespace Shrimp.SQL
         private object lockObj = new object();
         private object lockTransaction = new object();
         private object lockQueue = new object ();
+		private object lockReader = new object();
 
         public DBControl(string fileName)
         {
@@ -44,12 +48,12 @@ namespace Shrimp.SQL
 
         void queueTimer_Elapsed ( object sender, System.Timers.ElapsedEventArgs e )
         {
-            this.ProcessQueue ();
+            this.ProcessQueue (false);
         }
 
-        private void ProcessQueue ()
+        private void ProcessQueue ( bool wait )
         {
-            Task.Factory.StartNew ( () =>
+            Task task = Task.Factory.StartNew ( () =>
             {
                 SQLiteCommand[] list = null;
 
@@ -87,6 +91,8 @@ namespace Shrimp.SQL
                 }
 
             } );
+            if ( wait )
+                task.Wait ();
         }
 
         /// <summary>
@@ -111,7 +117,6 @@ namespace Shrimp.SQL
             var dest = this.sql.CreateCommand ();
             dest.CommandText = com;
             this.InsertData ( dest );
-
         }
 
         /// <summary>
@@ -150,20 +155,7 @@ namespace Shrimp.SQL
         public void Close()
         {
             queueTimer.Stop ();
-            this.ProcessQueue ();
-            while ( true )
-            {
-                Thread.Sleep ( 1 );
-                lock ( lockQueue )
-                {
-                    if ( commandQueue.Count != 0 )
-                    {
-                        continue;
-                    }
-                }
-                break;
-            }
-            this.queueTimer.Stop ();
+            this.ProcessQueue (true);
             this.sql.Close();
         }
 
@@ -176,32 +168,35 @@ namespace Shrimp.SQL
         /// <returns></returns>
         public List<TwitterStatus> GetlistTweets(string tableName, decimal offsetValue, decimal count)
         {
-            var sql = tableName;
-            this.command.CommandText = sql;
-            try
-            {
-                using ( SQLiteDataReader sdr = this.command.ExecuteReader () )
-                {
-                    List<TwitterStatus> tuples = new List<TwitterStatus> ();
-                    for ( int i = 0; sdr.Read (); i++ )
-                    {
-                        string[] column = new string[sdr.FieldCount];
-                        for ( int j = 0; j < sdr.FieldCount; j++ )
-                        {
-                            column[j] = sdr[j].ToString ();
-                        }
-                        tuples.Add ( new TwitterStatus ( column ) );
-                    }
+			var sql = tableName;
+			try
+			{
+				lock (this.lockReader)
+				{
+					this.command.CommandText = sql;
+					using (SQLiteDataReader sdr = this.command.ExecuteReader())
+					{
+						List<TwitterStatus> tuples = new List<TwitterStatus>();
+						for (int i = 0; sdr.Read(); i++)
+						{
+							string[] column = new string[sdr.FieldCount];
+							for (int j = 0; j < sdr.FieldCount; j++)
+							{
+								column[j] = sdr[j].ToString();
+							}
+							tuples.Add(new TwitterStatus(column));
+						}
 
-                    //リストを配列に変換して返す
-                    return tuples;
-                }
-            }
-            catch ( Exception err )
-            {
-                //  ?
-                Console.WriteLine ( err.Message );
-            }
+						//リストを配列に変換して返す
+						return tuples;
+					}
+				}
+			}
+			catch (Exception err)
+			{
+				//  ?
+				Console.WriteLine(err.Message);
+			}
             return null;
         }
 
@@ -214,11 +209,14 @@ namespace Shrimp.SQL
         /// <returns></returns>
         public decimal GetDatabasesTweets ( string tableName )
         {
-            this.command.CommandText = "select count(*) from "+ tableName +"";
             try
             {
-                object sdr = this.command.ExecuteScalar ();
-                return Convert.ToDecimal ( sdr ); // val1 = 0.4
+				lock (this.lockReader)
+				{
+					this.command.CommandText = "select count(*) from " + tableName + "";
+					object sdr = this.command.ExecuteScalar();
+					return Convert.ToDecimal(sdr); // val1 = 0.4
+				}
             }
             catch ( Exception err )
             {
@@ -237,25 +235,28 @@ namespace Shrimp.SQL
         /// <returns></returns>
         public List<TwitterStatus> GetTweetByUserID ( string sql, decimal offsetValue, decimal count )
         {
-            this.command.CommandText = sql;
             try
             {
-                using ( SQLiteDataReader sdr = this.command.ExecuteReader () )
-                {
-                    List<TwitterStatus> tuples = new List<TwitterStatus> ();
-                    for ( int i = 0; sdr.Read (); i++ )
-                    {
-                        string[] column = new string[sdr.FieldCount];
-                        for ( int j = 0; j < sdr.FieldCount; j++ )
-                        {
-                            column[j] = sdr[j].ToString ();
-                        }
-                        tuples.Add ( new TwitterStatus ( column ) );
-                    }
+				lock (this.lockReader)
+				{
+					this.command.CommandText = sql;
+					using (SQLiteDataReader sdr = this.command.ExecuteReader())
+					{
+						List<TwitterStatus> tuples = new List<TwitterStatus>();
+						for (int i = 0; sdr.Read(); i++)
+						{
+							string[] column = new string[sdr.FieldCount];
+							for (int j = 0; j < sdr.FieldCount; j++)
+							{
+								column[j] = sdr[j].ToString();
+							}
+							tuples.Add(new TwitterStatus(column));
+						}
 
-                    //リストを配列に変換して返す
-                    return tuples;
-                }
+						//リストを配列に変換して返す
+						return tuples;
+					}
+				}
             }
             catch ( Exception err )
             {
@@ -275,25 +276,28 @@ namespace Shrimp.SQL
         public List<TwitterDirectMessageStatus> GetlistDirectMessages(string tableName, decimal offsetValue, decimal count)
         {
             var sql = tableName;
-            this.command.CommandText = sql;
             try
             {
-                using ( SQLiteDataReader sdr = this.command.ExecuteReader () )
-                {
-                    List<TwitterDirectMessageStatus> tuples = new List<TwitterDirectMessageStatus> ();
-                    for ( int i = 0; sdr.Read (); i++ )
-                    {
-                        string[] column = new string[sdr.FieldCount];
-                        for ( int j = 0; j < sdr.FieldCount; j++ )
-                        {
-                            column[j] = sdr[j].ToString ();
-                        }
-                        tuples.Add ( new TwitterDirectMessageStatus ( column ) );
-                    }
+				lock (this.lockReader)
+				{
+					this.command.CommandText = sql;
+					using (SQLiteDataReader sdr = this.command.ExecuteReader())
+					{
+						List<TwitterDirectMessageStatus> tuples = new List<TwitterDirectMessageStatus>();
+						for (int i = 0; sdr.Read(); i++)
+						{
+							string[] column = new string[sdr.FieldCount];
+							for (int j = 0; j < sdr.FieldCount; j++)
+							{
+								column[j] = sdr[j].ToString();
+							}
+							tuples.Add(new TwitterDirectMessageStatus(column));
+						}
 
-                    //リストを配列に変換して返す
-                    return tuples;
-                }
+						//リストを配列に変換して返す
+						return tuples;
+					}
+				}
             }
             catch ( Exception err )
             {
@@ -373,6 +377,65 @@ namespace Shrimp.SQL
 
             this.InsertData(com);
         }
+
+		/// <summary>
+		/// 画像をデータベースに書き込む
+		/// </summary>
+		/// <param name="user"></param>
+		public void InsertImage(string command, string url, Bitmap image)
+		{
+			var com = this.sql.CreateCommand();
+			com.CommandText = command;
+			MemoryStream stream = new MemoryStream();
+			image.Save(stream, ImageFormat.Bmp);
+			Byte[] bytes = stream.ToArray();
+			stream.Dispose();
+
+			com.Parameters.Add(new SQLiteParameter(DbType.String) { Value = url });
+			com.Parameters.Add(new SQLiteParameter(DbType.Binary) { Value = bytes });
+			com.Prepare();
+
+			this.InsertData(com);
+		}
+
+		public Bitmap BytesToBitmap(byte[] byteArray)
+		{
+			using (MemoryStream ms = new MemoryStream(byteArray))
+			{
+				Bitmap img = (Bitmap)Image.FromStream(ms);
+				return img;
+			}
+		}
+
+		/// <summary>
+		/// 画像をデータベースに書き込む
+		/// </summary>
+		/// <param name="user"></param>
+		public Bitmap GetImage(string command, string url)
+		{
+            var sql = command;
+            try
+            {
+				lock (this.lockReader)
+				{
+					this.command.CommandText = sql;
+					using (SQLiteDataReader sdr = this.command.ExecuteReader())
+					{
+						if (sdr.Read())
+						{
+							var data = (byte[])sdr.GetValue(0);
+							return BytesToBitmap(data);
+						}
+					}
+				}
+            }
+            catch ( Exception err )
+            {
+                //  ?
+                Console.WriteLine ( err.Message );
+            }
+            return null;
+		}
 
 		/// <summary>
 		/// ユーザ一覧をデータベースにいっきに書き込む
@@ -581,6 +644,24 @@ namespace Shrimp.SQL
             lock ( lockQueue )
             {
                 commandQueue.Enqueue ( com );
+            }
+        }
+
+        /// <summary>
+        /// SQLへの処理を「直ちに」行う
+        /// </summary>
+        /// <param name="com"></param>
+        public void DoRequest ( SQLiteCommand com )
+        {
+            try
+            {
+                com.ExecuteNonQuery ();
+                com.Dispose ();
+            }
+            catch ( Exception err )
+            {
+                //  ?
+                Console.WriteLine ( err.Message );
             }
         }
 

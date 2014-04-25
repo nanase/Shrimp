@@ -11,7 +11,7 @@ namespace Shrimp.ControlParts.Popup
     {
         public event ItemClickedDelegate ItemClicked;
         public delegate void ItemClickedDelegate(object sender, ToolStripItemClickedEventArgs e);
-        private Dictionary<decimal, ToolStripMenuItem> accountNames = new Dictionary<decimal, ToolStripMenuItem>();
+		private Dictionary<decimal, ToolStripMenuItem> accountNames = new Dictionary<decimal, ToolStripMenuItem>();
 
         public StatusPopup()
         {
@@ -24,7 +24,15 @@ namespace Shrimp.ControlParts.Popup
         /// <param name="account"></param>
         public void InsertAccountName(TwitterInfo t, bool isSelected = false)
         {
-            var item = new ToolStripMenuItem(t.ScreenName + "", (t.IconData)) { Name = "" + t.UserId + "" };
+			var item = new ToolStripMenuItem();
+			item.Image = t.IconData;
+			string us = "";
+			if (t.isStreamingEnable)
+				us = "○ UserStreamに接続しています。";
+			else
+				us = "× UserStreamに接続していません。";
+			item.Text = "@" + t.ScreenName + "\n"+ us +"";
+			item.Name = t.UserId.ToString();
             this.Menu.Items.Insert(0, item);
             accountNames[t.UserId] = item;
 

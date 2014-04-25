@@ -25,7 +25,8 @@ namespace Shrimp.Plugin.Ref
         {
             if (String.IsNullOrEmpty(this.callbackFunction))
                 return null;
-            return this._callPlugin.FunctionCall(this.callbackFunction, args);
+            return null;
+            //return this._callPlugin.FunctionCall(this.callbackFunction, args);
         }
     }
 }

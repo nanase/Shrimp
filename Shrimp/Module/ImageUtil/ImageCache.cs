@@ -6,6 +6,9 @@ using System.Net;
 using System.Threading;
 using System.Timers;
 using Shrimp.Log;
+using System.Data;
+using Shrimp.SQL;
+using Shrimp.Setting;
 
 namespace Shrimp.Module.ImageUtil
 {
@@ -28,6 +31,7 @@ namespace Shrimp.Module.ImageUtil
         private static volatile List<ImageCacheData> tmpData = new List<ImageCacheData>();
         private static volatile bool isCrawling = false;
         private static decimal syncNum = 0;
+		private static DBControl db;
         #endregion
 
         #region コンストラクタ
@@ -36,6 +40,8 @@ namespace Shrimp.Module.ImageUtil
         {
             cacheData = new Dictionary<string, ImageCacheData>();
             loadingCacheData = new Queue<ImageCacheData>();
+			db = new DBControl(ShrimpSettings.ImageDatabasePath);
+			db.CreateTable(sqlCreate);
             thread = new Thread(new ThreadStart(loadAsync));
             thread.Start();
             checkTimer = new System.Timers.Timer();
@@ -93,6 +99,32 @@ namespace Shrimp.Module.ImageUtil
                 thread = null;
             }
         }
+		
+		/// <summary>
+		/// SQL構文
+		/// </summary>
+		public static string sqlCreate
+		{
+			get
+			{
+				return @"CREATE TABLE IF NOT EXISTS images(url primary key ON CONFLICT ignore, image );";
+			}
+		}
+
+		//	SQL構文
+		public static string insertImageSQL
+		{
+			//	イメージ
+			get
+			{
+				return "INSERT INTO images (url, image) values (?, ?)";
+			}
+		}
+
+		public static string getImageSQL(string url)
+		{
+			return "SELECT image FROM images where url == '"+ url +"'";
+		}
 
         /// <summary>
         /// ロードシンク
@@ -166,9 +198,24 @@ namespace Shrimp.Module.ImageUtil
         /// <param name="srv"></param>
         private static void loadWorker(string url, bool isIcon)
         {
-            Bitmap res = loadImageFromURL(url);
+			Bitmap res = null;
+			bool isCached = false;
+			if (db != null)
+			{
+				var data = db.GetImage(getImageSQL(url), url);
+				if (data != null)
+				{
+					res = data;
+					isCached = true;
+				}
+			}
+
+			if ( res == null )
+				res = loadImageFromURL(url);
             if (res != null)
             {
+				if (db != null && !isCached)
+					db.InsertImage(insertImageSQL, url, res);
                 Point p = new Point();
                 if (isIcon)
                 {
