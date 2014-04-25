@@ -106,6 +106,8 @@ namespace Shrimp.Twitter.Streaming
             webreq.UserAgent = "Shrimp";
             webreq.ProtocolVersion = HttpVersion.Version11;
             webreq.AutomaticDecompression = DecompressionMethods.Deflate;
+            if ( Setting.UserStream.isUseGZip )
+                webreq.AutomaticDecompression |= DecompressionMethods.GZip;
             webreq.ServicePoint.ConnectionLimit = 1000;
             webreq.Timeout = 30 * 1000;
             webreq.ContentType = "application/x-www-form-urlencoded";
@@ -144,6 +146,7 @@ namespace Shrimp.Twitter.Streaming
 				{
 					Thread.Sleep(ReconnectCount * 10000);
 
+                    streamQueue.StartQueue ();
 					//  再接続処理も含めて。
 					while (!sender.isStopFlag)
 					{

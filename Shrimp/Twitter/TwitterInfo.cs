@@ -160,6 +160,12 @@ namespace Shrimp.Twitter
         [XmlElement ( "executeShrimpBeamlatestDate" )]
         public DateTime ShrimpBeamLatestDate { get; set; }
 
+		/// <summary>
+		/// UserStreamがつながっているかどうか
+		/// </summary>
+		[XmlIgnore]
+		public bool isStreamingEnable { get; set; }
+
         #region コンストラクタ
         public TwitterInfo ()
         {
@@ -292,7 +298,7 @@ namespace Shrimp.Twitter
             {
                 webreq = (HttpWebRequest)WebRequest.Create(string.Format("{0}?{1}&oauth_signature={2}", normalizedUrl, normalizedRequestParameters, sig));
                 webreq.Method = method;
-                webreq.Timeout = 60 * 1000;
+                //webreq.Timeout = 60 * 1000;
                 webreq.UserAgent = "Shrimp";
                 webreq.ProtocolVersion = HttpVersion.Version11;
                 webreq.Proxy = null;
