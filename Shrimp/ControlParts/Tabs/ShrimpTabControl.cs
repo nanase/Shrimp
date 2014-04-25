@@ -20,20 +20,22 @@ namespace Shrimp.ControlParts.Tabs
             this.Font = new Font("Meiryo", 9f);
             this.NormalFont = new Font(this.Font.Name, 9f, FontStyle.Regular);
             this.BoldFont = new Font(this.Font.Name, 9f, FontStyle.Bold);
-            //Paintイベントで描画できるようにする
+            // Paintイベントで描画できるようにする
             if (TabRenderer.IsSupported)
                 this.SetStyle(ControlStyles.UserPaint, true);
-            //ダブルバッファリングを有効にする
+            // ダブルバッファリングを有効にする
             this.DoubleBuffered = true;
+			/*
             //this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             //this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             ////this.SetStyle(ControlStyles.DoubleBuffer, true);
-            //リサイズで再描画する
+			*/
+            // リサイズで再描画する
             this.ResizeRedraw = true;
-            //this.SetStyle(ControlStyles.ResizeRedraw, true);
+            // this.SetStyle(ControlStyles.ResizeRedraw, true);
 
-            //ControlStyles.UserPaintをTrueすると、
-            //SizeModeは強制的にTabSizeMode.Fixedにされる
+            // ControlStyles.UserPaintをTrueすると、
+            // SizeModeは強制的にTabSizeMode.Fixedにされる
             this.SizeMode = TabSizeMode.Normal;
             this.ItemSize = new Size(120, 18);
             this.Padding = new Point(20, 3);
@@ -41,20 +43,19 @@ namespace Shrimp.ControlParts.Tabs
             this.Alignment = TabAlignment.Top;
             this.Multiline = true;
             this.AllowDrop = true;
-
-            this.DragEnter += new DragEventHandler(ShrimpTabControl_DragEnter);
         }
 
-        void ShrimpTabControl_DragEnter(object sender, DragEventArgs e)
+        protected override void  OnDragEnter(DragEventArgs drgevent)
         {
-            if (e.Data.GetDataPresent(typeof(TabControls)) &&
-            this.TabPages.Contains((TabControls)(e.Data.GetData(typeof(TabControls)))))
+            base.OnDragEnter(drgevent);
+            if ( drgevent.Data.GetDataPresent ( typeof( TabControls ) ) &&
+            this.TabPages.Contains ( (TabControls)( drgevent.Data.GetData ( typeof( TabControls ) ) ) ) )
             {
-                e.Effect = DragDropEffects.Move;
+                drgevent.Effect = DragDropEffects.Move;
             }
             else
             {
-                e.Effect = DragDropEffects.None;
+                drgevent.Effect = DragDropEffects.None;
             }
         }
 
@@ -219,13 +220,13 @@ namespace Shrimp.ControlParts.Tabs
                 throw new Exception("カスタムタブコントロールを描画することができません");
             }
 
-            //TabControlの背景を塗る
+            // TabControlの背景を塗る
             e.Graphics.FillRectangle(SystemBrushes.Control, this.ClientRectangle);
 
             if (this.TabPages.Count == 0)
                 return;
 
-            //TabPageの枠を描画する
+            // TabPageの枠を描画する
             TabControls page = this.SelectedTab as TabControls;
             if (page == null)
                 return;
@@ -236,12 +237,12 @@ namespace Shrimp.ControlParts.Tabs
                 page.Bounds.Height + 5);
             TabRenderer.DrawTabPage(e.Graphics, pageRect);
 
-            //タブを描画する
+            // タブを描画する
             for (int i = 0; i < this.TabPages.Count; i++)
             {
                 page = this.TabPages[i] as TabControls;
                 Rectangle tabRect = this.GetTabRect(i);
-                //表示するタブの状態を決定する
+                // 表示するタブの状態を決定する
                 TabItemState state;
                 if (!this.Enabled)
                 {
@@ -256,8 +257,8 @@ namespace Shrimp.ControlParts.Tabs
                     state = TabItemState.Normal;
                 }
 
-                //選択されたタブとページの間の境界線を消すために、
-                //描画する範囲を大きくする
+                // 選択されたタブとページの間の境界線を消すために、
+                // 描画する範囲を大きくする
                 if (this.SelectedIndex == i)
                 {
                     if (this.Alignment == TabAlignment.Top)
@@ -280,7 +281,7 @@ namespace Shrimp.ControlParts.Tabs
                     }
                 }
 
-                //画像のサイズを決定する
+                // 画像のサイズを決定する
                 Size imgSize;
                 if (this.Alignment == TabAlignment.Left ||
                     this.Alignment == TabAlignment.Right)

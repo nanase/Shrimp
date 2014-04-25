@@ -104,18 +104,25 @@ namespace Shrimp.ControlParts.Timeline
             TimelineUtil.GenerateRetweetStatus(tweet, out retweet_text);
             //TimelineUtil.GenerateFavedStatus ( tweet, out retweet_text );
 
+            var isStS = Setting.Colors.IsShootingStar;
             //  生成
             LayoutPicture(offset_start_x, image_size);
-            LayoutName(TimelineUtil.GenerateName(dynamic_t) + " ", Setting.Fonts.NameFont);
+            var stsName = ( tweet.isReply ? Setting.ShootingStarColor.ReplyNameColor : 
+                tweet.isRetweet ? Setting.ShootingStarColor.RetweetNameColor :
+                Setting.ShootingStarColor.NameColor );
+            LayoutName(TimelineUtil.GenerateName(dynamic_t) + " ", Setting.Fonts.NameFont, ( isStS ? stsName : Setting.Colors.NameColor ) );
             var time = ( Setting.Timeline.isEnableAbsoluteTime ? TimeSpanUtil.AbsoluteTimeToString ( dynamic_t.created_at ) :
                 TimeSpanUtil.agoToString ( dynamic_t.created_at ) );
-            LayoutTime(time + " ", Setting.Fonts.NameFont);
-            LayoutText(dynamic_t.text, Setting.Fonts.TweetFont);
+            LayoutTime ( time + " ", Setting.Fonts.NameFont, ( isStS ? Setting.ShootingStarColor.ViaColor : Setting.Colors.NameColor ) );
+            stsName = ( tweet.isReply ? Setting.ShootingStarColor.ReplyTextColor :
+            tweet.isRetweet ? Setting.ShootingStarColor.RetweetTextColor :
+            Setting.ShootingStarColor.TweetColor );
+            LayoutText ( dynamic_t.text, Setting.Fonts.TweetFont, ( isStS ? stsName : Setting.Colors.TweetColor ) );
             if (dynamic_t.media_count != 0)
                 LayoutImage(dynamic_t.media_count, dynamic_t.entities.media);
-            LayoutVia("via " + dynamic_t.source, Setting.Fonts.ViaFont);
-            LayoutRetweet(retweet_text, Setting.Fonts.RetweetNotify);
-            LayoutStatuses(dynamic_t.favorite_count, dynamic_t.retweet_count, Setting.Fonts.RetweetNotify);
+            LayoutVia ( "via " + dynamic_t.source, Setting.Fonts.ViaFont, ( isStS ? Setting.ShootingStarColor.ViaColor : Setting.Colors.ViaColor ) );
+            LayoutRetweet ( retweet_text, Setting.Fonts.RetweetNotify, ( isStS ? Setting.ShootingStarColor.ViaColor : Setting.Colors.ViaColor ) );
+            LayoutStatuses ( dynamic_t.favorite_count, dynamic_t.retweet_count, Setting.Fonts.RetweetNotify, ( isStS ? Setting.ShootingStarColor.ViaColor : Setting.Colors.ViaColor ) );
             LayoutButtons();
             return true;
         }
@@ -127,7 +134,7 @@ namespace Shrimp.ControlParts.Timeline
         /// <param name="offset_start_x"></param>
         /// <param name="image_size"></param>
         /// <param name="maxWidth"></param>
-        protected virtual void StartLayoutLine(TwitterStatus tweet, bool isConversation, int offset_start_x, int image_size, int maxWidth)
+        protected virtual void StartLayoutLine ( TwitterStatus tweet, bool isConversation, int offset_start_x, int image_size, int maxWidth)
         {
             if (tweet == null)
                 return;
@@ -141,20 +148,31 @@ namespace Shrimp.ControlParts.Timeline
             tmp.CellWidthSize = maxWidth;
             MaxWidth = maxWidth;
 
+            var isStS = Setting.Colors.IsShootingStar;
+
             var time = ( Setting.Timeline.isEnableAbsoluteTime ? TimeSpanUtil.AbsoluteTimeToString ( dynamic_t.created_at ) :
     TimeSpanUtil.agoToString ( dynamic_t.created_at ) );
-            LayoutTime(time, Setting.Fonts.NameFont);
+            LayoutTime ( time, Setting.Fonts.NameFont, ( isStS ? Setting.ShootingStarColor.ViaColor : Setting.Colors.NameColor ) );
             double line_x = MaxWidth - (16.0 + tmp.Time.Size.Width + 10);
             //  生成
             LayoutPicture(offset_start_x, image_size);
-            tmp.Icon.Position = new Point(1, tmp.Icon.Position.Y - 4);
-            tmp.Icon.Size = new Size(16, 16);
-            LayoutName("@" + tweet.user.screen_name, Setting.Fonts.NameFont);
+			if (image_size != 0)
+			{
+				tmp.Icon.Position = new Point(1, tmp.Icon.Position.Y - 4);
+				tmp.Icon.Size = new Size(19, 19);
+			}
+            var stsName = ( tweet.isReply ? Setting.ShootingStarColor.ReplyNameColor :
+                tweet.isRetweet ? Setting.ShootingStarColor.RetweetNameColor :
+                Setting.ShootingStarColor.NameColor );
+            LayoutName ( "@" + tweet.user.screen_name, Setting.Fonts.NameFont, ( isStS ? stsName : Setting.Colors.NameColor ) );
 
             tmp.Name.Size = new Size((int)(0.15 * line_x), tmp.Name.Size.Height);
             tmp.Name.Position = new Point(tmp.Icon.Rect.Right + 5, tmp.Icon.Rect.Top);
             var ret = (tweet.retweeted_status != null ? "【@" + tweet.retweeted_status.user.screen_name + "をリツイートしました】 " + tweet.retweeted_status.text + "" : tweet.text);
-            LayoutText(ret, Setting.Fonts.TweetFont);
+            stsName = ( tweet.isReply ? Setting.ShootingStarColor.ReplyTextColor :
+            tweet.isRetweet ? Setting.ShootingStarColor.RetweetTextColor :
+            Setting.ShootingStarColor.TweetColor );
+            LayoutText ( ret, Setting.Fonts.TweetFont, ( isStS ? stsName : Setting.Colors.TweetColor ) );
             tmp.Tweet.Size = new Size((int)(0.85 * line_x), tmp.Name.Size.Height);
             tmp.Tweet.Position = new Point(tmp.Name.Rect.Right + 5, tmp.Icon.Rect.Top);
             tmp.Time.Position = new Point(tmp.Tweet.Rect.Right, tmp.Icon.Rect.Top);
@@ -184,7 +202,7 @@ namespace Shrimp.ControlParts.Timeline
             return Point.Empty;
         }
 
-        private Point LayoutName(string name, Font f)
+        private Point LayoutName(string name, Font f, Brush brush)
         {
             if (tmp != null)
             {
@@ -193,12 +211,14 @@ namespace Shrimp.ControlParts.Timeline
                 tmp.Name.Position = p;
                 tmp.Name.Size = DrawTextUtil.GetDrawTextSize(name, f, MaxWidth, false, true);
                 tmp.Name.Detail = name;
+                tmp.Name.TextFont = f;
+                tmp.Name.TextBrush = brush;
                 return p;
             }
             return Point.Empty;
         }
 
-        private Point LayoutTime(string time, Font f)
+        private Point LayoutTime ( string time, Font f, Brush brush )
         {
             if (tmp != null)
             {
@@ -207,12 +227,14 @@ namespace Shrimp.ControlParts.Timeline
                 Point p = new Point(this.MaxWidth - tmp.Name.Size.Width, tmp.Icon.Rect.Top);
                 tmp.Time.Position = p;
                 tmp.Time.Detail = time;
+                tmp.Time.TextFont = f;
+                tmp.Time.TextBrush = brush;
                 return p;
             }
             return Point.Empty;
         }
 
-        private Point LayoutText(string text, Font f)
+        private Point LayoutText ( string text, Font f, Brush brush )
         {
             if (tmp != null)
             {
@@ -221,6 +243,8 @@ namespace Shrimp.ControlParts.Timeline
                 tmp.Tweet.Position = p;
                 tmp.Tweet.Size = DrawTextUtil.GetOwnerDrawTextSize(text, f, p.X, MaxWidth);
                 tmp.Tweet.Detail = text;
+                tmp.Tweet.TextFont = f;
+                tmp.Tweet.TextBrush = brush;
                 return p;
             }
             return Point.Empty;
@@ -228,7 +252,7 @@ namespace Shrimp.ControlParts.Timeline
 
         private Point LayoutImage(int num, List<TwitterEntitiesMedia> medias)
         {
-            if (tmp != null && num > 0)
+            if (tmp != null && num > 0 && Setting.Timeline.isEnableInlineView)
             {
                 //  Padding考慮
                 Point p = new Point(tmp.Icon.Rect.Right + 5, tmp.Tweet.Rect.Bottom);
@@ -242,7 +266,7 @@ namespace Shrimp.ControlParts.Timeline
             return Point.Empty;
         }
 
-        private Point LayoutVia(string via, Font f)
+        private Point LayoutVia ( string via, Font f, Brush brush )
         {
             if (tmp != null)
             {
@@ -251,13 +275,15 @@ namespace Shrimp.ControlParts.Timeline
                 tmp.Via.Position = p;
                 tmp.Via.Size = DrawTextUtil.GetDrawTextSize(via, f, MaxWidth, false, true);
                 tmp.Via.Detail = via;
+                tmp.Via.TextFont = f;
+                tmp.Via.TextBrush = brush;
                 return p;
             }
             return Point.Empty;
         }
 
 
-        private Point LayoutRetweet(string retweet_notify_text, Font f)
+        private Point LayoutRetweet ( string retweet_notify_text, Font f, Brush brush )
         {
             if (tmp != null && retweet_notify_text != null)
             {
@@ -266,12 +292,14 @@ namespace Shrimp.ControlParts.Timeline
                 tmp.RetweetNotify.Position = p;
                 tmp.RetweetNotify.Size = DrawTextUtil.GetDrawTextSize(retweet_notify_text, f, MaxWidth, false, true);
                 tmp.RetweetNotify.Detail = retweet_notify_text;
+                tmp.RetweetNotify.TextFont = f;
+                tmp.RetweetNotify.TextBrush = brush;
                 return p;
             }
             return Point.Empty;
         }
 
-        private Point LayoutStatuses(decimal fav, decimal rt, Font f)
+        private Point LayoutStatuses ( decimal fav, decimal rt, Font f, Brush brush )
         {
             if (tmp != null)
             {
@@ -280,6 +308,8 @@ namespace Shrimp.ControlParts.Timeline
                 tmp.StatusesMuch.Position = p;
                 tmp.StatusesMuch.Size = DrawTextUtil.GetDrawTextSize("" + fav + " " + rt + "", f, MaxWidth, false, true);
                 tmp.StatusesMuch.Detail = "";
+                tmp.StatusesMuch.TextFont = f;
+                tmp.StatusesMuch.TextBrush = brush;
                 return p;
             }
             return Point.Empty;
